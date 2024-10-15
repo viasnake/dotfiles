@@ -3,6 +3,10 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
+PATH="$PATH:/home/linuxbrew/.linuxbrew/bin/brew"
+PATH="$PATH:$HOME/.local/share/mise/installs/python/latest/bin"
+PATH="$PATH:$HOME/.local/share/mise/installs/node/latest/bin"
+
 function get_os() {
   # Get os name from script path
   os="$(basename "$(dirname "$(dirname "$0")")")"
