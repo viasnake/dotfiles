@@ -3,10 +3,6 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
-PATH="$PATH:/home/linuxbrew/.linuxbrew/bin/brew"
-PATH="$PATH:$HOME/.local/share/mise/installs/python/latest/bin"
-PATH="$PATH:$HOME/.local/share/mise/installs/node/latest/bin"
-
 function error() {
   echo -e "\033[31m$1\033[0m"
 }
@@ -37,7 +33,7 @@ function symlink() {
 }
 
 # Install Homebrew
-if ! which brew; then
+if ! which brew > /dev/null 2>&1; then
   info "Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   success "Homebrew installed successfully"
@@ -55,7 +51,7 @@ else
 fi
 
 # Install python
-if ! which python; then
+if ! which python > /dev/null 2>&1; then
   info "Installing Python..."
   $HOME/.local/bin/mise use --global python
   success "Python installed successfully"
@@ -64,7 +60,7 @@ else
 fi
 
 # Install node
-if ! which node; then
+if ! which node > /dev/null 2>&1; then
   info "Installing Node.js..."
   $HOME/.local/bin/mise use --global node
   success "Node.js installed successfully"
@@ -74,7 +70,7 @@ fi
 
 
 # Install git
-if ! which git; then
+if ! which git > /dev/null 2>&1; then
   info "Installing Git..."
   brew install git
   success "Git installed successfully"
