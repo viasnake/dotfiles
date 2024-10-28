@@ -101,3 +101,6 @@ symlink "$PWD/git/$os/.config" "$HOME/.config/git"
 ## ssh
 symlink "$PWD/ssh/$os/config" "$HOME/.ssh/config"
 symlink "$PWD/ssh/$os/conf.d" "$HOME/.ssh/conf.d"
+
+info "Setup completed successfully"
+info "Please restart your terminal to see the changes"
