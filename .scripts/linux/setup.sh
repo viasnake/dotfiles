@@ -24,7 +24,7 @@ function info() {
 }
 
 function symlink() {
-  ln -fs "$1" "$2"
+  ln -nfs "$1" "$2"
   success "Symlink created: $2 -> $1"
 
   # 本当は既存のファイルがある場合の処理も書くべき
