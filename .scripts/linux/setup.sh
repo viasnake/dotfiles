@@ -40,6 +40,11 @@ function symlink() {
 # Get OS
 get_os
 
+## Config
+symlink "$HOME/git/$os/.bashrc" "$HOME/.bashrc"
+symlink "$HOME/git/$os/.gitconfig" "$HOME/.gitconfig"
+symlink "$HOME/git/$os/cond.d" "$HOME/.config/git"
+
 # Install Homebrew
 if ! which brew; then
   info "Installing Homebrew..."
@@ -85,7 +90,3 @@ if ! which git; then
 else
   info "Git is already installed"
 fi
-
-## Config
-symlink "$HOME/git/$os/.gitconfig" "$HOME/.gitconfig"
-symlink "$HOME/git/$os/cond.d" "$HOME/.config/git"
