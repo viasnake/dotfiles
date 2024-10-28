@@ -78,6 +78,20 @@ else
   info "Git is already installed"
 fi
 
+# Install fish
+if ! which fish > /dev/null 2>&1; then
+  info "Installing Fish..."
+  brew install fish
+  # Add fish to /etc/shells
+  # If already added, it will not be added again
+  if ! grep -q "/usr/local/bin/fish" /etc/shells; then
+    echo "/usr/local/bin/fish" | sudo tee -a /etc/shells > /dev/null
+  fi
+  success "Fish installed successfully"
+else
+  info "Fish is already installed"
+fi
+
 # Config
 ## bashrc
 symlink "$PWD/bash/$os/.bashrc" "$HOME/.bashrc"
