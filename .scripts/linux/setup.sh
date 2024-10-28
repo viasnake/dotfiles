@@ -36,11 +36,6 @@ function symlink() {
   # fi
 }
 
-## Config
-symlink "$PWD/bash/$os/.bashrc" "$HOME/.bashrc"
-symlink "$PWD/git/$os/.gitconfig" "$HOME/.gitconfig"
-symlink "$PWD/git/$os/.config" "$HOME/.config/git"
-
 # Install Homebrew
 if ! which brew; then
   info "Installing Homebrew..."
@@ -86,3 +81,13 @@ if ! which git; then
 else
   info "Git is already installed"
 fi
+
+# Config
+## bashrc
+symlink "$PWD/bash/$os/.bashrc" "$HOME/.bashrc"
+## git
+symlink "$PWD/git/$os/.gitconfig" "$HOME/.gitconfig"
+symlink "$PWD/git/$os/.config" "$HOME/.config/git"
+## ssh
+symlink "$PWD/ssh/$os/config" "$HOME/.ssh/config"
+symlink "$PWD/ssh/$os/conf.d" "$HOME/.ssh/conf.d"
