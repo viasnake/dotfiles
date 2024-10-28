@@ -7,11 +7,6 @@ PATH="$PATH:/home/linuxbrew/.linuxbrew/bin/brew"
 PATH="$PATH:$HOME/.local/share/mise/installs/python/latest/bin"
 PATH="$PATH:$HOME/.local/share/mise/installs/node/latest/bin"
 
-function get_os() {
-  # Get os name from script path
-  os="$(basename "$(dirname "$(dirname "$0")")")"
-}
-
 function error() {
   echo -e "\033[31m$1\033[0m"
 }
@@ -29,21 +24,22 @@ function info() {
 }
 
 function symlink() {
-  if [[ -e "$2" ]]; then
-    warning "File $2 already exists"
-  else
-    ln -fs "$1" "$2"
-    success "Symlink created: $2 -> $1"
-  fi
+  ln -fs "$1" "$2"
+  success "Symlink created: $2 -> $1"
+
+  # 本当は既存のファイルがある場合の処理も書くべき
+  # if [[ -e "$2" ]]; then
+  #   warning "File $2 already exists"
+  # else
+  #   ln -fs "$1" "$2"
+  #   success "Symlink created: $2 -> $1"
+  # fi
 }
 
-# Get OS
-get_os
-
 ## Config
-symlink "$HOME/git/$os/.bashrc" "$HOME/.bashrc"
-symlink "$HOME/git/$os/.gitconfig" "$HOME/.gitconfig"
-symlink "$HOME/git/$os/cond.d" "$HOME/.config/git"
+symlink "$PWD/bash/$os/.bashrc" "$HOME/.bashrc"
+symlink "$PWD/git/$os/.gitconfig" "$HOME/.gitconfig"
+symlink "$PWD/git/$os/.config" "$HOME/.config/git"
 
 # Install Homebrew
 if ! which brew; then
