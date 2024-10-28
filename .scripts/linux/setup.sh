@@ -32,7 +32,7 @@ function symlink() {
   if [[ -e "$2" ]]; then
     warning "File $2 already exists"
   else
-    ln -s "$1" "$2"
+    ln -fs "$1" "$2"
     success "Symlink created: $2 -> $1"
   fi
 }
