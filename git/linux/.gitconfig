@@ -1,4 +1,4 @@
 [include]
-path = "~/.config/git/user"
+path = "~/.config/git/personal"
 [alias]
 delete-merged-branch = "!f () { git checkout $1; git branch --merged|egrep -v '\\*|develop|main|master'|xargs git branch -d; };f"
