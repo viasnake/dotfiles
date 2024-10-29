@@ -40,6 +40,7 @@ function info() {
 
 # Uninstall fish
 info "Uninstalling fish..."
+brew uninstall fisher
 brew uninstall fish
 rm -rf "/home/linuxbrew/.linuxbrew/etc/fish"
 # Remove fish from /etc/shells
