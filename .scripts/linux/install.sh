@@ -168,17 +168,6 @@ else
   info "Java is already installed"
 fi
 
-# Install git
-info "Checking Git..."
-if ! which git > /dev/null 2>&1; then
-  warning "Git is not installed"
-  info "Installing Git..."
-  brew install git
-  success "Git installed successfully"
-else
-  info "Git is already installed"
-fi
-
 # Install fish
 info "Checking Fish..."
 if ! which fish > /dev/null 2>&1; then
