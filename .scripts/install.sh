@@ -61,26 +61,35 @@ function check_os() {
   os=""
 
   # FIXME: This is not the best way to check the OS
+
+  # macOS
   if is_macos; then
-    # Mac OS X
     os="macos"
-  elif is_linux; then
-    # Linux
-    os="linux"
-  elif is_wsl; then
-    # WSL1 or WSL2
-    os="wsl"
-  elif is_windows; then
-    # Windows
-    os="windows"
-  else
-    # Unsupported OS
-    error "Unsupported OS."
-    return 1
   fi
-  
-  # Return the OS
-  return 0
+
+  # Linux
+  if is_linux; then
+    os="linux"
+  fi
+
+  # Windows Subsystem for Linux
+  if is_wsl; then
+    os="wsl"
+  fi
+
+  # Windows
+  if is_windows; then
+    os="windows"
+  fi
+
+  # os is set
+  if [ -n "$os" ]; then
+    return 0
+  fi
+
+  # os is not set (unsupported OS)
+  error "OS not supported."
+  exit 1
 }
 
 
