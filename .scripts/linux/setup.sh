@@ -4,19 +4,34 @@
 set -e
 
 function error() {
-  echo -e "\033[31m$1\033[0m"
+  local red="\033[31m"
+  local reset="\033[0m"
+  local prefix="[ERROR] "
+  local message=$1
+  echo -e "${red}${prefix}${message}${reset}"
 }
 
 function success() {
-  echo -e "\033[32m$1\033[0m"
+  local green="\033[32m"
+  local reset="\033[0m"
+  local prefix="[SUCCESS] "
+  local message=$1
+  echo -e "${green}${prefix}${message}${reset}"
 }
 
 function warning() {
-  echo -e "\033[33m$1\033[0m"
+  local yellow="\033[33m"
+  local reset="\033[0m"
+  local prefix="[WARNING] "
+  local message=$1
 }
 
 function info() {
-  echo -e "\033[36m$1\033[0m"
+  local cyan="\033[36m"
+  local reset="\033[0m"
+  local prefix="[INFO] "
+  local message=$1
+  echo -e "${cyan}${prefix}${message}${reset}"
 }
 
 function symlink() {
@@ -86,6 +101,11 @@ if ! which git > /dev/null 2>&1; then
 else
   info "Git is already installed"
 fi
+## Configure Git
+info "Configuring Git..."
+symlink "$PWD/git/$os/.gitconfig" "$HOME/.gitconfig"
+symlink "$PWD/git/$os/.config" "$HOME/.config/git"
+info "Git configuration synced successfully"
 
 # Install fish
 info "Checking Fish..."
