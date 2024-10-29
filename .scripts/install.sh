@@ -104,12 +104,6 @@ script=".scripts/$os/setup.sh"
 info "OS: $os"
 info "Script: $script"
 
-# Check if the OS is set
-if [ -z "$os" ]; then
-  error "OS is not set."
-  exit 1
-fi
-
 # Check if the setup script exists
 if [ ! -f "$script" ]; then
   error "Setup script not found."
