@@ -48,6 +48,7 @@ function is_wsl() {
 
   # WSL 1
   if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
+    warning "WSL 1 is not officially supported."
     return 0
   # WSL 2
   elif grep -qEi "microsoft" /proc/version &> /dev/null; then
