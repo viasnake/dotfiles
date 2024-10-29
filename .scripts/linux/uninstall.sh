@@ -93,5 +93,11 @@ remove "$HOME/.ssh/conf.d"
 info "Removing homebrew files..."
 remove "$HOME/.Brewfile"
 
+# Uninstall dependencies
+## !! Do not remove as it may have an impact !! ##
+# info "Uninstalling dependencies..."
+# sudo apt-get remove -y build-essential procps curl file git
+# success "Dependencies uninstalled successfully"
+
 #
 success "Uninstallation completed successfully"
