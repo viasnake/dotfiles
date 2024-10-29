@@ -113,20 +113,20 @@ info "Checking OS..."
 check_os
 
 # Environment variables
-script=".scripts/$os/install.sh"
+script=".scripts/$os/uninstall.sh"
 
 # Debug information
 info "OS: $os"
 info "Script: $script"
 
-# Check if the install script exists
+# Check if the uninstall script exists
 if [ ! -f "$script" ]; then
-  error "Install script not found."
+  error "Uninstall script not found."
   exit 1
 fi
 
-# Run the install script
+# Run the uninstall script
 source "$script"
 
-# Check if the install script completed successfully
-success "Install script completed."
+# Check if the uninstall script completed successfully
+success "Uninstall script completed."

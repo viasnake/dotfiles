@@ -3,10 +3,14 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
+#
+PATH="$PATH:/home/linuxbrew/.linuxbrew/bin"
+PATH="$PATH:$HOME/.local/bin"
+
 function error() {
   local red="\033[31m"
   local reset="\033[0m"
-  local prefix="[ERROR] "
+  local prefix="[ERROR] "ee
   local message=$1
   echo -e "${red}${prefix}${message}${reset}"
 }
@@ -47,6 +51,30 @@ function symlink() {
   # fi
 }
 
+
+# Config
+info "Setting up configuration files..."
+
+## bashrc
+info "Setting up bashrc..."
+symlink "$PWD/bash/$os/.bashrc" "$HOME/.bashrc"
+
+## git
+info "Setting up git..."
+symlink "$PWD/git/$os/.gitconfig" "$HOME/.gitconfig"
+symlink "$PWD/git/$os/.config" "$HOME/.config/git"
+
+## ssh
+info "Setting up ssh..."
+symlink "$PWD/ssh/$os/config" "$HOME/.ssh/config"
+symlink "$PWD/ssh/$os/conf.d" "$HOME/.ssh/conf.d"
+
+## homebrew
+symlink "$PWD/homebrew/$os/.Brewfile" "$HOME/.Brewfile"
+
+#
+info "Configuration files setup successfully"
+
 # Install Homebrew
 info "Checking Homebrew..."
 if ! which brew > /dev/null 2>&1; then
@@ -60,7 +88,6 @@ fi
 
 # Install brew packages
 info "Installing brew packages..."
-symlink "$PWD/homebrew/$os/.Brewfile" "$HOME/.Brewfile"
 brew bundle --global --file="$HOME/.Brewfile"
 success "Brew packages installed successfully"
 
@@ -160,34 +187,13 @@ if ! which fish > /dev/null 2>&1; then
   brew install fish
   # Add fish to /etc/shells
   # If already added, it will not be added again
-  if ! grep -q "/usr/local/bin/fish" /etc/shells; then
-    echo "/usr/local/bin/fish" | sudo tee -a /etc/shells > /dev/null
+  if ! grep -q "/home/linuxbrew/.linuxbrew/bin/fish" /etc/shells; then
+    echo "/home/linuxbrew/.linuxbrew/bin/fish" | sudo tee -a /etc/shells > /dev/null
   fi
   success "Fish installed successfully"
 else
   info "Fish is already installed"
 fi
 
-# Config
-info "Setting up configuration files..."
-
-## bashrc
-info "Setting up bashrc..."
-symlink "$PWD/bash/$os/.bashrc" "$HOME/.bashrc"
-
-## git
-info "Setting up git..."
-symlink "$PWD/git/$os/.gitconfig" "$HOME/.gitconfig"
-symlink "$PWD/git/$os/.config" "$HOME/.config/git"
-
-## ssh
-info "Setting up ssh..."
-symlink "$PWD/ssh/$os/config" "$HOME/.ssh/config"
-symlink "$PWD/ssh/$os/conf.d" "$HOME/.ssh/conf.d"
-
 #
-info "Configuration files setup successfully"
-
-#
-info "Setup completed successfully"
-info "Please restart your terminal to see the changes"
+success "Installation completed successfully"
