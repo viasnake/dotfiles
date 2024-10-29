@@ -97,6 +97,50 @@ else
   info "Node.js is already installed"
 fi
 
+# Install go
+info "Checking Go..."
+if ! which go > /dev/null 2>&1; then
+  warning "Go is not installed"
+  info "Installing Go..."
+  $HOME/.local/bin/mise use --global go
+  success "Go installed successfully"
+else
+  info "Go is already installed"
+fi
+
+# Install ruby
+info "Checking Ruby..."
+if ! which ruby > /dev/null 2>&1; then
+  warning "Ruby is not installed"
+  info "Installing Ruby..."
+  $HOME/.local/bin/mise use --global ruby
+  success "Ruby installed successfully"
+else
+  info "Ruby is already installed"
+fi
+
+# Install Rust
+info "Checking Rust..."
+if ! which rustc > /dev/null 2>&1; then
+  warning "Rust is not installed"
+  info "Installing Rust..."
+  $HOME/.local/bin/mise use --global rust
+  success "Rust installed successfully"
+else
+  info "Rust is already installed"
+fi
+
+# Install Java
+info "Checking Java..."
+if ! which java > /dev/null 2>&1; then
+  warning "Java is not installed"
+  info "Installing Java..."
+  $HOME/.local/bin/mise use --global java
+  success "Java installed successfully"
+else
+  info "Java is already installed"
+fi
+
 # Install git
 info "Checking Git..."
 if ! which git > /dev/null 2>&1; then
