@@ -86,6 +86,22 @@ else
   info "Homebrew is already installed"
 fi
 
+# Install fish
+info "Checking Fish..."
+if ! which fish > /dev/null 2>&1; then
+  warning "Fish is not installed"
+  info "Installing Fish..."
+  brew install fish
+  # Add fish to /etc/shells
+  # If already added, it will not be added again
+  if ! grep -q "/home/linuxbrew/.linuxbrew/bin/fish" /etc/shells; then
+    echo "/home/linuxbrew/.linuxbrew/bin/fish" | sudo tee -a /etc/shells > /dev/null
+  fi
+  success "Fish installed successfully"
+else
+  info "Fish is already installed"
+fi
+
 # Install brew packages
 info "Installing brew packages..."
 brew bundle --global --file="$HOME/.Brewfile"
@@ -166,22 +182,6 @@ if ! which java > /dev/null 2>&1; then
   success "Java installed successfully"
 else
   info "Java is already installed"
-fi
-
-# Install fish
-info "Checking Fish..."
-if ! which fish > /dev/null 2>&1; then
-  warning "Fish is not installed"
-  info "Installing Fish..."
-  brew install fish
-  # Add fish to /etc/shells
-  # If already added, it will not be added again
-  if ! grep -q "/home/linuxbrew/.linuxbrew/bin/fish" /etc/shells; then
-    echo "/home/linuxbrew/.linuxbrew/bin/fish" | sudo tee -a /etc/shells > /dev/null
-  fi
-  success "Fish installed successfully"
-else
-  info "Fish is already installed"
 fi
 
 #
