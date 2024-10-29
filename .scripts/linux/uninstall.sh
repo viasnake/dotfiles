@@ -38,11 +38,22 @@ function info() {
   echo -e "${cyan}${prefix}${message}${reset}"
 }
 
+function remove() {
+  local file=$1
+  if [[ -e "$file" ]]; then
+    rm -rf "$file"
+    success "Removed: $file"
+  else
+    warning "File not found: $file"
+  fi
+}
+
 # Uninstall fish
 info "Uninstalling fish..."
 brew uninstall fisher
 brew uninstall fish
-rm -rf "/home/linuxbrew/.linuxbrew/etc/fish"
+# Remove fish configuration
+remove "/home/linuxbrew/.linuxbrew/etc/fish"
 # Remove fish from /etc/shells
 sudo sed -i '/fish/d' /etc/shells
 info "Fish uninstalled successfully"
@@ -50,15 +61,15 @@ info "Fish uninstalled successfully"
 # Uninstall mise
 info "Uninstalling mise..."
 $HOME/.local/bin/mise uninstall --all
-rm -f "$HOME/.local/bin/mise"
+remove "$HOME/.local/bin/mise"
 info "Mise uninstalled successfully"
 
 #  Uninstall Homebrew
 info "Uninstalling Homebrew..."
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
-rm -rf "/home/linuxbrew/.linuxbrew/etc"
-rm -rf "/home/linuxbrew/.linuxbrew/lib"
-rm -rf "/home/linuxbrew/.linuxbrew/share"
+remove "/home/linuxbrew/.linuxbrew/etc"
+remove "/home/linuxbrew/.linuxbrew/lib"
+remove "/home/linuxbrew/.linuxbrew/share"
 info "Homebrew uninstalled successfully"
 
 # Config
@@ -66,23 +77,21 @@ info "Removing configuration files..."
 
 ## bashrc
 info "Removing bashrc files..."
-rm -f "$HOME/.bashrc"
+remove "$HOME/.bashrc"
 
 ## git
 info "Removing git files..."
-rm -f "$HOME/.gitconfig"
-rm -rf "$HOME/.config/git"
+remove "$HOME/.gitconfig"
+remove "$HOME/.config/git"
 
 ## ssh
 info "Removing ssh files..."
-rm -f "$HOME/.ssh/config"
-rm -rf "$HOME/.ssh/conf.d"
+remove "$HOME/.ssh/config"
+remove "$HOME/.ssh/conf.d"
 
 ## homebrew
 info "Removing homebrew files..."
-rm -f "$HOME/.Brewfile"
-
-info "Configuration files removed successfully"
+remove "$HOME/.Brewfile"
 
 #
 success "Uninstallation completed successfully"
