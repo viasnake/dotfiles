@@ -46,10 +46,45 @@ function is_macos() {
 function is_linux() {
   # Linux
   if [[ "$(uname -s)" == "Linux" ]]; then
+    # If available, use LSB to identify distribution
+    lsb_dist=$(get_distribution)
+
+    # Check for supported distributions
+    case $lsb_dist in
+      ubuntu)
+        info "Distribution: Ubuntu"
+        return 0
+        ;;
+      debian|raspbian)
+        info "Distribution: Debian|Raspbian"
+        return 0
+        ;;
+      zorin)
+        info "Distribution: Zorin"
+        return 0
+        ;;
+      fedora|centos|rhel)
+        info "Distribution: Fedora|CentOS|RHEL"
+        return 1
+        ;;
+      *)
+        warning "Distribution: Unknown"
+        return 1
+        ;;
+    esac
     return 0
   else
     return 1
   fi
+}
+
+function get_distribution() {
+  # SEE: https://github.com/docker/docker-install/blob/6d51e2cd8c04b38e1c2237820245f4fc262aca6c/install.sh#L254-L263
+
+  if [ -r /etc/os-release ]; then
+    lsb_dist="$(. /etc/os-release && echo "$ID")"
+  fi
+  echo "$lsb_dist"
 }
 
 function is_windows() {
