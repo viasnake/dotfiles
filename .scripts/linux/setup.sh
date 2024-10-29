@@ -60,8 +60,8 @@ fi
 
 # Install brew packages
 info "Installing brew packages..."
-symlink "$PWD/homebrew/.Brewfile" "$HOME/.Brewfile"
-brew bundle --global
+symlink "$PWD/homebrew/$os/.Brewfile" "$HOME/.Brewfile"
+brew bundle --global --file="$HOME/.Brewfile"
 success "Brew packages installed successfully"
 
 # Install mise
@@ -109,15 +109,15 @@ else
 fi
 
 # Install ruby
-info "Checking Ruby..."
-if ! which ruby > /dev/null 2>&1; then
-  warning "Ruby is not installed"
-  info "Installing Ruby..."
-  $HOME/.local/bin/mise use --global ruby
-  success "Ruby installed successfully"
-else
-  info "Ruby is already installed"
-fi
+# info "Checking Ruby..."
+# if ! which ruby > /dev/null 2>&1; then
+#   warning "Ruby is not installed"
+#   info "Installing Ruby..."
+#   $HOME/.local/bin/mise use --global ruby
+#   success "Ruby installed successfully"
+# else
+#   info "Ruby is already installed"
+# fi
 
 # Install Rust
 info "Checking Rust..."
