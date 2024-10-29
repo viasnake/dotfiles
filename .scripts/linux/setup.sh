@@ -33,7 +33,9 @@ function symlink() {
 }
 
 # Install Homebrew
+info "Checking Homebrew..."
 if ! which brew > /dev/null 2>&1; then
+  warning "Homebrew is not installed"
   info "Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   success "Homebrew installed successfully"
@@ -42,7 +44,9 @@ else
 fi
 
 # Install mise
+info "Checking mise..."
 if [[ ! -e "$HOME/.local/bin/mise" ]]; then
+  warning "mise is not installed"
   info "Installing mise..."
   curl https://mise.run | sh
   success "mise installed successfully"
@@ -51,7 +55,9 @@ else
 fi
 
 # Install python
+info "Checking Python..."
 if ! which python > /dev/null 2>&1; then
+  warning "Python is not installed"
   info "Installing Python..."
   $HOME/.local/bin/mise use --global python
   success "Python installed successfully"
@@ -60,7 +66,9 @@ else
 fi
 
 # Install node
+info "Checking Node.js..."
 if ! which node > /dev/null 2>&1; then
+  warning "Node.js is not installed"
   info "Installing Node.js..."
   $HOME/.local/bin/mise use --global node
   success "Node.js installed successfully"
@@ -68,9 +76,10 @@ else
   info "Node.js is already installed"
 fi
 
-
 # Install git
+info "Checking Git..."
 if ! which git > /dev/null 2>&1; then
+  warning "Git is not installed"
   info "Installing Git..."
   brew install git
   success "Git installed successfully"
@@ -79,7 +88,9 @@ else
 fi
 
 # Install fish
+info "Checking Fish..."
 if ! which fish > /dev/null 2>&1; then
+  warning "Fish is not installed"
   info "Installing Fish..."
   brew install fish
   # Add fish to /etc/shells
