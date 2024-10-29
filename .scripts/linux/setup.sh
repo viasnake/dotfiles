@@ -101,11 +101,6 @@ if ! which git > /dev/null 2>&1; then
 else
   info "Git is already installed"
 fi
-## Configure Git
-info "Configuring Git..."
-symlink "$PWD/git/$os/.gitconfig" "$HOME/.gitconfig"
-symlink "$PWD/git/$os/.config" "$HOME/.config/git"
-info "Git configuration synced successfully"
 
 # Install fish
 info "Checking Fish..."
@@ -124,14 +119,25 @@ else
 fi
 
 # Config
+info "Setting up configuration files..."
+
 ## bashrc
+info "Setting up bashrc..."
 symlink "$PWD/bash/$os/.bashrc" "$HOME/.bashrc"
+
 ## git
+info "Setting up git..."
 symlink "$PWD/git/$os/.gitconfig" "$HOME/.gitconfig"
 symlink "$PWD/git/$os/.config" "$HOME/.config/git"
+
 ## ssh
+info "Setting up ssh..."
 symlink "$PWD/ssh/$os/config" "$HOME/.ssh/config"
 symlink "$PWD/ssh/$os/conf.d" "$HOME/.ssh/conf.d"
 
+#
+info "Configuration files setup successfully"
+
+#
 info "Setup completed successfully"
 info "Please restart your terminal to see the changes"
