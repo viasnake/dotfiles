@@ -58,6 +58,12 @@ else
   info "Homebrew is already installed"
 fi
 
+# Install brew packages
+info "Installing brew packages..."
+symlink "$PWD/homebrew/.Brewfile" "$HOME/.Brewfile"
+brew bundle --global
+success "Brew packages installed successfully"
+
 # Install mise
 info "Checking mise..."
 if [[ ! -e "$HOME/.local/bin/mise" ]]; then
