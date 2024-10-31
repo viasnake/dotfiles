@@ -218,3 +218,18 @@ function info() {
     info "Terraform is already installed"
   fi
 }
+
+# Install php
+{
+  info "Checking PHP..."
+
+  #
+  if ! which php > /dev/null 2>&1; then
+    warning "PHP is not installed"
+    info "Installing PHP..."
+    $HOME/.local/bin/mise use --global php
+    success "PHP installed successfully"
+  else
+    info "PHP is already installed"
+  fi
+}
