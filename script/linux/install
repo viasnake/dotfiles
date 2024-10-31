@@ -203,3 +203,18 @@ function info() {
     info "Java is already installed"
   fi
 }
+
+# Install Terraform
+{
+  info "Checking Terraform..."
+
+  #
+  if ! which terraform > /dev/null 2>&1; then
+    warning "Terraform is not installed"
+    info "Installing Terraform..."
+    $HOME/.local/bin/mise use --global terraform
+    success "Terraform installed successfully"
+  else
+    info "Terraform is already installed"
+  fi
+}
