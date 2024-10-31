@@ -78,20 +78,20 @@ function symlink() {
 
   ## bashrc
   info "Setting up bashrc..."
-  symlink "$PWD/bash/$os/.bashrc" "$HOME/.bashrc"
+  symlink "$PWD/$os/.bashrc" "$HOME/.bashrc"
 
   ## git
   info "Setting up git..."
-  symlink "$PWD/git/$os/.gitconfig" "$HOME/.gitconfig"
-  symlink "$PWD/git/$os/.config" "$HOME/.config/git"
+  symlink "$PWD/$os/.gitconfig" "$HOME/.gitconfig"
+  symlink "$PWD/$os/.config/git" "$HOME/.config/git"
 
   ## ssh
   info "Setting up ssh..."
-  symlink "$PWD/ssh/$os/config" "$HOME/.ssh/config"
-  symlink "$PWD/ssh/$os/conf.d" "$HOME/.ssh/conf.d"
+  symlink "$PWD/$os/.ssh/config" "$HOME/.ssh/config"
+  symlink "$PWD/$os/.ssh/conf.d" "$HOME/.ssh/conf.d"
 
   ## homebrew
-  symlink "$PWD/homebrew/$os/.Brewfile" "$HOME/.Brewfile"
+  symlink "$PWD/$os/.Brewfile" "$HOME/.Brewfile"
 
   #
   info "Configuration files setup successfully"
