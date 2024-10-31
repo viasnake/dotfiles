@@ -70,6 +70,11 @@ function symlink() {
   ## homebrew
   symlink "$PWD/$os/.Brewfile" "$HOME/.Brewfile"
 
+  ## fish
+  symlink "$PWD/$os/.config/fish/config.fish" "$HOME/.config/fish/config.fish"
+  symlink "$PWD/$os/.config/fish/fish_plugins" "$HOME/.config/fish/fish_plugins"
+  symlink "$PWD/$os/.config/fish/fish_variables" "$HOME/.config/fish/fish_variables"
+
   #
   info "Linking completed"
 }
