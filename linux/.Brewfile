@@ -1,4 +1,7 @@
 tap "homebrew/bundle"
+brew "bat"
+brew "fd"
 brew "fish"
 brew "fisher"
+brew "fzf"
 brew "gmailctl"
