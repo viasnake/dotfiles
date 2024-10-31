@@ -10,7 +10,7 @@ PATH="$PATH:$HOME/.local/bin"
 function error() {
   local red="\033[31m"
   local reset="\033[0m"
-  local prefix="[ERROR] "ee
+  local prefix="[ERROR] "
   local message=$1
   echo -e "${red}${prefix}${message}${reset}"
 }
@@ -38,7 +38,6 @@ function info() {
   echo -e "${cyan}${prefix}${message}${reset}"
 }
 
-
 # Install dependencies
 {
   info "Installing dependencies..."
@@ -64,7 +63,7 @@ function info() {
   info "Checking Homebrew..."
 
   #
-  if ! which brew > /dev/null 2>&1; then
+  if ! which brew >/dev/null 2>&1; then
     warning "Homebrew is not installed"
     info "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -79,14 +78,14 @@ function info() {
   info "Checking Fish..."
 
   #
-  if ! which fish > /dev/null 2>&1; then
+  if ! which fish >/dev/null 2>&1; then
     warning "Fish is not installed"
     info "Installing Fish..."
     brew install fish
     # Add fish to /etc/shells
     # If already added, it will not be added again
     if ! grep -q "/home/linuxbrew/.linuxbrew/bin/fish" /etc/shells; then
-      echo "/home/linuxbrew/.linuxbrew/bin/fish" | sudo tee -a /etc/shells > /dev/null
+      echo "/home/linuxbrew/.linuxbrew/bin/fish" | sudo tee -a /etc/shells >/dev/null
     fi
     success "Fish installed successfully"
   else
@@ -119,7 +118,7 @@ function info() {
   info "Checking Python..."
 
   #
-  if ! which python > /dev/null 2>&1; then
+  if ! which python >/dev/null 2>&1; then
     warning "Python is not installed"
     info "Installing Python..."
     $HOME/.local/bin/mise use --global python
@@ -134,7 +133,7 @@ function info() {
   info "Checking Node.js..."
 
   #
-  if ! which node > /dev/null 2>&1; then
+  if ! which node >/dev/null 2>&1; then
     warning "Node.js is not installed"
     info "Installing Node.js..."
     $HOME/.local/bin/mise use --global node
@@ -149,7 +148,7 @@ function info() {
   info "Checking Go..."
 
   #
-  if ! which go > /dev/null 2>&1; then
+  if ! which go >/dev/null 2>&1; then
     warning "Go is not installed"
     info "Installing Go..."
     $HOME/.local/bin/mise use --global go
@@ -164,7 +163,7 @@ function info() {
   info "Checking Ruby..."
 
   #
-  if ! which ruby > /dev/null 2>&1; then
+  if ! which ruby >/dev/null 2>&1; then
     warning "Ruby is not installed"
     info "Installing Ruby..."
     $HOME/.local/bin/mise use --global ruby
@@ -179,7 +178,7 @@ function info() {
   info "Checking Rust..."
 
   #
-  if ! which rustc > /dev/null 2>&1; then
+  if ! which rustc >/dev/null 2>&1; then
     warning "Rust is not installed"
     info "Installing Rust..."
     $HOME/.local/bin/mise use --global rust
@@ -194,7 +193,7 @@ function info() {
   info "Checking Java..."
 
   #
-  if ! which java > /dev/null 2>&1; then
+  if ! which java >/dev/null 2>&1; then
     warning "Java is not installed"
     info "Installing Java..."
     $HOME/.local/bin/mise use --global java
@@ -209,7 +208,7 @@ function info() {
   info "Checking Terraform..."
 
   #
-  if ! which terraform > /dev/null 2>&1; then
+  if ! which terraform >/dev/null 2>&1; then
     warning "Terraform is not installed"
     info "Installing Terraform..."
     $HOME/.local/bin/mise use --global terraform
