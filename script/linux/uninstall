@@ -49,55 +49,61 @@ function remove() {
 }
 
 # Uninstall fish
-info "Uninstalling fish..."
-brew uninstall fisher
-brew uninstall fish
-# Remove fish configuration
-remove "/home/linuxbrew/.linuxbrew/etc/fish"
-# Remove fish from /etc/shells
-sudo sed -i '/fish/d' /etc/shells
-info "Fish uninstalled successfully"
+{
+  info "Uninstalling fish..."
+
+  #
+  brew uninstall fisher
+  brew uninstall fish
+
+  #
+  remove "/home/linuxbrew/.linuxbrew/etc/fish"
+  ## Remove fish from /etc/shells
+  sudo sed -i '/fish/d' /etc/shells
+
+  #
+  info "Fish uninstalled successfully"
+}
+
 
 # Uninstall mise
-info "Uninstalling mise..."
-$HOME/.local/bin/mise uninstall --all
-remove "$HOME/.local/bin/mise"
-info "Mise uninstalled successfully"
+{
+  info "Uninstalling mise..."
+
+  #
+  $HOME/.local/bin/mise uninstall --all
+
+  #
+  remove "$HOME/.local/bin/mise"
+
+  #
+  info "Mise uninstalled successfully"
+}
 
 #  Uninstall Homebrew
-info "Uninstalling Homebrew..."
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
-remove "/home/linuxbrew/.linuxbrew/etc"
-remove "/home/linuxbrew/.linuxbrew/lib"
-remove "/home/linuxbrew/.linuxbrew/share"
-info "Homebrew uninstalled successfully"
+{
+  info "Uninstalling Homebrew..."
 
-# Config
-info "Removing configuration files..."
+  #
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
 
-## bashrc
-info "Removing bashrc files..."
-remove "$HOME/.bashrc"
+  #
+  remove "/home/linuxbrew/.linuxbrew/etc"
+  remove "/home/linuxbrew/.linuxbrew/lib"
+  remove "/home/linuxbrew/.linuxbrew/share"
 
-## git
-info "Removing git files..."
-remove "$HOME/.gitconfig"
-remove "$HOME/.config/git"
-
-## ssh
-info "Removing ssh files..."
-remove "$HOME/.ssh/config"
-remove "$HOME/.ssh/conf.d"
-
-## homebrew
-info "Removing homebrew files..."
-remove "$HOME/.Brewfile"
+  # 
+  info "Homebrew uninstalled successfully"
+}
 
 # Uninstall dependencies
 ## !! Do not remove as it may have an impact !! ##
-# info "Uninstalling dependencies..."
-# sudo apt-get remove -y build-essential procps curl file git
-# success "Dependencies uninstalled successfully"
+# {
+#   info "Uninstalling dependencies..."
 
-#
-success "Uninstallation completed successfully"
+#   #
+#   sudo apt-get remove -y build-essential procps curl file git
+
+#   #
+#   success "Dependencies uninstalled successfully"
+# }

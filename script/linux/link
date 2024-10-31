@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+# Exit immediately if a command exits with a non-zero status
+set -e
+
+#
+PATH="$PATH:/home/linuxbrew/.linuxbrew/bin"
+PATH="$PATH:$HOME/.local/bin"
+
+function error() {
+  local red="\033[31m"
+  local reset="\033[0m"
+  local prefix="[ERROR] "ee
+  local message=$1
+  echo -e "${red}${prefix}${message}${reset}"
+}
+
+function success() {
+  local green="\033[32m"
+  local reset="\033[0m"
+  local prefix="[SUCCESS] "
+  local message=$1
+  echo -e "${green}${prefix}${message}${reset}"
+}
+
+function warning() {
+  local yellow="\033[33m"
+  local reset="\033[0m"
+  local prefix="[WARNING] "
+  local message=$1
+}
+
+function info() {
+  local cyan="\033[36m"
+  local reset="\033[0m"
+  local prefix="[INFO] "
+  local message=$1
+  echo -e "${cyan}${prefix}${message}${reset}"
+}
+
+function symlink() {
+  ln -nfs "$1" "$2"
+  success "Symlink created: $2 -> $1"
+
+  # 本当は既存のファイルがある場合の処理も書くべき
+  # if [[ -e "$2" ]]; then
+  #   warning "File $2 already exists"
+  # else
+  #   ln -fs "$1" "$2"
+  #   success "Symlink created: $2 -> $1"
+  # fi
+}
+
+
+# Link configuration files
+{
+  info "Linking configuration files..."
+
+  ## bashrc
+  symlink "$PWD/$os/.bashrc" "$HOME/.bashrc"
+
+  ## git
+  symlink "$PWD/$os/.gitconfig" "$HOME/.gitconfig"
+  symlink "$PWD/$os/.config/git" "$HOME/.config/git"
+
+  ## ssh
+  symlink "$PWD/$os/.ssh/config" "$HOME/.ssh/config"
+  symlink "$PWD/$os/.ssh/conf.d" "$HOME/.ssh/conf.d"
+
+  ## homebrew
+  symlink "$PWD/$os/.Brewfile" "$HOME/.Brewfile"
+
+  #
+  info "Linking completed"
+}

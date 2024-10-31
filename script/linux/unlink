@@ -3,6 +3,10 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
+#
+PATH="$PATH:/home/linuxbrew/.linuxbrew/bin"
+PATH="$PATH:$HOME/.local/bin"
+
 function error() {
   local red="\033[31m"
   local reset="\033[0m"
@@ -34,5 +38,34 @@ function info() {
   echo -e "${cyan}${prefix}${message}${reset}"
 }
 
-error "This script is not supported on macOS"
-exit 1
+function remove() {
+  local file=$1
+  if [[ -e "$file" ]]; then
+    rm -rf "$file"
+    success "Removed: $file"
+  else
+    warning "File not found: $file"
+  fi
+}
+
+# Unlink configuration files
+{
+  info "Unlinking configuration files..."
+
+  # bashrc
+  remove "$HOME/.bashrc"
+
+  # git
+  remove "$HOME/.gitconfig"
+  remove "$HOME/.config/git"
+
+  # ssh
+  remove "$HOME/.ssh/config"
+  remove "$HOME/.ssh/conf.d"
+
+  # homebrew
+  remove "$HOME/.Brewfile"
+
+  #
+  success "Unlinking completed successfully"
+}

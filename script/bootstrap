@@ -3,6 +3,8 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
+# Functions
+
 function error() {
   local red="\033[31m"
   local reset="\033[0m"
@@ -34,15 +36,67 @@ function info() {
   echo -e "${cyan}${prefix}${message}${reset}"
 }
 
-function is_macos() {
-  # Mac OS X
-  if [[ "$(uname -s)" == "Darwin" ]]; then
+#
+function check_arguments() {
+  # Check the number of arguments
+  if [ "$#" -ne 1 ]; then
+    error "Invalid number of arguments."
+    exit 1
+  fi
+
+  # Check if the argument is valid
+  if [ "$1" == "install" ]; then
+    return 0
+  elif [ "$1" == "uninstall" ]; then
+    return 0
+  elif [ "$1" == "link" ]; then
+    return 0
+  elif [ "$1" == "unlink" ]; then
     return 0
   else
-    return 1
+    error "Invalid argument."
+    exit 1
   fi
 }
 
+#
+function check_os() {
+  os=""
+
+  # FIXME: This is not the best way to check the OS
+
+  # macOS
+  if is_macos; then
+    os="macos"
+  fi
+
+  # Linux
+  if is_linux; then
+    os="linux"
+  fi
+
+  # Windows Subsystem for Linux
+  if is_wsl; then
+    os="wsl"
+  fi
+
+  # Windows
+  if is_windows; then
+    os="windows"
+  fi
+
+  # os is set
+  if [ -n "$os" ]; then
+    info "Detected OS: $os"
+    return 0
+  fi
+
+  # os is not set (unsupported OS)
+  error "OS not supported."
+  exit 1
+}
+
+#
 function is_linux() {
   # Linux
   if [[ "$(uname -s)" == "Linux" ]]; then
@@ -78,6 +132,7 @@ function is_linux() {
   fi
 }
 
+#
 function get_distribution() {
   # SEE: https://github.com/docker/docker-install/blob/6d51e2cd8c04b38e1c2237820245f4fc262aca6c/install.sh#L254-L263
 
@@ -87,12 +142,24 @@ function get_distribution() {
   echo "$lsb_dist"
 }
 
+#
+function is_macos() {
+  # Mac OS X
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+#
 function is_windows() {
   # Windows
   # Why would you run this script on Windows?
   return 1
 }
 
+#
 function is_wsl() {
   # SEE: https://github.com/docker/docker-install/blob/6d51e2cd8c04b38e1c2237820245f4fc262aca6c/install.sh#L224-L230
 
@@ -108,60 +175,42 @@ function is_wsl() {
   fi
 }
 
-function check_os() {
-  os=""
 
-  # FIXME: This is not the best way to check the OS
+#
+info "Bootstrap script started."
 
-  # macOS
-  if is_macos; then
-    os="macos"
-  fi
+#
+info "Checking arguments..."
+check_arguments "$@"
 
-  # Linux
-  if is_linux; then
-    os="linux"
-  fi
-
-  # Windows Subsystem for Linux
-  if is_wsl; then
-    os="wsl"
-  fi
-
-  # Windows
-  if is_windows; then
-    os="windows"
-  fi
-
-  # os is set
-  if [ -n "$os" ]; then
-    return 0
-  fi
-
-  # os is not set (unsupported OS)
-  error "OS not supported."
-  exit 1
-}
-
-
+#
 info "Checking OS..."
 check_os
 
-# Environment variables
-script=".scripts/$os/install"
-
-# Debug information
-info "OS: $os"
-info "Script: $script"
-
-# Check if the install script exists
-if [ ! -f "$script" ]; then
-  error "Install script not found."
+# Set the script based on the argument
+info "Setting the script based on the argument..."
+if [ "$1" == "install" ]; then
+  script="script/$os/install"
+elif [ "$1" == "uninstall" ]; then
+  script="script/$os/uninstall"
+elif [ "$1" == "link" ]; then
+  script="script/$os/link"
+elif [ "$1" == "unlink" ]; then
+  script="script/$os/unlink"
+else
+  error "Invalid argument."
   exit 1
 fi
 
-# Run the install script
-source "$script"
+#
+info "Arguments: $@"
+info "Script: $script"
 
-# Check if the install script completed successfully
-success "Install script completed."
+# Run the script
+info "Running $script..."
+source "$script"
+info "$script finished."
+
+#
+info "Bootstrap script finished."
+exit 0

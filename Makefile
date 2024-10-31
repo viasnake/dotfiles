@@ -1,4 +1,13 @@
+BOOTSTRAP = script/bootstrap
+
+all: link install
+clean: uninstall unlink
+
 install:
-	@.scripts/install
+	$(BOOTSTRAP) install
 uninstall:
-	@.scripts/uninstall
+	$(BOOTSTRAP) uninstall
+link:
+	$(BOOTSTRAP) link
+unlink:
+	$(BOOTSTRAP) unlink

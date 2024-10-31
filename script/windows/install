@@ -34,10 +34,5 @@ function info() {
   echo -e "${cyan}${prefix}${message}${reset}"
 }
 
-function symlink() {
-  # WSL does not support symlinking
-  error "Symlinking is not supported on WSL"
-}
-
-error "This script is not supported on WSL"
+error "This script is not supported on Windows"
 exit 1
