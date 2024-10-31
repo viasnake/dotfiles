@@ -148,7 +148,7 @@ info "Checking OS..."
 check_os
 
 # Environment variables
-script=".scripts/$os/install.sh"
+script=".scripts/$os/install"
 
 # Debug information
 info "OS: $os"

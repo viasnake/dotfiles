@@ -1,4 +1,4 @@
 install:
-	@.scripts/install.sh
+	@.scripts/install
 uninstall:
-	@.scripts/uninstall.sh
+	@.scripts/uninstall

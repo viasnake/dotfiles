@@ -113,7 +113,7 @@ info "Checking OS..."
 check_os
 
 # Environment variables
-script=".scripts/$os/uninstall.sh"
+script=".scripts/$os/uninstall"
 
 # Debug information
 info "OS: $os"
