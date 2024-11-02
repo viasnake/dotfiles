@@ -66,6 +66,9 @@ function remove() {
   # homebrew
   remove "$HOME/.Brewfile"
 
+  # tabby
+  remove "$HOME/.config/tabby/config.yaml"
+
   #
   success "Unlinking completed successfully"
 }

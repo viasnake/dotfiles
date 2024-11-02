@@ -51,7 +51,6 @@ function symlink() {
   # fi
 }
 
-
 # Link configuration files
 {
   info "Linking configuration files..."
@@ -74,6 +73,9 @@ function symlink() {
   symlink "$PWD/$os/.config/fish/config.fish" "$HOME/.config/fish/config.fish"
   symlink "$PWD/$os/.config/fish/fish_plugins" "$HOME/.config/fish/fish_plugins"
   symlink "$PWD/$os/.config/fish/fish_variables" "$HOME/.config/fish/fish_variables"
+
+  ## tabby
+  symlink "$PWD/$os/.config/tabby/config.yaml" "$HOME/.config/tabby/config.yaml"
 
   #
   info "Linking completed"
