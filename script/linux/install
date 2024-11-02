@@ -217,3 +217,35 @@ function info() {
     info "Terraform is already installed"
   fi
 }
+
+# Install fonts
+{
+  info "Installing fonts..."
+
+  # https://github.com/yuru7/Firge/releases/tag/v0.3.0
+  info "Installing fonts..."
+
+  #
+  info "Downloading FirgeNerd font..."
+  url="https://github.com/yuru7/Firge/releases/download/v0.3.0/FirgeNerd_v0.3.0.zip"
+  wget -O "$PWD/$os/fonts/FirgeNerd_v0.3.0.zip" "$url"
+
+  #
+  info "Extracting FirgeNerd font..."
+  unzip -o "$PWD/$os/fonts/FirgeNerd_v0.3.0.zip" -d "$HOME/.local/share/fonts"
+
+  #
+  info "Downloading Firge font..."
+  url="https://github.com/yuru7/Firge/releases/download/v0.3.0/Firge_v0.3.0.zip"
+  wget -O "$PWD/$os/fonts/Firge_v0.3.0.zip" "$url"
+
+  #
+  info "Extracting Firge font..."
+  unzip -o "$PWD/$os/fonts/Firge_v0.3.0.zip" -d "$HOME/.local/share/fonts"
+
+  #
+  info "Updating font cache..."
+  fc-cache -fv
+
+  success "Fonts installed successfully"
+}

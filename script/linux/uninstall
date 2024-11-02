@@ -48,6 +48,17 @@ function remove() {
   fi
 }
 
+# Uninstall fonts
+{
+  info "Uninstalling fonts..."
+
+  #
+  remove "$HOME/.local/share/fonts"
+
+  #
+  info "Fonts uninstalled successfully"
+}
+
 # Uninstall fish
 {
   info "Uninstalling fish..."
@@ -64,7 +75,6 @@ function remove() {
   #
   info "Fish uninstalled successfully"
 }
-
 
 # Uninstall mise
 {
@@ -92,7 +102,7 @@ function remove() {
   remove "/home/linuxbrew/.linuxbrew/lib"
   remove "/home/linuxbrew/.linuxbrew/share"
 
-  # 
+  #
   info "Homebrew uninstalled successfully"
 }
 
