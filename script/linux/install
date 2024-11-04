@@ -211,11 +211,17 @@ function info() {
 {
   info "Installing fonts..."
 
-  # https://github.com/yuru7/Firge/releases/tag/v0.3.0
-  info "Installing fonts..."
+  #
+  info "Checking fonts..."
+  # fc-list
+  if fc-list | grep -q "Firge"; then
+    info "Fonts are already installed"
+    exit 0
+  fi
 
   #
   info "Downloading FirgeNerd font..."
+  ## https://github.com/yuru7/Firge/releases/tag/v0.3.0
   url="https://github.com/yuru7/Firge/releases/download/v0.3.0/FirgeNerd_v0.3.0.zip"
   wget -O "$PWD/$os/fonts/FirgeNerd_v0.3.0.zip" "$url"
 
