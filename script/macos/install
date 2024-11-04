@@ -3,10 +3,14 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
+#
+PATH="$PATH:/opt/homebrew/bin"
+PATH="$PATH:$HOME/.local/bin"
+
 function error() {
   local red="\033[31m"
   local reset="\033[0m"
-  local prefix="[ERROR] "ee
+  local prefix="[ERROR] "
   local message=$1
   echo -e "${red}${prefix}${message}${reset}"
 }
@@ -34,5 +38,233 @@ function info() {
   echo -e "${cyan}${prefix}${message}${reset}"
 }
 
-error "This script is not supported on macOS"
-exit 1
+# Install dependencies
+{
+  info "Installing dependencies..."
+
+  # Check if apt.txt exists
+  if [[ ! -f "$PWD/$os/apt.txt" ]]; then
+    error "apt.txt not found"
+    exit 1
+  fi
+
+  # Check if update-success-stamp exists and is older than 1 day
+  info "Checking for updates..."
+  if [[ ! -e /var/lib/apt/periodic/update-success-stamp || $(find /var/lib/apt/periodic/update-success-stamp -mtime +1) ]]; then
+    info "Update apt..."
+    sudo apt update
+  else
+    info "Apt is up to date"
+  fi
+
+  #
+  info "Checking dependencies..."
+  while IFS= read -r package; do
+    # Skip comments
+    if [[ $package == \#* ]]; then
+      continue
+    fi
+
+    # Check if package is installed
+    if dpkg -l "$package" >/dev/null 2>&1; then
+      info "$package is already installed"
+      continue
+    fi
+
+    # Install package
+    warning "$package is not installed"
+    info "Installing $package..."
+    sudo apt-get install -y "$package"
+    success "$package installed successfully"
+  done <"$PWD/$os/apt.txt"
+
+  #
+  info "Dependencies installed successfully"
+}
+
+# Install Homebrew
+{
+  info "Checking Homebrew..."
+
+  #
+  if ! which brew >/dev/null 2>&1; then
+    warning "Homebrew is not installed"
+    info "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    success "Homebrew installed successfully"
+  else
+    info "Homebrew is already installed"
+  fi
+}
+
+# Install fish
+{
+  info "Checking Fish..."
+
+  #
+  if ! which fish >/dev/null 2>&1; then
+    warning "Fish is not installed"
+    info "Installing Fish..."
+    brew install fish
+    # Add fish to /etc/shells
+    # If already added, it will not be added again
+    if ! grep -q "/home/linuxbrew/.linuxbrew/bin/fish" /etc/shells; then
+      echo "/home/linuxbrew/.linuxbrew/bin/fish" | sudo tee -a /etc/shells >/dev/null
+    fi
+    success "Fish installed successfully"
+  else
+    info "Fish is already installed"
+  fi
+}
+
+# Install brew packages
+{
+  info "Installing brew packages..."
+
+  #
+  brew bundle --global --file="$HOME/.Brewfile"
+  success "Brew packages installed successfully"
+}
+
+# Install python
+{
+  info "Checking Python..."
+
+  #
+  if ! which python >/dev/null 2>&1; then
+    warning "Python is not installed"
+    info "Installing Python..."
+    mise use --global python
+    success "Python installed successfully"
+  else
+    info "Python is already installed"
+  fi
+}
+
+# Install node
+{
+  info "Checking Node.js..."
+
+  #
+  if ! which node >/dev/null 2>&1; then
+    warning "Node.js is not installed"
+    info "Installing Node.js..."
+    mise use --global node
+    success "Node.js installed successfully"
+  else
+    info "Node.js is already installed"
+  fi
+}
+
+# Install go
+{
+  info "Checking Go..."
+
+  #
+  if ! which go >/dev/null 2>&1; then
+    warning "Go is not installed"
+    info "Installing Go..."
+    mise use --global go
+    success "Go installed successfully"
+  else
+    info "Go is already installed"
+  fi
+}
+
+# Install ruby
+{
+  info "Checking Ruby..."
+
+  #
+  if ! which ruby >/dev/null 2>&1; then
+    warning "Ruby is not installed"
+    info "Installing Ruby..."
+    mise use --global ruby
+    success "Ruby installed successfully"
+  else
+    info "Ruby is already installed"
+  fi
+}
+
+# Install Rust
+{
+  info "Checking Rust..."
+
+  #
+  if ! which rustc >/dev/null 2>&1; then
+    warning "Rust is not installed"
+    info "Installing Rust..."
+    mise use --global rust
+    success "Rust installed successfully"
+  else
+    info "Rust is already installed"
+  fi
+}
+
+# Install Java
+{
+  info "Checking Java..."
+
+  #
+  if ! which java >/dev/null 2>&1; then
+    warning "Java is not installed"
+    info "Installing Java..."
+    mise use --global java
+    success "Java installed successfully"
+  else
+    info "Java is already installed"
+  fi
+}
+
+# Install Terraform
+{
+  info "Checking Terraform..."
+
+  #
+  if ! which terraform >/dev/null 2>&1; then
+    warning "Terraform is not installed"
+    info "Installing Terraform..."
+    mise use --global terraform
+    success "Terraform installed successfully"
+  else
+    info "Terraform is already installed"
+  fi
+}
+
+# Install fonts
+{
+  info "Installing fonts..."
+
+  #
+  info "Checking fonts..."
+  # fc-list
+  if fc-list | grep -q "Firge"; then
+    info "Fonts are already installed"
+    exit 0
+  fi
+
+  #
+  info "Downloading FirgeNerd font..."
+  ## https://github.com/yuru7/Firge/releases/tag/v0.3.0
+  url="https://github.com/yuru7/Firge/releases/download/v0.3.0/FirgeNerd_v0.3.0.zip"
+  wget -O "$PWD/$os/fonts/FirgeNerd_v0.3.0.zip" "$url"
+
+  #
+  info "Extracting FirgeNerd font..."
+  unzip -o "$PWD/$os/fonts/FirgeNerd_v0.3.0.zip" -d "$HOME/.local/share/fonts"
+
+  #
+  info "Downloading Firge font..."
+  url="https://github.com/yuru7/Firge/releases/download/v0.3.0/Firge_v0.3.0.zip"
+  wget -O "$PWD/$os/fonts/Firge_v0.3.0.zip" "$url"
+
+  #
+  info "Extracting Firge font..."
+  unzip -o "$PWD/$os/fonts/Firge_v0.3.0.zip" -d "$HOME/.local/share/fonts"
+
+  #
+  info "Updating font cache..."
+  fc-cache -fv
+
+  success "Fonts installed successfully"
+}
