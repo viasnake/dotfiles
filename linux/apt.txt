@@ -1,19 +1,22 @@
+# Homebrew dependencies
+build-essential
 curl
 file
-build-essential
+git
 procps
+# Ruby dependencies
 autoconf
-patch
 build-essential
-rustc
-libssl-dev
-libyaml-dev
-libreadline6-dev
-zlib1g-dev
+libdb-dev
+libffi-dev
+libgdbm-dev
+libgdbm6
 libgmp-dev
 libncurses5-dev
-libffi-dev
-libgdbm6
-libgdbm-dev
-libdb-dev
+libreadline6-dev
+libssl-dev
+libyaml-dev
+patch
+rustc
 uuid-dev
+zlib1g-dev
