@@ -42,17 +42,41 @@ function info() {
 {
   info "Installing dependencies..."
 
+  # Check if apt.txt exists
+  if [[ ! -f "$PWD/$os/apt.txt" ]]; then
+    error "apt.txt not found"
+    exit 1
+  fi
+
+  # Check if update-success-stamp exists and is older than 1 day
+  info "Checking for updates..."
+  if [[ ! -e /var/lib/apt/periodic/update-success-stamp || $(find /var/lib/apt/periodic/update-success-stamp -mtime +1) ]]; then
+    info "Update apt..."
+    sudo apt update
+  else
+    info "Apt is up to date"
+  fi
+
   #
-  info "Updating package list..."
-  sudo apt update
+  info "Checking dependencies..."
+  while IFS= read -r package; do
+    # Skip comments
+    if [[ $package == \#* ]]; then
+      continue
+    fi
 
-  ## git curl file build-essential procps
-  info "Installing git, curl, file, build-essential, procps..."
-  sudo apt install -y git curl file build-essential procps
+    # Check if package is installed
+    if dpkg -l "$package" >/dev/null 2>&1; then
+      info "$package is already installed"
+      continue
+    fi
 
-  ## autoconf patch build-essential rustc libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libgmp-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev uuid-dev
-  info "Installing autoconf, patch, build-essential, rustc, libssl-dev, libyaml-dev, libreadline6-dev, zlib1g-dev, libgmp-dev, libncurses5-dev, libffi-dev, libgdbm6, libgdbm-dev, libdb-dev, uuid-dev..."
-  sudo apt install -y autoconf patch build-essential rustc libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libgmp-dev libncurses5-dev libffi-dev libgdbm6 libgdbm-dev libdb-dev uuid-dev
+    # Install package
+    warning "$package is not installed"
+    info "Installing $package..."
+    sudo apt-get install -y "$package"
+    success "$package installed successfully"
+  done <"$PWD/$os/apt.txt"
 
   #
   info "Dependencies installed successfully"
