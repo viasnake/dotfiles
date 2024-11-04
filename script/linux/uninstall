@@ -76,20 +76,6 @@ function remove() {
   info "Fish uninstalled successfully"
 }
 
-# Uninstall mise
-{
-  info "Uninstalling mise..."
-
-  #
-  $HOME/.local/bin/mise uninstall --all
-
-  #
-  remove "$HOME/.local/bin/mise"
-
-  #
-  info "Mise uninstalled successfully"
-}
-
 #  Uninstall Homebrew
 {
   info "Uninstalling Homebrew..."

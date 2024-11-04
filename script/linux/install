@@ -100,17 +100,6 @@ function info() {
   #
   brew bundle --global --file="$HOME/.Brewfile"
   success "Brew packages installed successfully"
-
-  # Install mise
-  info "Checking mise..."
-  if [[ ! -e "$HOME/.local/bin/mise" ]]; then
-    warning "mise is not installed"
-    info "Installing mise..."
-    curl https://mise.run | sh
-    success "mise installed successfully"
-  else
-    info "mise is already installed"
-  fi
 }
 
 # Install python
