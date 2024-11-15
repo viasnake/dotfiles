@@ -216,7 +216,9 @@ terminal:
   customColorSchemes: []
   profile: local:homelinuxbrew.linuxbrewbinfish
   font: Firge35Nerd Console
-ssh: {}
+ssh:
+  verifyHostKeys: false
+  warnOnClose: true
 clickableLinks: {}
 accessibility: {}
 appearance: {}
