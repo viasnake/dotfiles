@@ -1,0 +1,91 @@
+{
+  "editor.wordSegmenterLocales": "ja",
+  "editor.tabSize": 2,
+  "editor.fontSize": 18,
+  "workbench.colorTheme": "One Dark Pro",
+  "files.autoGuessEncoding": true,
+  "files.candidateGuessEncodings": [
+      "utf8",
+      "shiftjis",
+      "eucjp",
+  ],
+  "workbench.startupEditor": "none",
+  // 保存設定
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  // 便利
+  "scm.alwaysShowRepositories": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "editor.mouseWheelZoom": true,
+  "editor.renderLineHighlight": "all",
+  "editor.showFoldingControls": "always",
+  "editor.wordWrap": "on",
+  "scm.defaultViewMode": "tree",
+  "scm.diffDecorationsGutterWidth": 5,
+  "scm.inputFontFamily": "editor",
+  "scm.inputFontSize": 14,
+  "search.showLineNumbers": true,
+  "workbench.editor.wrapTabs": true,
+  // 事故防止
+  "editor.dragAndDrop": false,
+  "git.suggestSmartCommit": false,
+  "workbench.editor.closeOnFileDelete": true,
+  "settingsSync.ignoredExtensions": [
+      // 仕事で copilot を入れたくない
+      "github.copilot-chat",
+      "github.copilot"
+  ],
+  /////////////////////////////////////////////////
+  // Copilot
+  "github.copilot.enable": {
+      "*": true,
+      "scminput": true,
+      "markdown": true,
+      "plaintext": true
+  },
+  // Editor 設定
+  "editor.fontFamily": "Firge35, Monaco",
+  "editor.fontLigatures": true,
+  "editor.wrappingIndent": "indent",
+  "editor.insertSpaces": true,
+  "editor.guides.bracketPairs": true,
+  "editor.minimap.maxColumn": 80,
+  "editor.minimap.showSlider": "always",
+  "editor.smoothScrolling": true,
+  // Git 設定
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.pruneOnFetch": true,
+  // Terminal 設定
+  "terminal.integrated.mouseWheelZoom": true,
+  "terminal.integrated.enableVisualBell": true,
+  "terminal.integrated.enableImages": true,
+  "terminal.integrated.cursorBlinking": true,
+  "terminal.integrated.profiles.linux": {
+      "fish": {
+          "path": "/home/linuxbrew/.linuxbrew/bin/fish",
+          "args": [
+              "-l"
+          ]
+      }
+    },
+  "terminal.integrated.defaultProfile.linux": "fish",
+  // gitlens
+  "gitlens.hovers.currentLine.over": "line",
+  "explorer.confirmDelete": false,
+  /////////////////////////////////////////////////
+  // 仕事用
+  /////////////////////////////////////////////////
+  "terminal.integrated.profiles.osx": {
+      "fish": {
+          "path": "/opt/homebrew/bin/fish",
+          "args": [
+              "-l"
+          ]
+      }
+  },
+  "terminal.integrated.defaultProfile.osx": "fish",
+  "perlnavigator.perlPath": "/opt/homebrew/bin/perl",
+}
