@@ -115,8 +115,17 @@ if ! shopt -oq posix; then
     fi
 fi
 
-# linuxbrew path
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# linuxbrew
+if test -d /home/linuxbrew/.linuxbrew
+then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+# homebrew
+if test -d /opt/homebrew
+then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
 
 # mise path
 eval "$(/home/linuxbrew/.linuxbrew/bin/mise activate bash)"
