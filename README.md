@@ -9,7 +9,7 @@
 
 > [!TIP]
 > Whether or not the OS is supported is determined by `/etc/os-release`.
-> SEE: [install.sh](https://github.com/viasnake/dotfiles/blob/master/.scripts/install.sh)
+> SEE: [install.sh](https://github.com/viasnake/dotfiles/blob/master/script/bootstrap)
 
 ### Will be supported
 
