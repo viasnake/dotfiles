@@ -48,7 +48,6 @@ function symlink() {
 
   ## git
   symlink "$PWD/$os/.gitconfig" "$HOME/.gitconfig"
-  symlink "$PWD/$os/.config/git" "$HOME/.config/git"
 
   ## ssh
   symlink "$PWD/$os/.ssh/config" "$HOME/.ssh/config"
