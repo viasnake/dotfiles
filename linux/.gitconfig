@@ -2,3 +2,5 @@
 path = "~/.config/git"
 [alias]
 delete-merged-branch = "!f () { git checkout $1; git branch --merged|egrep -v '\\*|develop|main|master'|xargs git branch -d; };f"
+[credential "https://github.com"]
+helper = !/usr/bin/gh auth git-credential
