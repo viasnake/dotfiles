@@ -1,8 +1,5 @@
 tap "homebrew/bundle"
 brew "bat"
-brew "docker-buildx"
-brew "docker-compose"
-brew "docker"
 brew "fd"
 brew "fish"
 brew "fisher"
