@@ -61,6 +61,9 @@ function symlink() {
   symlink "$PWD/$os/.config/fish/fish_plugins" "$HOME/.config/fish/fish_plugins"
   symlink "$PWD/$os/.config/fish/fish_variables" "$HOME/.config/fish/fish_variables"
 
+  ## ghostty
+  symlink "$PWD/$os/.config/ghostty" "$HOME/.config/ghostty"
+
   #
   info "Linking completed"
 }
