@@ -8,4 +8,10 @@ if status is-interactive
   if test -d /opt/homebrew
     eval (/opt/homebrew/bin/brew shellenv)
   end
+
+  # mise
+  mise activate fish | source
+else
+  # mise
+  mise activate fish --shims | source
 end
