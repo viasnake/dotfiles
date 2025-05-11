@@ -77,7 +77,8 @@ function check_os() {
 
   # Windows Subsystem for Linux
   if is_wsl; then
-    os="wsl"
+    # Trust that wsl is identical to linux.
+    os="linux"
   fi
 
   # Windows
