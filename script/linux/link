@@ -6,7 +6,7 @@ set -e
 function error() {
   local red="\033[31m"
   local reset="\033[0m"
-  local prefix="[ERROR] "ee
+  local prefix="[ERROR] "
   local message=$1
   echo -e "${red}${prefix}${message}${reset}"
 }
@@ -57,6 +57,7 @@ function symlink() {
   symlink "$PWD/$os/.Brewfile" "$HOME/.Brewfile"
 
   ## fish
+  mkdir -p  "$HOME/.config/fish"
   symlink "$PWD/$os/.config/fish/config.fish" "$HOME/.config/fish/config.fish"
   symlink "$PWD/$os/.config/fish/fish_plugins" "$HOME/.config/fish/fish_plugins"
   symlink "$PWD/$os/.config/fish/fish_variables" "$HOME/.config/fish/fish_variables"
