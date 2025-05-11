@@ -20,3 +20,5 @@ patch
 rustc
 uuid-dev
 zlib1g-dev
+# Other
+unzip
