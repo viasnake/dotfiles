@@ -53,11 +53,9 @@ function remove() {
 
   # git
   remove "$HOME/.gitconfig"
-  remove "$HOME/.config/git"
 
   # ssh
   remove "$HOME/.ssh/config"
-  remove "$HOME/.ssh/conf.d"
 
   # homebrew
   remove "$HOME/.Brewfile"

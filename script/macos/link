@@ -51,7 +51,6 @@ function symlink() {
 
   ## ssh
   symlink "$PWD/config/ssh/config" "$HOME/.ssh/config"
-  symlink "$PWD/config/ssh/conf.d" "$HOME/.ssh/conf.d"
 
   ## homebrew
   symlink "$PWD/config/homebrew/.Brewfile" "$HOME/.Brewfile"
