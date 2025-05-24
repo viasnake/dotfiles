@@ -60,7 +60,8 @@ function info() {
   if ! which fisher >/dev/null 2>&1; then
     warning "Fisher is not installed"
     info "Installing Fisher..."
-    curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+    curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source
+    fisher install jorgebucaran/fisher
     success "Fisher installed successfully"
   else
     info "Fisher is already installed"
