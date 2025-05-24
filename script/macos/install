@@ -42,12 +42,6 @@ function info() {
 {
   info "Installing dependencies..."
 
-  # Check if apt.txt exists
-  if [[ ! -f "$PWD/config/apt.txt" ]]; then
-    error "apt.txt not found"
-    exit 1
-  fi
-
   # Check if update-success-stamp exists and is older than 1 day
   info "Checking for updates..."
   if [[ ! -e /var/lib/apt/periodic/update-success-stamp || $(find /var/lib/apt/periodic/update-success-stamp -mtime +1) ]]; then
@@ -59,12 +53,16 @@ function info() {
 
   #
   info "Checking dependencies..."
-  while IFS= read -r package; do
-    # Skip comments
-    if [[ $package == \#* ]]; then
-      continue
-    fi
+  dependencies=(
+    build-essential
+    curl
+    file
+    git
+    procps
+    unzip
+  )
 
+  for package in "${dependencies[@]}"; do
     # Check if package is installed
     if dpkg -l "$package" >/dev/null 2>&1; then
       info "$package is already installed"
@@ -76,7 +74,7 @@ function info() {
     info "Installing $package..."
     sudo apt-get install -y "$package"
     success "$package installed successfully"
-  done <"$PWD/config/apt.txt"
+  done
 
   #
   info "Dependencies installed successfully"
