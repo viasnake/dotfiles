@@ -6,20 +6,13 @@
 - Raspbian
 - Ubuntu
 - Zorin OS
-
-> [!TIP]
-> Whether or not the OS is supported is determined by `/etc/os-release`.
-> SEE: [install.sh](https://github.com/viasnake/dotfiles/blob/master/script/bootstrap)
-
-### Will be supported
-
 - MacOS
-- Windows
 - Windows Subsystem for Linux (WSL1)
 - Windows Subsystem for Linux 2 (WSL2)
 
-> [!NOTE]
-> WSL is expected to be mostly Linux, so it could work.
+> [!TIP]
+> Whether or not the OS is supported is determined by `/etc/os-release`.
+> SEE: [bootstrap](https://github.com/viasnake/dotfiles/blob/master/script/bootstrap)
 
 ## How to use
 

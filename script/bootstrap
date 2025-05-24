@@ -157,7 +157,7 @@ function is_macos() {
 function is_windows() {
   # Windows
   if grep -qEi "(msys|mingw64)" /proc/version &> /dev/null; then
-    return 0
+    return 1  # Not supported
   fi
   return 1
 }
