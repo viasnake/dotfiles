@@ -2,20 +2,14 @@ Include conf.d/config.secret
 
 SetEnv TERM=xterm-256color
 
-host alflag
+host alflag ssh.alflag.internal
   HostName ssh.alflag.internal
   Port 22
-  User infra
+  User root
   StrictHostKeyChecking no
   UserKnownHostsFile=/dev/null
 
-Host github
-  HostName github.com
-  User git
-  ForwardAgent yes
-  IdentityFile ~/.ssh/snake
-
-Host github.com
+Host github github.com
   HostName github.com
   User git
   ForwardAgent yes
