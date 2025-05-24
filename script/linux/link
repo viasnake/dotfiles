@@ -44,29 +44,29 @@ function symlink() {
   info "Linking configuration files..."
 
   ## bashrc
-  symlink "$PWD/config/.bashrc" "$HOME/.bashrc"
+  symlink "$PWD/config/bash/.bashrc" "$HOME/.bashrc"
 
   ## git
-  symlink "$PWD/config/.gitconfig" "$HOME/.gitconfig"
+  symlink "$PWD/config/git/.gitconfig" "$HOME/.gitconfig"
 
   ## ssh
-  symlink "$PWD/config/.ssh/config" "$HOME/.ssh/config"
-  symlink "$PWD/config/.ssh/conf.d" "$HOME/.ssh/conf.d"
+  symlink "$PWD/config/ssh/config" "$HOME/.ssh/config"
+  symlink "$PWD/config/ssh/conf.d" "$HOME/.ssh/conf.d"
 
   ## homebrew
-  symlink "$PWD/config/.Brewfile" "$HOME/.Brewfile"
+  symlink "$PWD/config/homebrew/.Brewfile" "$HOME/.Brewfile"
 
   ## fish
   mkdir -p  "$HOME/.config/fish"
-  symlink "$PWD/config/.config/fish/config.fish" "$HOME/.config/fish/config.fish"
-  symlink "$PWD/config/.config/fish/fish_plugins" "$HOME/.config/fish/fish_plugins"
-  symlink "$PWD/config/.config/fish/fish_variables" "$HOME/.config/fish/fish_variables"
-  symlink "$PWD/config/.config/fish/completions" "$HOME/.config/fish/completions"
-  symlink "$PWD/config/.config/fish/conf.d" "$HOME/.config/fish/conf.d"
-  symlink "$PWD/config/.config/fish/functions" "$HOME/.config/fish/functions"
+  symlink "$PWD/config/fish/config.fish" "$HOME/.config/fish/config.fish"
+  symlink "$PWD/config/fish/fish_plugins" "$HOME/.config/fish/fish_plugins"
+  symlink "$PWD/config/fish/fish_variables" "$HOME/.config/fish/fish_variables"
+  symlink "$PWD/config/fish/completions" "$HOME/.config/fish/completions"
+  symlink "$PWD/config/fish/conf.d" "$HOME/.config/fish/conf.d"
+  symlink "$PWD/config/fish/functions" "$HOME/.config/fish/functions"
 
   ## ghostty
-  symlink "$PWD/config/.config/ghostty" "$HOME/.config/ghostty"
+  symlink "$PWD/config/ghostty" "$HOME/.config/ghostty"
 
   #
   info "Linking completed"
