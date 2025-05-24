@@ -156,7 +156,9 @@ function is_macos() {
 #
 function is_windows() {
   # Windows
-  # Why would you run this script on Windows?
+  if grep -qEi "(msys|mingw64)" /proc/version &> /dev/null; then
+    return 0
+  fi
   return 1
 }
 
@@ -171,9 +173,8 @@ function is_wsl() {
   # WSL 2
   elif grep -qEi "microsoft" /proc/version &> /dev/null; then
     return 0
-  else
-    return 1
   fi
+  return 1
 }
 
 
