@@ -1,1 +1,65 @@
-install
+#!/usr/bin/env bash
+
+# Exit immediately if a command exits with a non-zero status
+set -e
+
+function error() {
+  local red="\033[31m"
+  local reset="\033[0m"
+  local prefix="[ERROR] "ee
+  local message=$1
+  echo -e "${red}${prefix}${message}${reset}"
+}
+
+function success() {
+  local green="\033[32m"
+  local reset="\033[0m"
+  local prefix="[SUCCESS] "
+  local message=$1
+  echo -e "${green}${prefix}${message}${reset}"
+}
+
+function warning() {
+  local yellow="\033[33m"
+  local reset="\033[0m"
+  local prefix="[WARNING] "
+  local message=$1
+}
+
+function info() {
+  local cyan="\033[36m"
+  local reset="\033[0m"
+  local prefix="[INFO] "
+  local message=$1
+  echo -e "${cyan}${prefix}${message}${reset}"
+}
+
+function symlink() {
+  ln -nfs "$1" "$2"
+  success "Symlink created: $2 -> $1"
+}
+
+# Link configuration files
+{
+  info "Linking configuration files..."
+
+  ## bashrc
+  symlink "$PWD/config/bash/.bashrc" "$HOME/.bashrc"
+
+  ## git
+  symlink "$PWD/config/git/.gitconfig" "$HOME/.gitconfig"
+
+  ## ssh
+  symlink "$PWD/config/ssh/config" "$HOME/.ssh/config"
+
+  ## homebrew
+  symlink "$PWD/config/homebrew/.Brewfile" "$HOME/.Brewfile"
+
+  ## fish
+  symlink "$PWD/config/fish/config.fish" "$HOME/.config/fish/config.fish"
+  symlink "$PWD/config/fish/fish_plugins" "$HOME/.config/fish/fish_plugins"
+  symlink "$PWD/config/fish/fish_variables" "$HOME/.config/fish/fish_variables"
+
+  #
+  info "Linking completed"
+}

@@ -3,10 +3,14 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
+#
+PATH="$PATH:/opt/homebrew/bin"
+PATH="$PATH:$HOME/.local/bin"
+
 function error() {
   local red="\033[31m"
   local reset="\033[0m"
-  local prefix="[ERROR] "ee
+  local prefix="[ERROR] "
   local message=$1
   echo -e "${red}${prefix}${message}${reset}"
 }
@@ -34,5 +38,31 @@ function info() {
   echo -e "${cyan}${prefix}${message}${reset}"
 }
 
-error "This script is not supported on Windows"
-exit 1
+# Install fish
+{
+  info "Checking Fish..."
+
+  #
+  if ! which fish >/dev/null 2>&1; then
+    warning "Fish is not installed"
+    info "Installing Fish..."
+    pacman -S fish
+    success "Fish installed successfully"
+  else
+    info "Fish is already installed"
+  fi
+}
+
+# Install fisher
+{
+  info "Checking Fisher..."
+
+  if ! which fisher >/dev/null 2>&1; then
+    warning "Fisher is not installed"
+    info "Installing Fisher..."
+    curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+    success "Fisher installed successfully"
+  else
+    info "Fisher is already installed"
+  fi
+}
