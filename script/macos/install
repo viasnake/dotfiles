@@ -43,7 +43,7 @@ function info() {
   info "Installing dependencies..."
 
   # Check if apt.txt exists
-  if [[ ! -f "$PWD/$os/apt.txt" ]]; then
+  if [[ ! -f "$PWD/config/apt.txt" ]]; then
     error "apt.txt not found"
     exit 1
   fi
@@ -76,7 +76,7 @@ function info() {
     info "Installing $package..."
     sudo apt-get install -y "$package"
     success "$package installed successfully"
-  done <"$PWD/$os/apt.txt"
+  done <"$PWD/config/apt.txt"
 
   #
   info "Dependencies installed successfully"
@@ -247,20 +247,20 @@ function info() {
   info "Downloading FirgeNerd font..."
   ## https://github.com/yuru7/Firge/releases/tag/v0.3.0
   url="https://github.com/yuru7/Firge/releases/download/v0.3.0/FirgeNerd_v0.3.0.zip"
-  wget -O "$PWD/$os/fonts/FirgeNerd_v0.3.0.zip" "$url"
+  wget -O "$PWD/config/fonts/FirgeNerd_v0.3.0.zip" "$url"
 
   #
   info "Extracting FirgeNerd font..."
-  unzip -o "$PWD/$os/fonts/FirgeNerd_v0.3.0.zip" -d "$HOME/.local/share/fonts"
+  unzip -o "$PWD/config/fonts/FirgeNerd_v0.3.0.zip" -d "$HOME/.local/share/fonts"
 
   #
   info "Downloading Firge font..."
   url="https://github.com/yuru7/Firge/releases/download/v0.3.0/Firge_v0.3.0.zip"
-  wget -O "$PWD/$os/fonts/Firge_v0.3.0.zip" "$url"
+  wget -O "$PWD/config/fonts/Firge_v0.3.0.zip" "$url"
 
   #
   info "Extracting Firge font..."
-  unzip -o "$PWD/$os/fonts/Firge_v0.3.0.zip" -d "$HOME/.local/share/fonts"
+  unzip -o "$PWD/config/fonts/Firge_v0.3.0.zip" -d "$HOME/.local/share/fonts"
 
   #
   info "Updating font cache..."
