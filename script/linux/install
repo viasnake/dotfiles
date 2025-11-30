@@ -104,14 +104,26 @@ function info() {
     warning "Fish is not installed"
     info "Installing Fish..."
     brew install fish
-    # Add fish to /etc/shells
-    # If already added, it will not be added again
-    if ! grep -q "/home/linuxbrew/.linuxbrew/bin/fish" /etc/shells; then
-      echo "/home/linuxbrew/.linuxbrew/bin/fish" | sudo tee -a /etc/shells >/dev/null
-    fi
-    success "Fish installed successfully"
   else
     info "Fish is already installed"
+  fi
+
+  # Add fish to /etc/shells
+  fish_path="/home/linuxbrew/.linuxbrew/bin/fish"
+  if ! grep -q "$fish_path" /etc/shells; then
+    info "Adding $fish_path to /etc/shells..."
+    echo "$fish_path" | sudo tee -a /etc/shells >/dev/null
+  else
+    info "Fish is already in /etc/shells"
+  fi
+
+  # Change default shell
+  if [ "$SHELL" != "$fish_path" ]; then
+    info "Changing default shell to $fish_path..."
+    chsh -s "$fish_path"
+    success "Default shell changed to fish"
+  else
+    info "Default shell is already fish"
   fi
 }
 

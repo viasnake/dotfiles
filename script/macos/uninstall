@@ -48,6 +48,15 @@ function remove() {
   fi
 }
 
+# Revert default shell
+{
+  if [[ "$SHELL" == *"fish"* ]]; then
+    info "Reverting default shell to /bin/bash..."
+    chsh -s /bin/bash
+    success "Default shell reverted to /bin/bash"
+  fi
+}
+
 # Uninstall fonts
 {
   info "Uninstalling fonts..."
