@@ -45,22 +45,15 @@ function check_arguments() {
   fi
 
   # Check if the argument is valid
-  if [ "$1" == "install" ]; then
-    return 0
-  elif [ "$1" == "uninstall" ]; then
-    return 0
-  elif [ "$1" == "link" ]; then
-    return 0
-  elif [ "$1" == "unlink" ]; then
-    return 0
-  elif [ "$1" == "install_fonts" ]; then
-    return 0
-  elif [ "$1" == "uninstall_fonts" ]; then
-    return 0
-  else
-    error "Invalid argument."
-    exit 1
-  fi
+  case "$1" in
+    install|uninstall|link|unlink|install_fonts|uninstall_fonts)
+      return 0
+      ;;
+    *)
+      error "Invalid argument."
+      exit 1
+      ;;
+  esac
 }
 
 #
@@ -195,20 +188,9 @@ check_os
 
 # Set the script based on the argument
 info "Setting the script based on the argument..."
-if [ "$1" == "install" ]; then
-  script="script/$os/install"
-elif [ "$1" == "uninstall" ]; then
-  script="script/$os/uninstall"
-elif [ "$1" == "link" ]; then
-  script="script/$os/link"
-elif [ "$1" == "unlink" ]; then
-  script="script/$os/unlink"
-elif [ "$1" == "install_fonts" ]; then
-  script="script/$os/install_fonts"
-elif [ "$1" == "uninstall_fonts" ]; then
-  script="script/$os/uninstall_fonts"
-else
-  error "Invalid argument."
+script="script/$os/$1"
+if [ ! -f "$script" ]; then
+  error "Script not found: $script"
   exit 1
 fi
 
