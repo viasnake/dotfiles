@@ -120,7 +120,7 @@ function info() {
   info "Installing brew packages..."
 
   #
-  brew bundle --global --file="$HOME/.Brewfile"
+  brew bundle --file="$HOME/.Brewfile"
   success "Brew packages installed successfully"
 }
 
