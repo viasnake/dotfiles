@@ -53,6 +53,10 @@ function check_arguments() {
     return 0
   elif [ "$1" == "unlink" ]; then
     return 0
+  elif [ "$1" == "install_fonts" ]; then
+    return 0
+  elif [ "$1" == "uninstall_fonts" ]; then
+    return 0
   else
     error "Invalid argument."
     exit 1
@@ -199,6 +203,10 @@ elif [ "$1" == "link" ]; then
   script="script/$os/link"
 elif [ "$1" == "unlink" ]; then
   script="script/$os/unlink"
+elif [ "$1" == "install_fonts" ]; then
+  script="script/$os/install_fonts"
+elif [ "$1" == "uninstall_fonts" ]; then
+  script="script/$os/uninstall_fonts"
 else
   error "Invalid argument."
   exit 1
