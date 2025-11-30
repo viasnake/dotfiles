@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+# Exit immediately if a command exits with a non-zero status
+set -e
+
+#
+PATH="$PATH:/home/linuxbrew/.linuxbrew/bin"
+PATH="$PATH:$HOME/.local/bin"
+
+function error() {
+  local red="\033[31m"
+  local reset="\033[0m"
+  local prefix="[ERROR] "
+  local message=$1
+  echo -e "${red}${prefix}${message}${reset}"
+}
+
+function success() {
+  local green="\033[32m"
+  local reset="\033[0m"
+  local prefix="[SUCCESS] "
+  local message=$1
+  echo -e "${green}${prefix}${message}${reset}"
+}
+
+function warning() {
+  local yellow="\033[33m"
+  local reset="\033[0m"
+  local prefix="[WARNING] "
+  local message=$1
+}
+
+function info() {
+  local cyan="\033[36m"
+  local reset="\033[0m"
+  local prefix="[INFO] "
+  local message=$1
+  echo -e "${cyan}${prefix}${message}${reset}"
+}
+
+# Install fonts
+{
+  info "Installing fonts..."
+
+  #
+  info "Checking fonts..."
+  # fc-list
+  if fc-list | grep -q "Firge"; then
+    info "Fonts are already installed"
+    exit 0
+  fi
+
+  #
+  info "Downloading FirgeNerd font..."
+  ## https://github.com/yuru7/Firge/releases/tag/v0.3.0
+  url="https://github.com/yuru7/Firge/releases/download/v0.3.0/FirgeNerd_v0.3.0.zip"
+  wget -O "$PWD/config/fonts/FirgeNerd_v0.3.0.zip" "$url"
+
+  #
+  info "Extracting FirgeNerd font..."
+  unzip -o "$PWD/config/fonts/FirgeNerd_v0.3.0.zip" -d "$HOME/.local/share/fonts"
+
+  #
+  info "Downloading Firge font..."
+  url="https://github.com/yuru7/Firge/releases/download/v0.3.0/Firge_v0.3.0.zip"
+  wget -O "$PWD/config/fonts/Firge_v0.3.0.zip" "$url"
+
+  #
+  info "Extracting Firge font..."
+  unzip -o "$PWD/config/fonts/Firge_v0.3.0.zip" -d "$HOME/.local/share/fonts"
+
+  #
+  info "Updating font cache..."
+  fc-cache -fv
+
+  success "Fonts installed successfully"
+}

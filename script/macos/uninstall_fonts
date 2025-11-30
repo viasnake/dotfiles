@@ -4,7 +4,7 @@
 set -e
 
 #
-PATH="$PATH:/home/linuxbrew/.linuxbrew/bin"
+PATH="$PATH:/opt/homebrew/bin"
 PATH="$PATH:$HOME/.local/bin"
 
 function error() {
@@ -48,47 +48,13 @@ function remove() {
   fi
 }
 
-# Uninstall fish
+# Uninstall fonts
 {
-  info "Uninstalling fish..."
+  info "Uninstalling fonts..."
 
   #
-  brew uninstall fisher
-  brew uninstall fish
+  remove "$HOME/.local/share/fonts"
 
   #
-  remove "/home/linuxbrew/.linuxbrew/etc/fish"
-  ## Remove fish from /etc/shells
-  sudo sed -i '/fish/d' /etc/shells
-
-  #
-  info "Fish uninstalled successfully"
+  info "Fonts uninstalled successfully"
 }
-
-#  Uninstall Homebrew
-{
-  info "Uninstalling Homebrew..."
-
-  #
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
-
-  #
-  remove "/home/linuxbrew/.linuxbrew/etc"
-  remove "/home/linuxbrew/.linuxbrew/lib"
-  remove "/home/linuxbrew/.linuxbrew/share"
-
-  #
-  info "Homebrew uninstalled successfully"
-}
-
-# Uninstall dependencies
-## !! Do not remove as it may have an impact !! ##
-# {
-#   info "Uninstalling dependencies..."
-
-#   #
-#   sudo apt-get remove -y build-essential procps curl file git
-
-#   #
-#   success "Dependencies uninstalled successfully"
-# }

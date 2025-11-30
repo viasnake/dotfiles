@@ -11,3 +11,7 @@ link:
 	$(BOOTSTRAP) link
 unlink:
 	$(BOOTSTRAP) unlink
+install_fonts:
+	$(BOOTSTRAP) install_fonts
+uninstall_fonts:
+	$(BOOTSTRAP) uninstall_fonts
