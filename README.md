@@ -30,6 +30,18 @@ cd dotfiles
 make install
 ```
 
+> [!TIP]
+> Setup your git identity by editing the git config file:
+> ```bash
+> vim ~/.config/git
+> ```
+> Add the following lines:
+> ```
+> [user]
+>     name = viasnake
+>     email = admin@viasnake.com
+> ```
+
 ## How to uninstall
 
 ```bash
