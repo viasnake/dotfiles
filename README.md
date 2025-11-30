@@ -25,7 +25,7 @@
 ### Installation
 
 ```bash
-git clone git@github.com:viasnake/dotfiles.git
+git clone https://github.com/viasnake/dotfiles.git
 cd dotfiles
 make install
 ```
