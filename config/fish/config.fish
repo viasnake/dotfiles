@@ -11,6 +11,9 @@ if status is-interactive
 
   # mise
   mise activate fish | source
+
+  #
+  set --universal pure_show_system_time true
 else
   # mise
   mise activate fish --shims | source
