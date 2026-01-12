@@ -59,10 +59,10 @@ function symlink() {
   mkdir -p  "$HOME/.config/fish"
   symlink "$PWD/config/fish/config.fish" "$HOME/.config/fish/config.fish"
   symlink "$PWD/config/fish/fish_plugins" "$HOME/.config/fish/fish_plugins"
-  symlink "$PWD/config/fish/fish_variables" "$HOME/.config/fish/fish_variables"
-  symlink "$PWD/config/fish/completions" "$HOME/.config/fish/completions"
-  symlink "$PWD/config/fish/conf.d" "$HOME/.config/fish/conf.d"
-  symlink "$PWD/config/fish/functions" "$HOME/.config/fish/functions"
+  # symlink "$PWD/config/fish/fish_variables" "$HOME/.config/fish/fish_variables"
+  # symlink "$PWD/config/fish/completions" "$HOME/.config/fish/completions"
+  # symlink "$PWD/config/fish/conf.d" "$HOME/.config/fish/conf.d"
+  # symlink "$PWD/config/fish/functions" "$HOME/.config/fish/functions"
 
   ## ghostty
   symlink "$PWD/config/ghostty" "$HOME/.config/ghostty"
