@@ -135,3 +135,17 @@ function info() {
   brew bundle --file="$HOME/.Brewfile"
   success "Brew packages installed successfully"
 }
+
+# Install mise tools
+{
+  info "Checking mise..."
+
+  #
+  if which mise >/dev/null 2>&1; then
+    info "Installing mise tools..."
+    mise install
+    success "mise tools installed successfully"
+  else
+    info "mise is not installed, skipping mise tools installation"
+  fi
+}

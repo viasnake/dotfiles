@@ -65,6 +65,10 @@ function symlink() {
   # symlink "$PWD/config/fish/conf.d" "$HOME/.config/fish/conf.d"
   # symlink "$PWD/config/fish/functions" "$HOME/.config/fish/functions"
 
+  ## mise
+  mkdir -p  "$HOME/.config/mise"
+  symlink "$PWD/config/mise" "$HOME/.config/mise"
+
   ## ghostty
   symlink "$PWD/config/ghostty" "$HOME/.config/ghostty"
 

@@ -9,8 +9,10 @@ if status is-interactive
     eval (/opt/homebrew/bin/brew shellenv)
   end
 
-  # mise
+  #
   mise activate fish | source
+  zoxide init fish --cmd cd | source
+  fzf --fish | source
 
   #
   set --universal pure_show_system_time true
