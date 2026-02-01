@@ -16,6 +16,20 @@ if status is-interactive
 
   #
   set --universal pure_show_system_time true
+
+  # ssh-agent
+  if not set -q SSH_AUTH_SOCK
+    eval (ssh-agent -c)
+
+    # Add keys from ssh config
+    if test -f $HOME/.ssh/config
+      for key in (grep -i 'IdentityFile' $HOME/.ssh/config | awk '{print $2}')
+        if test -f $key
+          ssh-add $key
+        end
+      end
+    end
+  end
 else
   # mise
   mise activate fish --shims | source
