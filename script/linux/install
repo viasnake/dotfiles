@@ -136,6 +136,20 @@ function info() {
   success "Brew packages installed successfully"
 }
 
+# Install fisher plugins
+{
+  info "Checking Fisher..."
+
+  #
+  if ! which fish >/dev/null 2>&1; then
+    error "Fish is not installed, cannot install Fisher plugins"
+  else
+    info "Installing Fisher plugins..."
+    fish -c "fisher install $(cat $HOME/.config/fish/fish_plugins | tr '\n' ' ')"
+    success "Fisher plugins installed successfully"
+  fi
+}
+
 # Install mise tools
 {
   info "Checking mise..."
