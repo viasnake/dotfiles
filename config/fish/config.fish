@@ -24,9 +24,14 @@ if status is-interactive
     # Add keys from ssh config
     if test -f $HOME/.ssh/config
       for key in (grep -i 'IdentityFile' $HOME/.ssh/config | awk '{print $2}')
-        echo $key
+
+        # Expand ~ to home directory
+        if string match -q '~*' $key
+          set key (string replace '~' $HOME $key)
+        end
+
+        # Add the key if the file exists
         if test -f $key
-          echo "Adding key: $key"
           ssh-add $key
         end
       end
