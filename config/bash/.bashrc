@@ -128,4 +128,4 @@ then
 fi
 
 # mise path
-eval "$(/home/linuxbrew/.linuxbrew/bin/mise activate bash)"
+eval "$(/home/linuxbrew/.linuxbrew/bin/mise activate bash --shims)"
