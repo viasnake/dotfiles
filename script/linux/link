@@ -35,7 +35,22 @@ function info() {
 }
 
 function symlink() {
+
+  # Create parent directory if it doesn't exist
+  local target_dir
+  target_dir=$(dirname "$2")
+  mkdir -p "$target_dir"
+
+  # Remove existing file or symlink
+  if [ -e "$2" ] || [ -L "$2" ]; then
+    rm -rf "$2"
+    info "Removed existing file/symlink: $2"
+  fi
+
+  # Create symlink
   ln -nfs "$1" "$2"
+
+  #
   success "Symlink created: $2 -> $1"
 }
 
