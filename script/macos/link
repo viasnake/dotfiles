@@ -77,7 +77,6 @@ function symlink() {
   mkdir -p "$HOME/.config/opencode/providers"
   mkdir -p "$HOME/.config/opencode/providers/profiles"
   symlink "$PWD/config/opencode/AGENTS.md" "$HOME/.config/opencode/AGENTS.md"
-  symlink "$PWD/config/opencode/README.md" "$HOME/.config/opencode/README.md"
   symlink "$PWD/config/opencode/opencode.jsonc" "$HOME/.config/opencode/opencode.jsonc"
   symlink "$PWD/config/opencode/providers/catalog.json" "$HOME/.config/opencode/providers/catalog.json"
   symlink "$PWD/config/opencode/providers/profiles/personal.json" "$HOME/.config/opencode/providers/profiles/personal.json"
