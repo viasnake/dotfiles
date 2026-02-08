@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "providers": [
+    {
+      "id": "context7",
+      "kind": "mcp",
+      "external": true,
+      "enabled_by_default": true,
+      "mcp": {
+        "type": "local",
+        "command": [
+          "npx",
+          "-y",
+          "@upstash/context7-mcp",
+          "--api-key",
+          "{env:CONTEXT7_API_KEY}"
+        ]
+      },
+      "secrets": [
+        {
+          "env": "CONTEXT7_API_KEY",
+          "bw_item_id_env": "BW_CONTEXT7_ITEM_ID",
+          "bw_field": "password"
+        }
+      ]
+    },
+    {
+      "id": "playwright",
+      "kind": "mcp",
+      "external": true,
+      "enabled_by_default": true,
+      "mcp": {
+        "type": "local",
+        "command": [
+          "npx",
+          "@playwright/mcp@latest"
+        ]
+      },
+      "secrets": []
+    }
+  ]
+}

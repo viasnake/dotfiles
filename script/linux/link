@@ -93,8 +93,15 @@ function symlink() {
   ## opencode
   mkdir -p "$HOME/.config/opencode"
   mkdir -p "$HOME/.config/opencode/instructions"
+  mkdir -p "$HOME/.config/opencode/providers"
+  mkdir -p "$HOME/.config/opencode/providers/profiles"
   symlink "$PWD/config/opencode/AGENTS.md" "$HOME/.config/opencode/AGENTS.md"
+  symlink "$PWD/config/opencode/README.md" "$HOME/.config/opencode/README.md"
   symlink "$PWD/config/opencode/opencode.jsonc" "$HOME/.config/opencode/opencode.jsonc"
+  symlink "$PWD/config/opencode/providers/catalog.json" "$HOME/.config/opencode/providers/catalog.json"
+  symlink "$PWD/config/opencode/providers/profiles/personal.json" "$HOME/.config/opencode/providers/profiles/personal.json"
+  symlink "$PWD/config/opencode/providers/profiles/work.json" "$HOME/.config/opencode/providers/profiles/work.json"
+  symlink "$PWD/config/opencode/providers/profiles/restricted.json" "$HOME/.config/opencode/providers/profiles/restricted.json"
   symlink "$PWD/config/opencode/instructions/coding-style.md" "$HOME/.config/opencode/instructions/coding-style.md"
   symlink "$PWD/config/opencode/instructions/documentation.md" "$HOME/.config/opencode/instructions/documentation.md"
 

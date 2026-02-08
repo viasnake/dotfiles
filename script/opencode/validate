@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+PROFILE="${1:-${OPENCODE_PROFILE:-personal}}"
+CATALOG_PATH="$REPO_ROOT/config/opencode/providers/catalog.json"
+PROFILE_PATH="$REPO_ROOT/config/opencode/providers/profiles/$PROFILE.json"
+
+if [[ ! -f "$CATALOG_PATH" ]]; then
+  echo "[ERROR] Catalog not found: $CATALOG_PATH" >&2
+  exit 1
+fi
+
+if [[ ! -f "$PROFILE_PATH" ]]; then
+  echo "[ERROR] Profile not found: $PROFILE_PATH" >&2
+  exit 1
+fi
+
+python3 - "$CATALOG_PATH" "$PROFILE_PATH" <<'PY'
+import json
+import sys
+
+catalog_path, profile_path = sys.argv[1], sys.argv[2]
+
+with open(catalog_path, "r", encoding="utf-8") as f:
+    catalog = json.load(f)
+
+with open(profile_path, "r", encoding="utf-8") as f:
+    profile = json.load(f)
+
+errors = []
+providers = catalog.get("providers")
+if not isinstance(providers, list):
+    errors.append("catalog.providers must be an array")
+    providers = []
+
+ids = []
+for idx, provider in enumerate(providers):
+    if not isinstance(provider, dict):
+        errors.append(f"providers[{idx}] must be an object")
+        continue
+    pid = provider.get("id")
+    kind = provider.get("kind")
+    if not isinstance(pid, str) or not pid:
+        errors.append(f"providers[{idx}].id must be a non-empty string")
+    else:
+        ids.append(pid)
+    if kind != "mcp":
+        errors.append(f"providers[{idx}].kind must be 'mcp'")
+
+    mcp = provider.get("mcp")
+    if not isinstance(mcp, dict):
+        errors.append(f"providers[{idx}].mcp must be an object")
+    else:
+        if not isinstance(mcp.get("type"), str) or not mcp["type"]:
+            errors.append(f"providers[{idx}].mcp.type must be a non-empty string")
+        command = mcp.get("command")
+        if not isinstance(command, list) or not command or not all(isinstance(x, str) and x for x in command):
+            errors.append(f"providers[{idx}].mcp.command must be an array of non-empty strings")
+
+    secrets = provider.get("secrets", [])
+    if not isinstance(secrets, list):
+        errors.append(f"providers[{idx}].secrets must be an array")
+    else:
+        for sidx, secret in enumerate(secrets):
+            if not isinstance(secret, dict):
+                errors.append(f"providers[{idx}].secrets[{sidx}] must be an object")
+                continue
+            env_name = secret.get("env")
+            if not isinstance(env_name, str) or not env_name:
+                errors.append(f"providers[{idx}].secrets[{sidx}].env must be a non-empty string")
+
+if len(ids) != len(set(ids)):
+    errors.append("provider ids must be unique")
+
+allowed_ids = profile.get("allowed_ids")
+if not isinstance(allowed_ids, list) or not all(isinstance(x, str) and x for x in allowed_ids):
+    errors.append("profile.allowed_ids must be an array of non-empty strings")
+    allowed_ids = []
+
+unknown = sorted(set(allowed_ids) - set(ids))
+for item in unknown:
+    errors.append(f"profile.allowed_ids contains unknown provider id: {item}")
+
+if errors:
+    for err in errors:
+        print(f"[ERROR] {err}", file=sys.stderr)
+    sys.exit(1)
+
+print(f"[INFO] Validation passed for profile '{profile.get('name', 'unknown')}'")
+PY
