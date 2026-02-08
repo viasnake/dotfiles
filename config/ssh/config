@@ -6,11 +6,15 @@ host alflag ssh.alflag.internal
   HostName ssh.alflag.internal
   Port 22
   User root
+  ForwardAgent no
+  IdentityAgent none
   StrictHostKeyChecking no
   UserKnownHostsFile=/dev/null
 
 Host github github.com
   HostName github.com
   User git
+
+Host *
   ForwardAgent yes
-  IdentityFile ~/.ssh/snake
+  IdentityAgent $SSH_AUTH_SOCK

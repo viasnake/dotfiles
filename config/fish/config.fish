@@ -17,25 +17,8 @@ if status is-interactive
   #
   set --universal pure_show_system_time true
 
-  # ssh-agent
   if not set -q SSH_AUTH_SOCK
-    eval (ssh-agent -c)
-
-    # Add keys from ssh config
-    if test -f $HOME/.ssh/config
-      for key in (grep -i 'IdentityFile' $HOME/.ssh/config | awk '{print $2}')
-
-        # Expand ~ to home directory
-        if string match -q '~*' $key
-          set key (string replace '~' $HOME $key)
-        end
-
-        # Add the key if the file exists
-        if test -f $key
-          ssh-add $key
-        end
-      end
-    end
+    echo "[WARNING] SSH_AUTH_SOCK is not set. Bitwarden SSH Agent is required." >&2
   end
 else
   # mise
