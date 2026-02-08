@@ -4,6 +4,10 @@
     "input_submit": "return",
     "input_newline": "shift+return,ctrl+return,alt+return,ctrl+j",
   },
+  "instructions": [
+    "instructions/coding-style.md",
+    "instructions/documentation.md"
+  ],
   "mcp": {
     "context7": {
       "type": "remote",

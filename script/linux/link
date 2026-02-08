@@ -92,7 +92,11 @@ function symlink() {
 
   ## opencode
   mkdir -p "$HOME/.config/opencode"
+  mkdir -p "$HOME/.config/opencode/instructions"
   symlink "$PWD/config/opencode/AGENTS.md" "$HOME/.config/opencode/AGENTS.md"
+  symlink "$PWD/config/opencode/opencode.jsonc" "$HOME/.config/opencode/opencode.jsonc"
+  symlink "$PWD/config/opencode/instructions/coding-style.md" "$HOME/.config/opencode/instructions/coding-style.md"
+  symlink "$PWD/config/opencode/instructions/documentation.md" "$HOME/.config/opencode/instructions/documentation.md"
 
   #
   info "Linking completed"
