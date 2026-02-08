@@ -17,9 +17,6 @@ if status is-interactive
   #
   set --universal pure_show_system_time true
 
-  if not set -q SSH_AUTH_SOCK
-    echo "[WARNING] SSH_AUTH_SOCK is not set. Bitwarden SSH Agent is required." >&2
-  end
 else
   # mise
   mise activate fish --shims | source

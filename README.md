@@ -38,58 +38,17 @@ make install
 >     email = <your-email>
 > ```
 
-## 初回セットアップ（Bitwarden + opencode + SSH）
+## 初回セットアップ（opencode + SSH）
 
 この章だけ見れば、初回セットアップが完了するようにしています。
 
-### 1. Bitwarden CLI の認証情報を取得
-
-#### BW_CLIENTID / BW_CLIENTSECRET
-
-1. Bitwarden Web Vault を開く
-2. `Settings` -> `Security` -> `Keys` -> `API Key`
-3. API key を作成または表示
-4. 以下を控える
-   - `client_id` -> `BW_CLIENTID`
-   - `client_secret` -> `BW_CLIENTSECRET`
-
-#### BW_PASSWORD
-
-- Bitwarden のマスターパスワード
-
-#### BW_CONTEXT7_ITEM_ID / BW_SSH_KEY_ITEM_ID
-
-1. Bitwarden で対象アイテムを用意
-   - Context7 API key 用アイテム
-   - SSH private key 用アイテム
-2. CLI で一度ログイン・アンロック
-
-```bash
-bw login --apikey
-export BW_PASSWORD='<your-master-password>'
-export BW_SESSION="$(bw unlock --passwordenv BW_PASSWORD --raw)"
-```
-
-3. アイテム ID を検索
-
-```bash
-bw list items --search "context7" --session "$BW_SESSION"
-bw list items --search "ssh" --session "$BW_SESSION"
-```
-
-4. 各アイテムの `id` を控える
-
-### 2. 共通 secrets ファイルを作成
+### 1. 共通 secrets ファイルを作成
 
 ```bash
 mkdir -p ~/.config/secrets
 chmod 700 ~/.config/secrets
 cat > ~/.config/secrets/runtime.env.secret <<'EOF'
-BW_CLIENTID=<bitwarden-api-client-id>
-BW_CLIENTSECRET=<bitwarden-api-client-secret>
-BW_PASSWORD=<bitwarden-master-password>
-BW_CONTEXT7_ITEM_ID=<bitwarden-item-id-for-context7>
-BW_SSH_KEY_ITEM_ID=<bitwarden-item-id-for-ssh-key>
+CONTEXT7_API_KEY=<context7-api-key>
 EOF
 chmod 600 ~/.config/secrets/runtime.env.secret
 ```
@@ -99,7 +58,7 @@ chmod 600 ~/.config/secrets/runtime.env.secret
 - `SECRETS_ENV_FILE` を指定すると別パスを使える
 - secrets ファイルは Git 管理しない
 
-### 3. opencode を起動
+### 2. opencode を起動
 
 個人プロファイル（外部 MCP 利用）:
 
@@ -113,30 +72,30 @@ OPENCODE_PROFILE=personal script/opencode/run-with-secrets
 OPENCODE_PROFILE=work script/opencode/run-with-secrets
 ```
 
-### 4. サーバで SSH コマンドを実行
+### 3. SSH 鍵をローカル配置する
 
 ```bash
-script/ssh/with-agent-secrets -- ssh -T git@github.com
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/snake
 ```
 
-- 一時 `ssh-agent` を起動
-- Bitwarden から鍵を読み込み `ssh-add -` で投入
-- コマンド終了時に agent を停止
+`config/ssh/config` は GitHub に対して `IdentityFile ~/.ssh/snake` を使います。
 
-### 5. 最低限の動作確認
+### 4. 最低限の動作確認
 
 ```bash
-bw --version
 script/opencode/validate personal
 ssh -G github -F config/ssh/config
+ssh -T git@github.com
 ```
 
-### 6. トラブルシュート
+### 5. トラブルシュート
 
-`[WARNING] SSH_AUTH_SOCK is not set. Bitwarden SSH Agent is required.` が出る場合:
+`Permission denied (publickey)` が出る場合:
 
-- ローカル端末: Bitwarden Desktop の SSH Agent を有効化し、新しいターミナルを開く
-- サーバ作業: `script/ssh/with-agent-secrets -- <command>` で実行する
+- `~/.ssh/snake` が存在するか確認
+- `chmod 600 ~/.ssh/snake` を再実行
+- `ssh -G github -F config/ssh/config | grep identityfile` で反映確認
 
 ## アンインストール
 

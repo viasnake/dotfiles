@@ -1,6 +1,5 @@
 [tools]
 bat = "latest"
-bitwarden = "latest"
 fd = "latest"
 fzf = "latest"
 gh = "latest"

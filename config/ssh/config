@@ -14,7 +14,7 @@ host alflag ssh.alflag.internal
 Host github github.com
   HostName github.com
   User git
+  IdentityFile ~/.ssh/snake
 
 Host *
   ForwardAgent yes
-  IdentityAgent $SSH_AUTH_SOCK

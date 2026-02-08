@@ -18,9 +18,7 @@
       },
       "secrets": [
         {
-          "env": "CONTEXT7_API_KEY",
-          "bw_item_id_env": "BW_CONTEXT7_ITEM_ID",
-          "bw_field": "password"
+          "env": "CONTEXT7_API_KEY"
         }
       ]
     },
