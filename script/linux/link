@@ -90,6 +90,10 @@ function symlink() {
   ## ghostty
   symlink "$PWD/config/ghostty" "$HOME/.config/ghostty"
 
+  ## opencode
+  mkdir -p "$HOME/.config/opencode"
+  symlink "$PWD/config/opencode/AGENTS.md" "$HOME/.config/opencode/AGENTS.md"
+
   #
   info "Linking completed"
 }

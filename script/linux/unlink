@@ -60,6 +60,9 @@ function remove() {
   # homebrew
   remove "$HOME/.Brewfile"
 
+  # opencode
+  remove "$HOME/.config/opencode/AGENTS.md"
+
   #
   success "Unlinking completed successfully"
 }
