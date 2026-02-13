@@ -56,9 +56,13 @@ function remove() {
 
   # ssh
   remove "$HOME/.ssh/config"
+  remove "$HOME/.ssh/config.d/00-base.conf"
 
   # homebrew
   remove "$HOME/.Brewfile"
+
+  # dot command
+  remove "$HOME/.local/bin/dot"
 
   #
   success "Unlinking completed successfully"

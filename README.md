@@ -38,11 +38,11 @@ make install
 >     email = <your-email>
 > ```
 
-## 初回セットアップ（opencode + SSH）
+## 初回セットアップ（dot + Bitwarden + SSH）
 
 この章だけ見れば、初回セットアップが完了するようにしています。
 
-### 1. 共通 secrets ファイルを作成
+### 1. 共通 secrets ファイルを作成（任意）
 
 ```bash
 mkdir -p ~/.config/secrets
@@ -58,7 +58,38 @@ chmod 600 ~/.config/secrets/runtime.env.secret
 - `SECRETS_ENV_FILE` を指定すると別パスを使える
 - secrets ファイルは Git 管理しない
 
-### 2. opencode を起動
+### 2. `dot` コマンドを有効化
+
+```bash
+make link
+```
+
+`~/.local/bin/dot` にシンボリックリンクが作成されます。
+
+### 3. Bitwarden CLI をセットアップ
+
+```bash
+bw login
+export BW_SESSION="$(bw unlock --raw)"
+```
+
+`BW_SESSION` は同一シェルで `dot ssh sync` 実行時に利用されます。
+
+### 4. bootstrap を実行
+
+```bash
+dot bootstrap
+```
+
+仕事用プロファイルを同時に使う場合は次の順で実行します。
+
+```bash
+dot work enable
+DOT_WORK_REPO_URL=<ghec-repo-url> dot work sync
+dot bootstrap
+```
+
+### 5. opencode を起動
 
 個人プロファイル（外部 MCP 利用）:
 
@@ -72,30 +103,46 @@ OPENCODE_PROFILE=personal script/opencode/run-with-secrets
 OPENCODE_PROFILE=work script/opencode/run-with-secrets
 ```
 
-### 3. SSH 鍵をローカル配置する
-
-```bash
-chmod 700 ~/.ssh
-chmod 600 ~/.ssh/snake
-```
-
-`config/ssh/config` は GitHub に対して `IdentityFile ~/.ssh/snake` を使います。
-
-### 4. 最低限の動作確認
+### 6. 最低限の動作確認
 
 ```bash
 script/opencode/validate personal
-ssh -G github -F config/ssh/config
-ssh -T git@github.com
+dot ssh status
+ssh -G github
 ```
 
-### 5. トラブルシュート
+### 7. 鍵ローテーション
+
+Bitwarden のアイテム更新後に次を実行します。
+
+```bash
+dot ssh sync
+```
+
+デフォルトでは次のアイテム名を検索します。
+
+- personal: `personal-ssh`
+- work: `work-ssh`
+
+必要なら環境変数で上書きできます。
+
+```bash
+DOT_SSH_PERSONAL_ITEM=<item-id-or-name> DOT_SSH_WORK_ITEM=<item-id-or-name> dot ssh sync
+```
+
+### 8. work 設定の更新
+
+```bash
+dot work sync
+```
+
+### 9. トラブルシュート
 
 `Permission denied (publickey)` が出る場合:
 
-- `~/.ssh/snake` が存在するか確認
-- `chmod 600 ~/.ssh/snake` を再実行
-- `ssh -G github -F config/ssh/config | grep identityfile` で反映確認
+- `dot ssh status` で鍵ファイルと権限を確認
+- `export BW_SESSION="$(bw unlock --raw)"` を再実行
+- `dot ssh sync` を再実行
 
 ## アンインストール
 

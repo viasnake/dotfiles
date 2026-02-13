@@ -1,5 +1,9 @@
 [include]
 path = "~/.config/git"
+
+[includeIf "gitdir:~/work/"]
+path = "~/.gitconfig.work"
+
 [alias]
 vacuum = "!f () { git checkout $1; git branch --merged|egrep -v '\\*|develop|main|master'|xargs git branch -d; };f"
 [credential "https://github.com"]

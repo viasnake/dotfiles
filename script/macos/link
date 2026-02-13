@@ -50,7 +50,9 @@ function symlink() {
   symlink "$PWD/config/git/.gitconfig" "$HOME/.gitconfig"
 
   ## ssh
+  mkdir -p "$HOME/.ssh/config.d"
   symlink "$PWD/config/ssh/config" "$HOME/.ssh/config"
+  symlink "$PWD/config/ssh/config.d/00-base.conf" "$HOME/.ssh/config.d/00-base.conf"
 
   ## homebrew
   symlink "$PWD/config/homebrew/.Brewfile" "$HOME/.Brewfile"
@@ -84,6 +86,10 @@ function symlink() {
   symlink "$PWD/config/opencode/providers/profiles/restricted.json" "$HOME/.config/opencode/providers/profiles/restricted.json"
   symlink "$PWD/config/opencode/instructions/coding-style.md" "$HOME/.config/opencode/instructions/coding-style.md"
   symlink "$PWD/config/opencode/instructions/documentation.md" "$HOME/.config/opencode/instructions/documentation.md"
+
+  ## dot command
+  mkdir -p "$HOME/.local/bin"
+  symlink "$PWD/bin/dot" "$HOME/.local/bin/dot"
 
   #
   info "Linking completed"

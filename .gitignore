@@ -1,2 +1,13 @@
 *.secret
 .env.secret
+
+# SSH and credentials
+id_*
+*.pem
+*.key
+*kubeconfig*
+*credentials*
+
+# Bitwarden session or logs
+*BW_SESSION*
+*.session.log
