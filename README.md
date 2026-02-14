@@ -58,13 +58,19 @@ chmod 600 ~/.config/secrets/runtime.env.secret
 - `SECRETS_ENV_FILE` を指定すると別パスを使える
 - secrets ファイルは Git 管理しない
 
-### 2. `dot` コマンドを有効化
+### 2. dot 管理コマンドを有効化
 
 ```bash
 make link
 ```
 
-`~/.local/bin/dot` にシンボリックリンクが作成されます。
+以降の dot 管理操作はすべて `make` ターゲット経由で実行します。
+
+主要ターゲット:
+
+- `make dot-bootstrap`
+- `make dot-work-enable` / `make dot-work-disable` / `make dot-work-sync` / `make dot-work-status`
+- `make dot-ssh-sync` / `make dot-ssh-status` / `make dot-ssh-test`
 
 ### 3. Bitwarden CLI をセットアップ
 
@@ -73,20 +79,20 @@ bw login
 export BW_SESSION="$(bw unlock --raw)"
 ```
 
-`BW_SESSION` は同一シェルで `dot ssh sync` 実行時に利用されます。
+`BW_SESSION` は同一シェルで `make dot-ssh-sync` 実行時に利用されます。
 
 ### 4. bootstrap を実行
 
 ```bash
-dot bootstrap
+make dot-bootstrap
 ```
 
 仕事用プロファイルを同時に使う場合は次の順で実行します。
 
 ```bash
-dot work enable
-DOT_WORK_REPO_URL=<ghec-repo-url> dot work sync
-dot bootstrap
+make dot-work-enable
+DOT_WORK_REPO_URL=<ghec-repo-url> make dot-work-sync
+make dot-bootstrap
 ```
 
 ### 5. opencode を起動
@@ -107,7 +113,7 @@ OPENCODE_PROFILE=work script/opencode/run-with-secrets
 
 ```bash
 script/opencode/validate personal
-dot ssh status
+make dot-ssh-status
 ssh -G github
 ```
 
@@ -116,10 +122,16 @@ ssh -G github
 Bitwarden のアイテム更新後に次を実行します。
 
 ```bash
-dot ssh sync
+make dot-ssh-sync
 ```
 
-デフォルトでは次のアイテム名を検索します。
+Bitwarden のアイテムは `SSH キー` タイプを使います。
+
+- item type: `SSH キー`
+- personal key item name: `personal-ssh`
+- work key item name: `work-ssh`
+
+デフォルトでは次のアイテム名で検索します。
 
 - personal: `personal-ssh`
 - work: `work-ssh`
@@ -127,22 +139,22 @@ dot ssh sync
 必要なら環境変数で上書きできます。
 
 ```bash
-DOT_SSH_PERSONAL_ITEM=<item-id-or-name> DOT_SSH_WORK_ITEM=<item-id-or-name> dot ssh sync
+DOT_SSH_PERSONAL_ITEM=<item-id-or-name> DOT_SSH_WORK_ITEM=<item-id-or-name> make dot-ssh-sync
 ```
 
 ### 8. work 設定の更新
 
 ```bash
-dot work sync
+make dot-work-sync
 ```
 
 ### 9. トラブルシュート
 
 `Permission denied (publickey)` が出る場合:
 
-- `dot ssh status` で鍵ファイルと権限を確認
+- `make dot-ssh-status` で鍵ファイルと権限を確認
 - `export BW_SESSION="$(bw unlock --raw)"` を再実行
-- `dot ssh sync` を再実行
+- `make dot-ssh-sync` を再実行
 
 ## アンインストール
 
