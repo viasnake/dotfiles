@@ -67,9 +67,6 @@ function remove() {
   remove "$HOME/.config/opencode/instructions/coding-style.md"
   remove "$HOME/.config/opencode/instructions/documentation.md"
 
-  # dot command
-  remove "$HOME/.local/bin/dot"
-
   #
   success "Unlinking completed successfully"
 }

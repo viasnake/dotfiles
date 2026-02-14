@@ -61,9 +61,6 @@ function remove() {
   # homebrew
   remove "$HOME/.Brewfile"
 
-  # dot command
-  remove "$HOME/.local/bin/dot"
-
   #
   success "Unlinking completed successfully"
 }

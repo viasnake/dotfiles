@@ -106,10 +106,6 @@ function symlink() {
   symlink "$PWD/config/opencode/instructions/coding-style.md" "$HOME/.config/opencode/instructions/coding-style.md"
   symlink "$PWD/config/opencode/instructions/documentation.md" "$HOME/.config/opencode/instructions/documentation.md"
 
-  ## dot command
-  mkdir -p "$HOME/.local/bin"
-  symlink "$PWD/bin/dot" "$HOME/.local/bin/dot"
-
   #
   info "Linking completed"
 }
