@@ -1,7 +1,13 @@
 BOOTSTRAP = script/bootstrap
-DOT = ./bin/dot
+DOT = ./script/dot
 
-all: link install
+.PHONY: all setup clean install uninstall link unlink install_fonts uninstall_fonts \
+	opencode_validate opencode_sync \
+	dot-bootstrap dot-bootstrap-agent dot-work-enable dot-work-disable dot-work-status dot-work-sync \
+	dot-ssh-sync dot-ssh-sync-agent dot-ssh-status dot-ssh-test
+
+all: setup
+setup: link install dot-bootstrap
 clean: uninstall unlink
 
 install:

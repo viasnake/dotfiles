@@ -27,7 +27,7 @@
 ```bash
 git clone https://github.com/viasnake/dotfiles.git
 cd dotfiles
-make install
+make setup
 ```
 
 > [!TIP]
@@ -58,34 +58,32 @@ chmod 600 ~/.config/secrets/runtime.env.secret
 - `SECRETS_ENV_FILE` を指定すると別パスを使える
 - secrets ファイルは Git 管理しない
 
-### 2. dot 管理コマンドを有効化
-
-```bash
-make link
-```
-
-以降の dot 管理操作はすべて `make` ターゲット経由で実行します。
-
-主要ターゲット:
-
-- `make dot-bootstrap`
-- `make dot-work-enable` / `make dot-work-disable` / `make dot-work-sync` / `make dot-work-status`
-- `make dot-ssh-sync` / `make dot-ssh-status` / `make dot-ssh-test`
-
-### 3. Bitwarden CLI をセットアップ
+### 2. Bitwarden CLI をセットアップ
 
 ```bash
 bw login
 export BW_SESSION="$(bw unlock --raw)"
 ```
 
-`BW_SESSION` は同一シェルで `make dot-ssh-sync` 実行時に利用されます。
+`BW_SESSION` は同一シェルで `make setup` や `make dot-ssh-sync` 実行時に利用されます。
 
-### 4. bootstrap を実行
+### 3. 初回セットアップを実行（ワンコマンド）
 
 ```bash
-make dot-bootstrap
+make setup
 ```
+
+`make setup` は次を順番に実行します。
+
+- `make link`
+- `make install`
+- `make dot-bootstrap`
+
+### 4. 主要ターゲット
+
+- `make dot-bootstrap`
+- `make dot-work-enable` / `make dot-work-disable` / `make dot-work-sync` / `make dot-work-status`
+- `make dot-ssh-sync` / `make dot-ssh-status` / `make dot-ssh-test`
 
 仕事用プロファイルを同時に使う場合は次の順で実行します。
 
