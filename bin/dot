@@ -54,8 +54,8 @@ Usage:
 
 Environment variables:
   DOT_WORK_REPO_URL        Work repo URL (required for initial clone)
-  DOT_SSH_PERSONAL_ITEM    Bitwarden item ID/name for personal key
-  DOT_SSH_WORK_ITEM        Bitwarden item ID/name for work key
+  DOT_SSH_PERSONAL_ITEM    Bitwarden SSH key item ID/name for personal key
+  DOT_SSH_WORK_ITEM        Bitwarden SSH key item ID/name for work key
   WORK_PROFILE             Set to 1 to treat work profile as enabled
 EOF
 }
@@ -229,11 +229,21 @@ resolve_bw_item() {
   return 1
 }
 
-extract_field() {
+extract_ssh_keypair() {
   local item_json="$1"
-  local field_name="$2"
+  local key_kind="$2"
 
-  printf '%s' "$item_json" | jq -r --arg field_name "$field_name" '([.fields[]? | select(.name == $field_name) | .value][0]) // empty'
+  if [ "$key_kind" = "private" ]; then
+    printf '%s' "$item_json" | jq -r '.sshKey.privateKey // .sshKey.keyPair.privateKey // .keyPair.privateKey // empty'
+    return 0
+  fi
+
+  if [ "$key_kind" = "public" ]; then
+    printf '%s' "$item_json" | jq -r '.sshKey.publicKey // .sshKey.keyPair.publicKey // .keyPair.publicKey // empty'
+    return 0
+  fi
+
+  return 1
 }
 
 write_keypair() {
@@ -265,13 +275,20 @@ sync_single_ssh_key() {
     return 1
   fi
 
+  local item_type
+  item_type="$(printf '%s' "$item_json" | jq -r '.type // empty')"
+  if [ "$item_type" != "5" ]; then
+    warn "Skip $label key, item is not SSH key type (type=$item_type)"
+    return 1
+  fi
+
   local private_key
   local public_key
-  private_key="$(extract_field "$item_json" "ssh_private_key")"
-  public_key="$(extract_field "$item_json" "ssh_public_key")"
+  private_key="$(extract_ssh_keypair "$item_json" "private")"
+  public_key="$(extract_ssh_keypair "$item_json" "public")"
 
   if [ -z "$private_key" ] || [ -z "$public_key" ]; then
-    warn "Skip $label key, missing ssh_private_key or ssh_public_key"
+    warn "Skip $label key, missing ssh keypair values in item"
     return 1
   fi
 
