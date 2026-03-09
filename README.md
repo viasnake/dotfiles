@@ -93,7 +93,26 @@ DOT_WORK_REPO_URL=<ghec-repo-url> make dot-work-sync
 make dot-bootstrap
 ```
 
-### 5. opencode を起動
+### 5. Codex CLI を使う
+
+`make link` 後、Codex の設定は `~/.codex/config.toml` に、グローバル指示は `~/.codex/AGENTS.md` に配置されます。
+
+Context7 を使う場合は、Codex 起動前に必要な環境変数を shell で設定します。
+
+```bash
+export CONTEXT7_API_KEY=<context7-api-key>
+codex
+```
+
+MCP の確認:
+
+```bash
+codex mcp --help
+```
+
+TUI では `/mcp` でも確認できます。
+
+### 6. opencode を起動
 
 個人プロファイル（外部 MCP 利用）:
 
@@ -107,7 +126,7 @@ OPENCODE_PROFILE=personal script/opencode/run-with-secrets
 OPENCODE_PROFILE=work script/opencode/run-with-secrets
 ```
 
-### 6. 最低限の動作確認
+### 7. 最低限の動作確認
 
 ```bash
 script/opencode/validate personal
@@ -115,7 +134,15 @@ make dot-ssh-status
 ssh -G github
 ```
 
-### 7. 鍵ローテーション
+Codex 側は次も確認できます。
+
+```bash
+test -L ~/.codex/config.toml
+test -L ~/.codex/AGENTS.md
+codex mcp --help
+```
+
+### 8. 鍵ローテーション
 
 Bitwarden のアイテム更新後に次を実行します。
 
@@ -140,13 +167,13 @@ Bitwarden のアイテムは `SSH キー` タイプを使います。
 DOT_SSH_PERSONAL_ITEM=<item-id-or-name> DOT_SSH_WORK_ITEM=<item-id-or-name> make dot-ssh-sync
 ```
 
-### 8. work 設定の更新
+### 9. work 設定の更新
 
 ```bash
 make dot-work-sync
 ```
 
-### 9. トラブルシュート
+### 10. トラブルシュート
 
 `Permission denied (publickey)` が出る場合:
 

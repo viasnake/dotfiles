@@ -92,6 +92,11 @@ function symlink() {
   ## ghostty
   symlink "$PWD/config/ghostty" "$HOME/.config/ghostty"
 
+  ## codex
+  mkdir -p "$HOME/.codex"
+  symlink "$PWD/config/codex/config.toml" "$HOME/.codex/config.toml"
+  symlink "$PWD/config/codex/AGENTS.md" "$HOME/.codex/AGENTS.md"
+
   ## opencode
   mkdir -p "$HOME/.config/opencode"
   mkdir -p "$HOME/.config/opencode/instructions"
