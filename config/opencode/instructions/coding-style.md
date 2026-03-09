@@ -6,8 +6,6 @@ unless explicitly overridden by project-level rules.
 
 Consistency, readability, and maintainability take precedence over personal preference.
 
----
-
 ## Core Values
 
 - Readability is not a matter of taste; it is the minimization of comprehension cost.
@@ -19,8 +17,6 @@ Consistency, readability, and maintainability take precedence over personal pref
 Code must be designed so that
 **another person (including your future self) can understand it correctly
 in the shortest possible time**.
-
----
 
 ## Naming
 
@@ -35,8 +31,6 @@ in the shortest possible time**.
 Names are the most important form of documentation.
 Ambiguous naming is technical debt.
 
----
-
 ## Structure & Modularity
 
 - Each module, class, or function must have a single primary responsibility.
@@ -46,8 +40,6 @@ Ambiguous naming is technical debt.
 
 The structure must make it clear
 **what breaks when something is changed**.
-
----
 
 ## Error Handling
 
@@ -59,8 +51,6 @@ The structure must make it clear
   - where it failed
   - under which input or condition
 - Use structured or typed errors when callers need to branch behavior.
-
----
 
 ## Logging & Observability
 
@@ -75,8 +65,6 @@ The structure must make it clear
 
 A system that cannot be observed cannot be operated.
 
----
-
 ## Configuration & Secrets
 
 - Configuration must be explicit and discoverable.
@@ -84,8 +72,6 @@ A system that cannot be observed cannot be operated.
 - Secrets must never be committed, logged, or printed.
 - If a secret may have been exposed, treat it as compromised
   and rotate accordingly.
-
----
 
 ## Comments
 
@@ -97,8 +83,6 @@ A system that cannot be observed cannot be operated.
 - Stale comments are worse than no comments.
 - Avoid emojis in comments unless they materially improve comprehension.
 
----
-
 ## Documentation in Code
 
 - Public APIs must document:
@@ -108,8 +92,6 @@ A system that cannot be observed cannot be operated.
   - constraints and invariants
 - Include minimal usage examples only when they prevent misuse.
 - Prefer linking to ADRs or design documents for non-trivial decisions.
-
----
 
 ## Tests
 
@@ -122,15 +104,11 @@ A system that cannot be observed cannot be operated.
   - regression of fixed bugs
 - If tests are impractical, document the alternative verification strategy.
 
----
-
 ## Backwards Compatibility
 
 - Breaking changes must be explicit and justified.
 - Provide migration steps or compatibility layers when reasonable.
 - Never change behavior silently under the same interface.
-
----
 
 ## Performance
 
@@ -141,16 +119,12 @@ A system that cannot be observed cannot be operated.
   - invalidation strategy
   - failure behavior
 
----
-
 ## Security
 
 - Treat inputs as untrusted by default.
 - Validate, sanitize, and constrain inputs at boundaries.
 - Prefer allow-lists over deny-lists.
 - Follow the principle of least privilege.
-
----
 
 ## Working Outside Your Domain
 
@@ -163,8 +137,6 @@ A system that cannot be observed cannot be operated.
 
 **Using AI is not a reason to lower readability requirements;
 it is a reason to raise them.**
-
----
 
 ## Overrides
 

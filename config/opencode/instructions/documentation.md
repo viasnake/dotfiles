@@ -8,8 +8,6 @@ in order to enable engineers to **understand, decide, and change systems safely*
 The goal of documentation is not to maximize information,
 but to **minimize comprehension cost and decision cost**.
 
----
-
 ## Audience & Scope
 
 This guideline primarily targets
@@ -30,8 +28,6 @@ User-facing documentation (e.g., user guides, API usage guides)
 should follow the principles of structure, visualization, and avoidance of implicit knowledge,
 but is **not required** to explain internal design or decision rationale.
 
----
-
 ## Core Principles
 
 - Documentation is written to enable decisions, not just to be read.
@@ -42,8 +38,6 @@ but is **not required** to explain internal design or decision rationale.
 
 Documentation is an artifact,
 and its quality must be evaluated just like code.
-
----
 
 ## Writing Rules
 
@@ -56,14 +50,10 @@ and its quality must be evaluated just like code.
 Technical documentation is not narrative or storytelling;
 it is a **factual record that supports decisions and actions**.
 
----
-
 ## Documentation Responsibilities
 
 Documentation is categorized by responsibility.
 This guideline defines responsibilities from three perspectives.
-
----
 
 ### Documentation That Must Be Written
 
@@ -77,8 +67,6 @@ The absence of the following is considered a defect:
 
 These documents exist to fulfill
 **accountability for design, decisions, and operations**.
-
----
 
 ### Documentation That Engineers Are Expected to Read
 
@@ -94,8 +82,6 @@ before making changes, operating systems, or reviewing work:
 
 Proceeding without reading these documents introduces risk.
 
----
-
 ### Documentation That Must Be Considered for Updates on Change
 
 When code or behavior changes,
@@ -109,8 +95,6 @@ the need to update the following must always be evaluated:
 
 Choosing not to update documentation
 is itself an **explicit design decision**.
-
----
 
 ## Engineer-Facing README
 
@@ -126,8 +110,6 @@ but it **must include information required for safe decision-making**.
 The README serves as the entry point
 and a map to more detailed documentation.
 
----
-
 ## Design Documents
 
 Design documents exist to explain structure
@@ -140,8 +122,6 @@ They must include:
 - High-level failure behavior
 
 Prefer diagrams and visual representations over prose.
-
----
 
 ## ADR (Architecture Decision Record)
 
@@ -161,8 +141,6 @@ An ADR must include at minimum:
 ADRs represent
 **accountability to future engineers**.
 
----
-
 ## Operations and Maintenance Documentation
 
 Operations documentation exists to enable engineers
@@ -173,8 +151,6 @@ It must include:
 - Initial actions during incidents
 - Observability points (logs, metrics)
 - Dangerous operations and cautions
-
----
 
 ## Documentation for Work Outside Your Domain
 
@@ -189,8 +165,6 @@ documentation must explicitly state:
 Documentation should serve as
 **safe footing for domain experts to intervene later**.
 
----
-
 ## What Not to Document
 
 The following should generally not be documented:
@@ -202,8 +176,6 @@ The following should generally not be documented:
 Choosing not to document something
 is part of the design decision-making process.
 
----
-
 ## Maintenance
 
 - Documentation must be maintained like code.
@@ -211,8 +183,6 @@ is part of the design decision-making process.
 - If documentation cannot be kept accurate, consider removing it.
 
 Outdated documentation is more dangerous than no documentation.
-
----
 
 ## Overrides
 
