@@ -63,6 +63,7 @@ function remove() {
 
   # opencode
   remove "$HOME/.config/opencode/AGENTS.md"
+  remove "$HOME/.config/opencode/agents"
   remove "$HOME/.config/opencode/opencode.jsonc"
   remove "$HOME/.config/opencode/instructions/coding-style.md"
   remove "$HOME/.config/opencode/instructions/documentation.md"
