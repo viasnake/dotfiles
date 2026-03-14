@@ -18,3 +18,7 @@ args = ["@playwright/mcp@latest"]
 [features]
 personality = true
 shell_tool = true
+multi_agent = true
+
+[tui]
+theme = "solarized-dark"
