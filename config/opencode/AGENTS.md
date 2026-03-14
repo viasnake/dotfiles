@@ -110,3 +110,11 @@ but to support reasoned, durable decisions under uncertainty.
 - Never apply, deploy, or perform destructive actions
   without explicit instruction.
 - No direct commits to main or forceful operations unless authorized.
+
+## Custom Agents
+
+- Use `build`, `plan`, `research`, and `docs` as the main user-facing modes.
+- Use `implementer` for end-to-end changes, not just shell-oriented work.
+- Use `pattern-guardian` for repository consistency review.
+- Use `security-auditor` for security, permission, and secret-handling review.
+- Keep prompts explicit about when an agent should be used and when it should not.
