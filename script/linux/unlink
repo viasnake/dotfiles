@@ -6,7 +6,7 @@ set -e
 function error() {
   local red="\033[31m"
   local reset="\033[0m"
-  local prefix="[ERROR] "ee
+  local prefix="[ERROR] "
   local message=$1
   echo -e "${red}${prefix}${message}${reset}"
 }
@@ -64,6 +64,7 @@ function remove() {
   # opencode
   remove "$HOME/.config/opencode/AGENTS.md"
   remove "$HOME/.config/opencode/agents"
+  remove "$HOME/.config/opencode/skills"
   remove "$HOME/.config/opencode/opencode.jsonc"
   remove "$HOME/.config/opencode/instructions/coding-style.md"
   remove "$HOME/.config/opencode/instructions/documentation.md"

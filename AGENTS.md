@@ -40,12 +40,9 @@ If Cursor or Copilot rules are added later, treat them as additional repository 
 - `make install` - install platform dependencies
 - `make dot-bootstrap` - link public repo, then run work sync and SSH sync when applicable
 
-### Validation / sync
-- `make opencode_validate` - validate OpenCode provider catalog/profile consistency
-- `script/opencode/validate personal` - validate a specific profile
-- `script/opencode/validate work` - validate a specific profile
-- `make opencode_sync` - regenerate `config/opencode/opencode.jsonc`
-- `script/opencode/sync personal` - sync a specific profile
+### Validation / config
+- `make opencode_validate` - validate OpenCode config and managed skill layout
+- `script/opencode/validate` - validate `config/opencode/opencode.jsonc` and `config/opencode/skills/`
 
 ### Operational checks
 - `make dot-work-status` - inspect work-profile state
@@ -62,8 +59,7 @@ If Cursor or Copilot rules are added later, treat them as additional repository 
 There is no unit-test framework with per-test selectors such as `pytest path::test_name` or `go test -run`.
 
 For the closest equivalent of a single targeted check, run the narrowest script or target that covers the edited area:
-- `script/opencode/validate personal`
-- `script/opencode/sync personal`
+- `script/opencode/validate`
 - `./script/dot ssh test`
 - `./script/dot ssh status`
 - `./script/dot work status`
@@ -72,14 +68,14 @@ For the closest equivalent of a single targeted check, run the narrowest script 
 If a real test framework is added later, update this file with exact single-test syntax.
 
 ## When To Run Which Check
-- after editing `config/opencode/providers/*` or `config/opencode/opencode.jsonc`, run `make opencode_validate` and usually `make opencode_sync`
+- after editing `config/opencode/opencode.jsonc` or anything under `config/opencode/skills/`, run `make opencode_validate`
 - after editing `script/dot` or SSH config, run `make dot-ssh-status` and `make dot-ssh-test` when safe
 - after editing bootstrap/install/link logic, run the narrowest affected script or `make` target rather than `make setup` unless end-to-end verification is necessary
 - after editing anything that could affect secrets or repo contents, run `pre-commit run --all-files` when practical
 
 ## Code Style
 Use repository conventions first.
-The best concrete references are `script/dot`, `script/opencode/validate`, `script/opencode/sync`, and `script/lib/load-secrets-env`.
+The best concrete references are `script/dot`, `script/opencode/validate`, and `script/lib/load-secrets-env`.
 
 ### Language mix
 - Bash is the primary implementation language.
@@ -141,7 +137,7 @@ The best concrete references are `script/dot`, `script/opencode/validate`, `scri
 ### Configuration editing
 - preserve stable schemas in JSON/TOML config files
 - avoid unrelated reformatting
-- keep provider IDs unique and profile `allowed_ids` aligned with the catalog
+- keep skill names aligned with their directory names
 - prefer environment-variable placeholders for secret-bearing commands
 
 ### Cross-platform behavior

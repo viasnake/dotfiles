@@ -6,7 +6,7 @@ set -e
 function error() {
   local red="\033[31m"
   local reset="\033[0m"
-  local prefix="[ERROR] "ee
+  local prefix="[ERROR] "
   local message=$1
   echo -e "${red}${prefix}${message}${reset}"
 }
@@ -35,6 +35,15 @@ function info() {
 }
 
 function symlink() {
+  local target_dir
+  target_dir=$(dirname "$2")
+  mkdir -p "$target_dir"
+
+  if [ -e "$2" ] || [ -L "$2" ]; then
+    rm -rf "$2"
+    info "Removed existing file/symlink: $2"
+  fi
+
   ln -nfs "$1" "$2"
   success "Symlink created: $2 -> $1"
 }
@@ -80,17 +89,10 @@ function symlink() {
 
   ## opencode
   mkdir -p "$HOME/.config/opencode"
-  mkdir -p "$HOME/.config/opencode/agents"
-  mkdir -p "$HOME/.config/opencode/instructions"
-  mkdir -p "$HOME/.config/opencode/providers"
-  mkdir -p "$HOME/.config/opencode/providers/profiles"
   symlink "$PWD/config/opencode/AGENTS.md" "$HOME/.config/opencode/AGENTS.md"
   symlink "$PWD/config/opencode/agents" "$HOME/.config/opencode/agents"
+  symlink "$PWD/config/opencode/skills" "$HOME/.config/opencode/skills"
   symlink "$PWD/config/opencode/opencode.jsonc" "$HOME/.config/opencode/opencode.jsonc"
-  symlink "$PWD/config/opencode/providers/catalog.json" "$HOME/.config/opencode/providers/catalog.json"
-  symlink "$PWD/config/opencode/providers/profiles/personal.json" "$HOME/.config/opencode/providers/profiles/personal.json"
-  symlink "$PWD/config/opencode/providers/profiles/work.json" "$HOME/.config/opencode/providers/profiles/work.json"
-  symlink "$PWD/config/opencode/providers/profiles/restricted.json" "$HOME/.config/opencode/providers/profiles/restricted.json"
   symlink "$PWD/config/opencode/instructions/coding-style.md" "$HOME/.config/opencode/instructions/coding-style.md"
   symlink "$PWD/config/opencode/instructions/documentation.md" "$HOME/.config/opencode/instructions/documentation.md"
 

@@ -2,7 +2,7 @@ BOOTSTRAP = script/bootstrap
 DOT = ./script/dot
 
 .PHONY: all setup clean install uninstall link unlink install_fonts uninstall_fonts \
-	opencode_validate opencode_sync \
+	opencode_validate \
 	dot-bootstrap dot-bootstrap-agent dot-work-enable dot-work-disable dot-work-status dot-work-sync \
 	dot-ssh-sync dot-ssh-sync-agent dot-ssh-status dot-ssh-test
 
@@ -25,9 +25,6 @@ uninstall_fonts:
 
 opencode_validate:
 	script/opencode/validate
-
-opencode_sync:
-	script/opencode/sync
 
 dot-bootstrap:
 	$(DOT) bootstrap

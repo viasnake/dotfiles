@@ -4,91 +4,115 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+CONFIG_PATH="$REPO_ROOT/config/opencode/opencode.jsonc"
+SKILLS_PATH="$REPO_ROOT/config/opencode/skills"
 
-PROFILE="${1:-${OPENCODE_PROFILE:-personal}}"
-CATALOG_PATH="$REPO_ROOT/config/opencode/providers/catalog.json"
-PROFILE_PATH="$REPO_ROOT/config/opencode/providers/profiles/$PROFILE.json"
-
-if [[ ! -f "$CATALOG_PATH" ]]; then
-  echo "[ERROR] Catalog not found: $CATALOG_PATH" >&2
+if [[ $# -ne 0 ]]; then
+  echo "[ERROR] validate does not accept profile arguments anymore" >&2
   exit 1
 fi
 
-if [[ ! -f "$PROFILE_PATH" ]]; then
-  echo "[ERROR] Profile not found: $PROFILE_PATH" >&2
+if [[ ! -f "$CONFIG_PATH" ]]; then
+  echo "[ERROR] Config not found: $CONFIG_PATH" >&2
   exit 1
 fi
 
-python3 - "$CATALOG_PATH" "$PROFILE_PATH" <<'PY'
+if [[ ! -d "$SKILLS_PATH" ]]; then
+  echo "[ERROR] Skills directory not found: $SKILLS_PATH" >&2
+  exit 1
+fi
+
+python3 - "$CONFIG_PATH" "$SKILLS_PATH" <<'PY'
 import json
+import os
+import re
 import sys
 
-catalog_path, profile_path = sys.argv[1], sys.argv[2]
+config_path, skills_path = sys.argv[1], sys.argv[2]
+name_pattern = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
-with open(catalog_path, "r", encoding="utf-8") as f:
-    catalog = json.load(f)
+with open(config_path, "r", encoding="utf-8") as f:
+    config = json.load(f)
 
-with open(profile_path, "r", encoding="utf-8") as f:
-    profile = json.load(f)
+
+def parse_frontmatter(skill_path):
+    with open(skill_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    if not content.startswith("---\n"):
+        return None, "is missing YAML frontmatter"
+
+    end_marker = content.find("\n---\n", 4)
+    if end_marker == -1:
+        return None, "frontmatter is not closed"
+
+    metadata = {}
+    frontmatter = content[4:end_marker]
+    for line in frontmatter.splitlines():
+        if not line.strip():
+            continue
+        if ":" not in line:
+            return None, f"has invalid frontmatter line: {line}"
+        key, value = line.split(":", 1)
+        metadata[key.strip()] = value.strip()
+
+    return metadata, None
+
 
 errors = []
-providers = catalog.get("providers")
-if not isinstance(providers, list):
-    errors.append("catalog.providers must be an array")
-    providers = []
+mcp = config.get("mcp")
+if not isinstance(mcp, dict):
+    errors.append("config.mcp must be an object")
+else:
+    context7 = mcp.get("context7")
+    if context7 is not None:
+        if not isinstance(context7, dict):
+            errors.append("config.mcp.context7 must be an object")
+        else:
+            command = context7.get("command")
+            if not isinstance(command, list) or not command or not all(isinstance(x, str) and x for x in command):
+                errors.append("config.mcp.context7.command must be an array of non-empty strings")
+    if "playwright" in mcp:
+        errors.append("config.mcp.playwright must be removed; use the playwright-cli skill instead")
 
-ids = []
-for idx, provider in enumerate(providers):
-    if not isinstance(provider, dict):
-        errors.append(f"providers[{idx}] must be an object")
+for entry in sorted(os.listdir(skills_path)):
+    skill_dir = os.path.join(skills_path, entry)
+    if not os.path.isdir(skill_dir):
         continue
-    pid = provider.get("id")
-    kind = provider.get("kind")
-    if not isinstance(pid, str) or not pid:
-        errors.append(f"providers[{idx}].id must be a non-empty string")
-    else:
-        ids.append(pid)
-    if kind != "mcp":
-        errors.append(f"providers[{idx}].kind must be 'mcp'")
+    if os.path.islink(skill_dir):
+        errors.append(f"skill '{entry}' must not be a symlink")
+        continue
 
-    mcp = provider.get("mcp")
-    if not isinstance(mcp, dict):
-        errors.append(f"providers[{idx}].mcp must be an object")
-    else:
-        if not isinstance(mcp.get("type"), str) or not mcp["type"]:
-            errors.append(f"providers[{idx}].mcp.type must be a non-empty string")
-        command = mcp.get("command")
-        if not isinstance(command, list) or not command or not all(isinstance(x, str) and x for x in command):
-            errors.append(f"providers[{idx}].mcp.command must be an array of non-empty strings")
+    skill_path = os.path.join(skill_dir, "SKILL.md")
+    if not os.path.isfile(skill_path):
+        errors.append(f"skill '{entry}' is missing SKILL.md")
+        continue
+    if os.path.islink(skill_path):
+        errors.append(f"skill '{entry}' SKILL.md must not be a symlink")
+        continue
 
-    secrets = provider.get("secrets", [])
-    if not isinstance(secrets, list):
-        errors.append(f"providers[{idx}].secrets must be an array")
-    else:
-        for sidx, secret in enumerate(secrets):
-            if not isinstance(secret, dict):
-                errors.append(f"providers[{idx}].secrets[{sidx}] must be an object")
-                continue
-            env_name = secret.get("env")
-            if not isinstance(env_name, str) or not env_name:
-                errors.append(f"providers[{idx}].secrets[{sidx}].env must be a non-empty string")
+    metadata, parse_error = parse_frontmatter(skill_path)
+    if parse_error:
+        errors.append(f"skill '{entry}' {parse_error}")
+        continue
 
-if len(ids) != len(set(ids)):
-    errors.append("provider ids must be unique")
+    skill_name = metadata.get("name", "")
+    description = metadata.get("description", "")
 
-allowed_ids = profile.get("allowed_ids")
-if not isinstance(allowed_ids, list) or not all(isinstance(x, str) and x for x in allowed_ids):
-    errors.append("profile.allowed_ids must be an array of non-empty strings")
-    allowed_ids = []
+    if not skill_name:
+        errors.append(f"skill '{entry}' must define frontmatter name")
+    elif skill_name != entry:
+        errors.append(f"skill '{entry}' name must match directory name")
+    elif not name_pattern.fullmatch(skill_name):
+        errors.append(f"skill '{entry}' name must be lowercase kebab-case")
 
-unknown = sorted(set(allowed_ids) - set(ids))
-for item in unknown:
-    errors.append(f"profile.allowed_ids contains unknown provider id: {item}")
+    if not description:
+        errors.append(f"skill '{entry}' must define frontmatter description")
 
 if errors:
     for err in errors:
         print(f"[ERROR] {err}", file=sys.stderr)
     sys.exit(1)
 
-print(f"[INFO] Validation passed for profile '{profile.get('name', 'unknown')}'")
+print("[INFO] Validation passed for OpenCode config and skills")
 PY

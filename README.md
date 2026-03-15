@@ -114,22 +114,16 @@ TUI では `/mcp` でも確認できます。
 
 ### 6. opencode を起動
 
-個人プロファイル（外部 MCP 利用）:
-
 ```bash
-OPENCODE_PROFILE=personal script/opencode/run-with-secrets
+script/opencode/run-with-secrets
 ```
 
-仕事プロファイル（外部 MCP 無効）:
-
-```bash
-OPENCODE_PROFILE=work script/opencode/run-with-secrets
-```
+Playwright は MCP ではなく repo 管理の `playwright-cli` skill で扱います。
 
 ### 7. 最低限の動作確認
 
 ```bash
-script/opencode/validate personal
+make opencode_validate
 make dot-ssh-status
 ssh -G github
 ```
