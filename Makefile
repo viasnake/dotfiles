@@ -3,8 +3,7 @@ DOT = ./script/dot
 
 .PHONY: all setup clean install uninstall link unlink install_fonts uninstall_fonts \
 	opencode_validate \
-	dot-bootstrap dot-bootstrap-agent dot-work-enable dot-work-disable dot-work-status dot-work-sync \
-	dot-ssh-sync dot-ssh-sync-agent dot-ssh-status dot-ssh-test
+	dot-bootstrap
 
 all: setup
 setup: link install dot-bootstrap
@@ -28,30 +27,3 @@ opencode_validate:
 
 dot-bootstrap:
 	$(DOT) bootstrap
-
-dot-bootstrap-agent:
-	$(DOT) bootstrap --agent
-
-dot-work-enable:
-	$(DOT) work enable
-
-dot-work-disable:
-	$(DOT) work disable
-
-dot-work-status:
-	$(DOT) work status
-
-dot-work-sync:
-	$(DOT) work sync
-
-dot-ssh-sync:
-	$(DOT) ssh sync
-
-dot-ssh-sync-agent:
-	$(DOT) ssh sync --agent
-
-dot-ssh-status:
-	$(DOT) ssh status
-
-dot-ssh-test:
-	$(DOT) ssh test

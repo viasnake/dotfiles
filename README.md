@@ -38,7 +38,7 @@ make setup
 >     email = <your-email>
 > ```
 
-## 初回セットアップ（dot + Bitwarden + SSH）
+## 初回セットアップ（dot）
 
 この章だけ見れば、初回セットアップが完了するようにしています。
 
@@ -58,16 +58,7 @@ chmod 600 ~/.config/secrets/runtime.env.secret
 - `SECRETS_ENV_FILE` を指定すると別パスを使える
 - secrets ファイルは Git 管理しない
 
-### 2. Bitwarden CLI をセットアップ
-
-```bash
-bw login
-export BW_SESSION="$(bw unlock --raw)"
-```
-
-`BW_SESSION` は同一シェルで `make setup` や `make dot-ssh-sync` 実行時に利用されます。
-
-### 3. 初回セットアップを実行（ワンコマンド）
+### 2. 初回セットアップを実行（ワンコマンド）
 
 ```bash
 make setup
@@ -79,21 +70,11 @@ make setup
 - `make install`
 - `make dot-bootstrap`
 
-### 4. 主要ターゲット
+### 3. 主要ターゲット
 
 - `make dot-bootstrap`
-- `make dot-work-enable` / `make dot-work-disable` / `make dot-work-sync` / `make dot-work-status`
-- `make dot-ssh-sync` / `make dot-ssh-status` / `make dot-ssh-test`
 
-仕事用プロファイルを同時に使う場合は次の順で実行します。
-
-```bash
-make dot-work-enable
-DOT_WORK_REPO_URL=<ghec-repo-url> make dot-work-sync
-make dot-bootstrap
-```
-
-### 5. Codex CLI を使う
+### 4. Codex CLI を使う
 
 `make link` 後、Codex の設定は `~/.codex/config.toml` に、グローバル指示は `~/.codex/AGENTS.md` に配置されます。
 
@@ -112,7 +93,7 @@ codex mcp --help
 
 TUI では `/mcp` でも確認できます。
 
-### 6. opencode を起動
+### 5. opencode を起動
 
 ```bash
 script/opencode/run-with-secrets
@@ -120,12 +101,11 @@ script/opencode/run-with-secrets
 
 Playwright は MCP ではなく repo 管理の `playwright-cli` skill で扱います。
 
-### 7. 最低限の動作確認
+### 6. 最低限の動作確認
 
 ```bash
 make opencode_validate
-make dot-ssh-status
-ssh -G github
+make dot-bootstrap
 ```
 
 Codex 側は次も確認できます。
@@ -136,44 +116,13 @@ test -L ~/.codex/AGENTS.md
 codex mcp --help
 ```
 
-### 8. 鍵ローテーション
+### 7. トラブルシュート
 
-Bitwarden のアイテム更新後に次を実行します。
+`make dot-bootstrap` が失敗する場合:
 
-```bash
-make dot-ssh-sync
-```
-
-Bitwarden のアイテムは `SSH キー` タイプを使います。
-
-- item type: `SSH キー`
-- personal key item name: `personal-ssh`
-- work key item name: `work-ssh`
-
-デフォルトでは次のアイテム名で検索します。
-
-- personal: `personal-ssh`
-- work: `work-ssh`
-
-必要なら環境変数で上書きできます。
-
-```bash
-DOT_SSH_PERSONAL_ITEM=<item-id-or-name> DOT_SSH_WORK_ITEM=<item-id-or-name> make dot-ssh-sync
-```
-
-### 9. work 設定の更新
-
-```bash
-make dot-work-sync
-```
-
-### 10. トラブルシュート
-
-`Permission denied (publickey)` が出る場合:
-
-- `make dot-ssh-status` で鍵ファイルと権限を確認
-- `export BW_SESSION="$(bw unlock --raw)"` を再実行
-- `make dot-ssh-sync` を再実行
+- `./script/dot help` でコマンドが実行可能か確認
+- `make link` を再実行してシンボリックリンクを更新
+- `make -n dot-bootstrap` で実行内容を確認
 
 ## アンインストール
 
