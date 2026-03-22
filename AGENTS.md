@@ -1,146 +1,159 @@
 # AGENTS.md
 
 ## Scope
-This is the repository-local guide for coding agents working in this dotfiles repo.
-It applies at the repository root and below.
+This file is the repository-local operating guide for coding agents in this dotfiles repo.
+It applies from `/home/sysadmin/dotfiles` downward.
 
-This repository is primarily shell scripts plus configuration files.
-There is no conventional application build step.
-Verification is mostly done through targeted `make` targets, script entry points, and config validation.
+The repository is mostly Bash scripts plus configuration files.
+There is no traditional compile/build artifact.
+Verification is done by targeted `make` targets, direct script checks, and Bats tests.
 
 ## Rule Sources Checked
-- `.cursor/rules/`: not present
-- `.cursorrules`: not present
-- `.github/copilot-instructions.md`: not present
+- `.cursor/rules/`: not present (searched recursively)
+- `.cursorrules`: not present (searched recursively)
+- `.github/copilot-instructions.md`: not present (searched recursively)
 - existing agent guidance: `config/codex/AGENTS.md`, `config/opencode/AGENTS.md`
 - shared style guidance: `config/opencode/instructions/coding-style.md`
 
-If Cursor or Copilot rules are added later, treat them as additional repository instructions.
+If Cursor or Copilot rule files are added later, treat them as additional instructions with repository scope.
 
 ## Repository Shape
-- `Makefile` is the main entry point for repeatable operations.
-- `script/` contains operational Bash scripts.
-- `config/` contains dotfiles, agent config, JSON/JSONC/TOML config, and instruction docs.
-- `script/opencode/validate` is the strongest reference for current shell style.
-- older scripts under `script/linux/`, `script/macos/`, and `misc/` are looser; preserve behavior, but prefer the newer conventions when editing.
+- `Makefile`: canonical entry point for setup and test workflows.
+- `script/bootstrap`: dispatches install/link/unlink operations.
+- `script/opencode/validate`: strongest style and validation reference for modern scripts.
+- `script/lib/load-secrets-env`: reference for Bash function design and env-file parsing.
+- `test/*.bats`: unit tests for shell helpers and validators.
+- `config/`: managed dotfiles and agent/tool configuration (JSON/JSONC/TOML/Markdown).
+
+Older scripts under `script/linux/`, `script/macos/`, and `misc/` may use looser patterns.
+Preserve behavior there, but prefer modern conventions when touching code.
 
 ## Working Principles
-- make small, auditable changes
-- inspect before editing
-- prefer reversible changes
-- keep Linux and macOS behavior aligned unless the difference is real and documented
-- avoid machine-specific assumptions unless the repo already relies on them
-- never commit secrets, generated credentials, or machine-local runtime state
+- Make small, auditable, reversible changes.
+- Inspect before editing; do not guess structure.
+- Keep Linux and macOS behavior aligned unless differences are real and documented.
+- Avoid machine-specific assumptions unless the repository already requires them.
+- Never commit secrets, generated credentials, or host-local runtime state.
 
-## Canonical Commands
+## Build, Lint, and Test Commands
 
-### Setup / bootstrap
-- `make setup` - full setup: `link`, `install`
-- `make link` - create symlinks into the home directory
-- `make install` - install platform dependencies
+### Setup and bootstrap commands
+- `make setup` - full local setup (`link` + `install`).
+- `make link` / `make unlink` - manage symlinks into `$HOME`.
+- `make install` / `make uninstall` - install or remove platform dependencies.
+- `make install_fonts` / `make uninstall_fonts` - font installation lifecycle.
+- `make clean` - shorthand for `uninstall` + `unlink`.
 
-### Validation / config
-- `make opencode_validate` - validate OpenCode config and managed skill layout
-- `script/opencode/validate` - validate `config/opencode/opencode.jsonc` and `config/opencode/skills/`
+### Validation and smoke checks
+- `make opencode_validate` - validate OpenCode config and skill layout.
+- `script/opencode/validate` - same validator without `make` wrapper.
+- `make -n setup` - dry-run of setup commands (safe operational preview).
+- `make test-smoke` - runs `opencode_validate` and dry-run setup.
 
-### Operational checks
-- `make -n setup` - preview setup command execution without changes
+### Unit tests (Bats)
+- `make test-unit` - run Bats tests if `bats` exists, otherwise fallback via `mise`.
+- `make test` - full test suite (`test-smoke` then `test-unit`).
+- `bats test` - direct all-unit run (when `bats` is installed).
 
-### Lint / security
-- `pre-commit run --all-files` - run configured hooks
-- `pre-commit run gitleaks --all-files` - run the only configured hook directly
+### Lint and security
+- `pre-commit run --all-files` - run all configured hooks.
+- `pre-commit run gitleaks --all-files` - run secret scanning hook only.
 
-## Single-Test Guidance
-There is no unit-test framework with per-test selectors such as `pytest path::test_name` or `go test -run`.
+Current pre-commit config only includes `gitleaks`; there is no separate formatter/linter suite.
 
-For the closest equivalent of a single targeted check, run the narrowest script or target that covers the edited area:
-- `script/opencode/validate`
-- `make -n setup`
+## Single-Test Guidance (Important)
+Use the narrowest possible check that covers your edit.
 
-If a real test framework is added later, update this file with exact single-test syntax.
+### Single Bats file
+- `bats test/opencode-validate.bats`
+- `bats test/load-secrets-env.bats`
 
-## When To Run Which Check
-- after editing `config/opencode/opencode.jsonc` or anything under `config/opencode/skills/`, run `make opencode_validate`
-- after editing `Makefile` setup/test wiring, run `make -n setup`
-- after editing bootstrap/install/link logic, run the narrowest affected script or `make` target rather than `make setup` unless end-to-end verification is necessary
-- after editing anything that could affect secrets or repo contents, run `pre-commit run --all-files` when practical
+### Single Bats test case
+- `bats --filter "validate fails when playwright MCP entry exists" test/opencode-validate.bats`
+- If `bats` is missing: `MISE_WARN_MISSING_TOOLS=0 mise x bats -- bats --filter "<test name>" test/<file>.bats`
 
-## Code Style
-Use repository conventions first.
-The best concrete references are `script/opencode/validate` and `script/lib/load-secrets-env`.
+### Non-Bats targeted checks
+- `script/opencode/validate` for config/skill validation changes.
+- `make -n setup` for bootstrap wiring and command-flow verification.
 
-### Language mix
+If new test frameworks are introduced later, add exact single-test selectors here.
+
+## Change-Based Verification Matrix
+- Edited `config/opencode/opencode.jsonc` or `config/opencode/skills/**`: run `make opencode_validate`.
+- Edited `script/opencode/validate`: run `script/opencode/validate` and `bats test/opencode-validate.bats`.
+- Edited `script/lib/load-secrets-env`: run `bats test/load-secrets-env.bats`.
+- Edited `Makefile` test/setup targets: run `make test-smoke` and at least one relevant `bats` file.
+- Edited install/link/unlink scripts: run the narrowest script-level check plus `make -n setup`.
+- Edited anything potentially affecting secrets/repo safety: run `pre-commit run --all-files` when practical.
+
+## Code Style Guidelines
+Follow existing repository patterns first.
+Primary references: `script/opencode/validate` and `script/lib/load-secrets-env`.
+
+### Language and typing approach
 - Bash is the primary implementation language.
-- Small embedded Python snippets are used for structured JSON validation and transformation.
-- JSON, JSONC, TOML, SSH config, and shell config files are maintained source, not generated noise.
+- Embedded Python is allowed for structured parsing/validation tasks.
+- There is no static type-checking pipeline; enforce correctness with explicit checks and tests.
+- Treat JSON/JSONC/TOML schemas as contracts; validate required keys and value types explicitly.
 
 ### Imports and dependencies
-- in embedded Python, keep imports at the top of the snippet
-- prefer standard library imports unless the repo already depends on something external
-- in shell, treat external commands as dependencies and validate them with `require_cmd` when absence would make behavior unclear
+- In Python snippets, keep imports at the top and prefer standard library modules.
+- In shell scripts, treat external binaries as dependencies and check availability when needed.
+- Do not introduce new runtime dependencies unless necessary and documented.
 
 ### Formatting
-- use 2 spaces for shell indentation
-- use 4 spaces for embedded Python indentation
-- keep JSON and JSONC pretty-printed with 2-space indentation
-- keep TOML compact and stable; preserve existing grouping unless regrouping helps comprehension
-- end files with a trailing newline
-
-### Bash conventions
-- prefer `#!/usr/bin/env bash`
-- prefer `set -euo pipefail` for new or significantly edited Bash scripts
-- use uppercase names for script-level constants and env-derived configuration
-- use lowercase snake_case for function names and local variables
-- quote expansions unless unquoted behavior is intentionally required
-- prefer `[[ ... ]]` in Bash-specific code
-- declare non-global function variables with `local`
-- prefer `printf` over `echo` when escaping or exact output matters
-- resolve repo-relative paths from `BASH_SOURCE[0]`, not from the caller's working directory
-
-### Python conventions
-- keep Python snippets small, explicit, and single-purpose
-- prefer straightforward loops and checks over compact clever expressions
-- use descriptive names like `catalog_path`, `profile_path`, `allowed_ids`, and `enabled_count`
-- use explicit UTF-8 file reads/writes
-- exit non-zero on validation failure and print actionable messages to stderr
+- Bash: 2-space indentation, no tabs.
+- Embedded Python: 4-space indentation.
+- JSON/JSONC: stable 2-space indentation.
+- TOML: preserve existing grouping and key order unless reorganization improves clarity.
+- End every file with a trailing newline.
 
 ### Naming
-- use descriptive names that reveal intent
-- functions should use verbs
-- types or classes, if introduced later, should use nouns
-- boolean names should read as predicates: `is_*`, `has_*`, `can_*`, `should_*`
-- avoid negative boolean names when a positive form is possible
-- avoid unexplained abbreviations except standard ones like `SSH`, `JSON`, `MCP`, and `URL`
+- Use descriptive, intention-revealing names.
+- Functions: verb phrases (`load_runtime_secrets_env`).
+- Variables: lowercase snake_case for locals; uppercase for script-level constants/env-derived config.
+- Booleans should read as predicates: `is_*`, `has_*`, `can_*`, `should_*`.
+- Avoid unexplained abbreviations except common terms (`JSON`, `URL`, `SSH`, `MCP`).
+
+### Bash conventions
+- Prefer `#!/usr/bin/env bash`.
+- Prefer `set -euo pipefail` for new or substantially modified scripts.
+- Use `[[ ... ]]` for Bash conditionals.
+- Quote expansions unless unquoted behavior is intentionally required.
+- Use `local` inside functions for non-global variables.
+- Prefer `printf` over `echo` when exact output/escaping matters.
+- Resolve repo-relative paths via `BASH_SOURCE[0]`, not caller working directory.
 
 ### Error handling
-- fail fast on invalid arguments, missing files, and missing required commands
-- never swallow errors silently
-- if continuing after a failure is intentional, do it explicitly and log why
-- make error messages say what failed and what to check next
-- use stderr for error output
-- prefer diagnosable behavior over over-abstracted helpers
+- Fail fast on invalid args, missing files, and invalid config shape.
+- Never swallow errors silently; if ignoring input is intentional, do it explicitly.
+- Emit actionable errors to stderr with failure context and next-check hint.
+- Use non-zero exit status on validation/contract failures.
+- Prefer diagnosable behavior over compact but opaque helpers.
 
-### Comments and docs
-- write comments in English
-- comment the reason, constraint, or trade-off, not the obvious mechanics
-- avoid comments that only narrate the next line
-- when workflow changes, update nearby docs such as `README.md` or this file
+### Comments and documentation
+- Write comments in English.
+- Explain why/constraints/trade-offs, not obvious mechanics.
+- Keep comments synchronized with behavior; delete stale comments quickly.
+- When behavior or workflow changes, update nearby docs (`README.md`, this file, or related docs).
 
 ### Configuration editing
-- preserve stable schemas in JSON/TOML config files
-- avoid unrelated reformatting
-- keep skill names aligned with their directory names
-- prefer environment-variable placeholders for secret-bearing commands
+- Preserve existing schema and key stability in managed config files.
+- Avoid unrelated reformatting/noise diffs.
+- Keep skill directory names and frontmatter `name` aligned.
+- Use environment-variable placeholders for secret-bearing values.
 
-### Cross-platform behavior
-- check both Linux and macOS script paths before changing shared setup behavior
-- do not assume GNU-only or BSD-only flags without checking compatibility patterns already used in the repo
+### Cross-platform compatibility
+- Validate both Linux and macOS paths when touching shared setup logic.
+- Avoid GNU-only/BSD-only flags unless the same portability pattern already exists in repo.
 
-## Verification Expectations
-- report exactly which commands were run
-- if a command was skipped because it would mutate machine state, say so explicitly
-- do not claim full validation when only static inspection was done
-- prefer targeted validation before broad bootstrap commands
+## Verification and Reporting Expectations
+- Report exactly which commands were executed.
+- If a command was skipped to avoid machine mutation, state that explicitly.
+- Do not claim full validation when only static inspection was performed.
+- Prefer targeted checks before broad setup operations.
 
-## Default Behavior
-When unsure, follow the patterns in `script/opencode/validate` and `script/lib/load-secrets-env`, run the narrowest relevant validation command, and call out any unverified platform-specific behavior.
+## Default Behavior for Agents
+When uncertain, mimic patterns from `script/opencode/validate` and `script/lib/load-secrets-env`.
+Choose the narrowest meaningful validation command for the changed area.
+Call out assumptions and any unverified platform-specific behavior.
