@@ -1,5 +1,6 @@
 [tools]
 bat = "0.26.1"
+bats = "1.13.0"
 bitwarden = "2026.1.0"
 codex = "latest"
 dotnet = "10.0.102"

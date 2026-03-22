@@ -108,6 +108,41 @@ make opencode_validate
 make dot-bootstrap
 ```
 
+非破壊のスモークテストだけをまとめて実行する場合は、次を使います。
+
+```bash
+make test-smoke
+```
+
+`make test-smoke` は次を実行します。
+
+- `./script/dot help`
+- `make opencode_validate`
+- `make -n dot-bootstrap`
+
+環境に `bats` がある場合は、単体テストを含めて次も実行できます。
+
+```bash
+make test
+```
+
+`make test` は `test-smoke` と `test-unit` を順番に実行します。
+`test-unit` は `bats` が未インストールならスキップされます。
+ただし CI 環境では `bats` が見つからない場合にエラーで終了します。
+`bats` は `mise` で導入できます。
+
+```bash
+mise install bats
+```
+
+現在の `test-unit` は次を対象にしています。
+
+- `script/lib/load-secrets-env`
+- `script/dot` の非破壊 CLI パス（`help`、不正コマンド、不正引数）
+- `script/opencode/validate` の正常系/異常系（fixture ベース）
+
+GitHub Actions では `pull_request` と `master` への push で `make test` を実行します。
+
 Codex 側は次も確認できます。
 
 ```bash
