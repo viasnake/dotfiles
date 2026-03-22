@@ -21,7 +21,7 @@ If Cursor or Copilot rules are added later, treat them as additional repository 
 - `Makefile` is the main entry point for repeatable operations.
 - `script/` contains operational Bash scripts.
 - `config/` contains dotfiles, agent config, JSON/JSONC/TOML config, and instruction docs.
-- `script/dot` is the strongest reference for current shell style.
+- `script/opencode/validate` is the strongest reference for current shell style.
 - older scripts under `script/linux/`, `script/macos/`, and `misc/` are looser; preserve behavior, but prefer the newer conventions when editing.
 
 ## Working Principles
@@ -35,17 +35,16 @@ If Cursor or Copilot rules are added later, treat them as additional repository 
 ## Canonical Commands
 
 ### Setup / bootstrap
-- `make setup` - full setup: `link`, `install`, `dot-bootstrap`
+- `make setup` - full setup: `link`, `install`
 - `make link` - create symlinks into the home directory
 - `make install` - install platform dependencies
-- `make dot-bootstrap` - link public repo and refresh symlinks via `script/bootstrap link`
 
 ### Validation / config
 - `make opencode_validate` - validate OpenCode config and managed skill layout
 - `script/opencode/validate` - validate `config/opencode/opencode.jsonc` and `config/opencode/skills/`
 
 ### Operational checks
-- `make dot-bootstrap` - run the `dot` bootstrap entrypoint
+- `make -n setup` - preview setup command execution without changes
 
 ### Lint / security
 - `pre-commit run --all-files` - run configured hooks
@@ -56,19 +55,19 @@ There is no unit-test framework with per-test selectors such as `pytest path::te
 
 For the closest equivalent of a single targeted check, run the narrowest script or target that covers the edited area:
 - `script/opencode/validate`
-- `make -n dot-bootstrap`
+- `make -n setup`
 
 If a real test framework is added later, update this file with exact single-test syntax.
 
 ## When To Run Which Check
 - after editing `config/opencode/opencode.jsonc` or anything under `config/opencode/skills/`, run `make opencode_validate`
-- after editing `script/dot`, run `./script/dot help` and `make -n dot-bootstrap`
+- after editing `Makefile` setup/test wiring, run `make -n setup`
 - after editing bootstrap/install/link logic, run the narrowest affected script or `make` target rather than `make setup` unless end-to-end verification is necessary
 - after editing anything that could affect secrets or repo contents, run `pre-commit run --all-files` when practical
 
 ## Code Style
 Use repository conventions first.
-The best concrete references are `script/dot`, `script/opencode/validate`, and `script/lib/load-secrets-env`.
+The best concrete references are `script/opencode/validate` and `script/lib/load-secrets-env`.
 
 ### Language mix
 - Bash is the primary implementation language.
@@ -144,4 +143,4 @@ The best concrete references are `script/dot`, `script/opencode/validate`, and `
 - prefer targeted validation before broad bootstrap commands
 
 ## Default Behavior
-When unsure, follow the patterns in `script/dot` and `script/opencode/validate`, run the narrowest relevant validation command, and call out any unverified platform-specific behavior.
+When unsure, follow the patterns in `script/opencode/validate` and `script/lib/load-secrets-env`, run the narrowest relevant validation command, and call out any unverified platform-specific behavior.

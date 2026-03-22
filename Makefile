@@ -1,13 +1,11 @@
 BOOTSTRAP = script/bootstrap
-DOT = ./script/dot
 
 .PHONY: all setup clean install uninstall link unlink install_fonts uninstall_fonts \
 	opencode_validate \
-	dot-bootstrap \
 	test test-smoke test-unit
 
 all: setup
-setup: link install dot-bootstrap
+setup: link install
 clean: uninstall unlink
 
 install:
@@ -26,15 +24,11 @@ uninstall_fonts:
 opencode_validate:
 	script/opencode/validate
 
-dot-bootstrap:
-	$(DOT) bootstrap
-
 test: test-smoke test-unit
 
 test-smoke:
-	$(DOT) help
 	$(MAKE) opencode_validate
-	$(MAKE) -n dot-bootstrap
+	$(MAKE) -n setup
 
 test-unit:
 	@if command -v bats >/dev/null 2>&1; then \

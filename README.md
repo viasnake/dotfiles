@@ -1,28 +1,17 @@
 # dotfiles
 
-## 対応 OS
+Personal dotfiles for Linux, macOS, and WSL.
+Main entrypoint: `make setup`.
 
-- Debian
-- Raspbian
-- Ubuntu
-- Zorin OS
-- macOS
-- Windows Subsystem for Linux (WSL1)
-- Windows Subsystem for Linux 2 (WSL2)
+## Requirements
 
-> [!TIP]
-> 対応可否は `/etc/os-release` で判定します。
-> 実装: `script/bootstrap`
+- `git`
+- `make`
+- `sudo`
 
-## インストール
+Supported environments: Debian, Raspbian, Ubuntu, Zorin OS, macOS, WSL1, WSL2.
 
-### 前提
-
-- git
-- make
-- sudo
-
-### 手順
+## Quick Start
 
 ```bash
 git clone https://github.com/viasnake/dotfiles.git
@@ -30,136 +19,68 @@ cd dotfiles
 make setup
 ```
 
-> [!TIP]
-> Git の user 情報は `~/.config/git` を編集して設定します。
-> ```
-> [user]
->     name = <your-name>
->     email = <your-email>
-> ```
+`make setup` runs:
 
-## 初回セットアップ（dot）
+- `make link`
+- `make install`
 
-この章だけ見れば、初回セットアップが完了するようにしています。
+If needed, set your Git identity in `~/.gitconfig`:
 
-### 1. 共通 secrets ファイルを作成（任意）
+```ini
+[user]
+  name = <your-name>
+  email = <your-email>
+```
+
+## Optional: Secrets
+
+Create a local secrets file for tools that read runtime env vars (for example, Context7):
 
 ```bash
 mkdir -p ~/.config/secrets
 chmod 700 ~/.config/secrets
 cat > ~/.config/secrets/runtime.env.secret <<'EOF'
-CONTEXT7_API_KEY=<context7-api-key>
+CONTEXT7_API_KEY=<your-context7-api-key>
 EOF
 chmod 600 ~/.config/secrets/runtime.env.secret
 ```
 
-- 形式は `KEY=VALUE`
-- 空行と `#` で始まる行は無視される
-- `SECRETS_ENV_FILE` を指定すると別パスを使える
-- secrets ファイルは Git 管理しない
+Notes:
 
-### 2. 初回セットアップを実行（ワンコマンド）
+- Format: `KEY=VALUE`
+- Lines starting with `#` are ignored
+- You can override the path with `SECRETS_ENV_FILE`
+- Never commit secret files
 
-```bash
-make setup
-```
+## Optional: SSH for GitHub
 
-`make setup` は次を順番に実行します。
-
-- `make link`
-- `make install`
-- `make dot-bootstrap`
-
-### 3. 主要ターゲット
-
-- `make dot-bootstrap`
-
-### 4. Codex CLI を使う
-
-`make link` 後、Codex の設定は `~/.codex/config.toml` に、グローバル指示は `~/.codex/AGENTS.md` に配置されます。
-
-Context7 を使う場合は、Codex 起動前に必要な環境変数を shell で設定します。
+This repo links SSH config that uses `~/.ssh/id_ed25519_personal` for `github`/`github.com`.
 
 ```bash
-export CONTEXT7_API_KEY=<context7-api-key>
-codex
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_personal -C "you@example.com"
+chmod 600 ~/.ssh/id_ed25519_personal
+chmod 644 ~/.ssh/id_ed25519_personal.pub
+ssh -T github
 ```
 
-MCP の確認:
+Add `~/.ssh/id_ed25519_personal.pub` to your GitHub account before running `ssh -T github`.
 
-```bash
-codex mcp --help
-```
-
-TUI では `/mcp` でも確認できます。
-
-### 5. opencode を起動
-
-```bash
-script/opencode/run-with-secrets
-```
-
-Playwright は MCP ではなく repo 管理の `playwright-cli` skill で扱います。
-
-### 6. 最低限の動作確認
+## Verification
 
 ```bash
 make opencode_validate
-make dot-bootstrap
-```
-
-非破壊のスモークテストだけをまとめて実行する場合は、次を使います。
-
-```bash
 make test-smoke
 ```
 
-`make test-smoke` は次を実行します。
-
-- `./script/dot help`
-- `make opencode_validate`
-- `make -n dot-bootstrap`
-
-環境に `bats` がある場合は、単体テストを含めて次も実行できます。
+Optional dry-run:
 
 ```bash
-make test
+make -n setup
 ```
 
-`make test` は `test-smoke` と `test-unit` を順番に実行します。
-`test-unit` は `bats` が未インストールならスキップされます。
-ただし CI 環境では `bats` が見つからない場合にエラーで終了します。
-`bats` は `mise` で導入できます。
-
-```bash
-mise install bats
-```
-
-現在の `test-unit` は次を対象にしています。
-
-- `script/lib/load-secrets-env`
-- `script/dot` の非破壊 CLI パス（`help`、不正コマンド、不正引数）
-- `script/opencode/validate` の正常系/異常系（fixture ベース）
-
-GitHub Actions では `pull_request` と `master` への push で `make test` を実行します。
-
-Codex 側は次も確認できます。
-
-```bash
-test -L ~/.codex/config.toml
-test -L ~/.codex/AGENTS.md
-codex mcp --help
-```
-
-### 7. トラブルシュート
-
-`make dot-bootstrap` が失敗する場合:
-
-- `./script/dot help` でコマンドが実行可能か確認
-- `make link` を再実行してシンボリックリンクを更新
-- `make -n dot-bootstrap` で実行内容を確認
-
-## アンインストール
+## Uninstall
 
 ```bash
 make uninstall
