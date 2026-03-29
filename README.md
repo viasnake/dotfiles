@@ -83,6 +83,34 @@ Optional dry-run:
 make -n setup
 ```
 
+## OpenCode via ocx (personal)
+
+This repository keeps OpenCode config in `config/opencode/` and publishes it into `~/.config/opencode/`.
+
+- Available profiles: `personal`, `work`
+- Default profile: `personal`
+- Override profile per command: set `OCX_PROFILE=<name>`
+- Runtime launcher: `script/opencode/run-with-secrets`
+
+Install tools and link files:
+
+```bash
+make install
+make link
+```
+
+Install the worktree plugin for your profile:
+
+```bash
+OCX_PROFILE=personal ocx add kdco/worktree --from https://registry.kdco.dev
+
+# optional: work profile
+OCX_PROFILE=work ocx add kdco/worktree --from https://registry.kdco.dev
+```
+
+This repository includes a starter worktree config at `.opencode/worktree.jsonc`.
+Tune `sync` and `hooks` there as needed for your local workflow.
+
 ## Uninstall
 
 ```bash

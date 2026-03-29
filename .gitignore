@@ -11,3 +11,9 @@ id_*
 # Bitwarden session or logs
 *BW_SESSION*
 *.session.log
+
+# OCX runtime artifacts
+.ocx/
+.opencode/.gitignore
+.opencode/package.json
+.opencode/plugins/
