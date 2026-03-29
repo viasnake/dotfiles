@@ -12,13 +12,17 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" .
+          git checkout "${GITHUB_SHA}"
 
-      - name: Setup mise and bats
-        uses: jdx/mise-action@v4
-        with:
-          install_args: bats
+      - name: Install bats
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats
 
       - name: Run tests
         run: make test
