@@ -34,15 +34,18 @@ If needed, set your Git identity in `~/.gitconfig`:
 
 ## Optional: Secrets
 
-Create a local secrets file for tools that read runtime env vars (for example, Context7):
+`make setup` (or `make install`) creates a local secrets template file for tools that read runtime env vars (for example, Context7):
+
+- `~/.config/secrets/runtime.env.secret`
+- The file is created only when missing
+- The initial content is comments only
+
+Then edit the file and add actual values as needed:
 
 ```bash
-mkdir -p ~/.config/secrets
-chmod 700 ~/.config/secrets
-cat > ~/.config/secrets/runtime.env.secret <<'EOF'
+cat >> ~/.config/secrets/runtime.env.secret <<'EOF'
 CONTEXT7_API_KEY=<your-context7-api-key>
 EOF
-chmod 600 ~/.config/secrets/runtime.env.secret
 ```
 
 Notes:

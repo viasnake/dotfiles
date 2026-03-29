@@ -182,6 +182,13 @@ info "Bootstrap script started."
 info "Checking arguments..."
 check_arguments "$@"
 
+if [[ "$1" == "install" ]]; then
+  info "Ensuring runtime secrets file..."
+  source "script/lib/ensure-runtime-secrets-file"
+  ensure_runtime_secrets_file
+  info "Runtime secrets file check finished."
+fi
+
 #
 info "Checking OS..."
 check_os
