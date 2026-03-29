@@ -1,10 +1,16 @@
-model = "gpt-5.4"
+model = "gpt-5.3-codex"
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
-web_search = "cached"
-model_reasoning_effort = "high"
+web_search = "live"
+model_reasoning_effort = "medium"
 personality = "pragmatic"
 file_opener = "vscode"
+plan_mode_reasoning_effort = "high"
+
+[features]
+personality = true
+shell_tool = true
+multi_agent = true
 
 [mcp_servers.context7]
 command = "npx"
@@ -15,10 +21,6 @@ env_vars = ["CONTEXT7_API_KEY"]
 command = "npx"
 args = ["@playwright/mcp@latest"]
 
-[features]
-personality = true
-shell_tool = true
-multi_agent = true
-
 [tui]
 theme = "solarized-dark"
+status_line = ["context-remaining", "current-dir", "model-name", "git-branch", "context-used", "context-window-size", "used-tokens", "total-input-tokens", "total-output-tokens"]
