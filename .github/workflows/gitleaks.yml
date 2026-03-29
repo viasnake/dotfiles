@@ -17,13 +17,9 @@ jobs:
           git clone "https://github.com/${GITHUB_REPOSITORY}.git" .
           git checkout "${GITHUB_SHA}"
 
-      - name: Install gitleaks
-        env:
-          GITLEAKS_VERSION: 8.28.0
+      - name: Install pre-commit
         run: |
-          curl -sSLo gitleaks.tar.gz "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
-          tar -xzf gitleaks.tar.gz
-          sudo install -m 0755 gitleaks /usr/local/bin/gitleaks
+          python3 -m pip install --user pre-commit
 
       - name: Run gitleaks
-        run: gitleaks dir . --redact
+        run: ~/.local/bin/pre-commit run gitleaks --all-files
