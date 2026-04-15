@@ -12,30 +12,6 @@ personality = true
 shell_tool = true
 multi_agent = true
 
-[mcp_servers.context7]
-command = "npx"
-args = ["-y", "@upstash/context7-mcp"]
-env_vars = ["CONTEXT7_API_KEY"]
-
-[mcp_servers.playwright]
-command = "npx"
-args = ["@playwright/mcp@latest"]
-
 [tui]
 theme = "solarized-dark"
 status_line = ["context-remaining", "current-dir", "model-name", "git-branch", "context-used", "context-window-size", "used-tokens", "total-input-tokens", "total-output-tokens"]
-
-[plugins."google-calendar@openai-curated"]
-enabled = true
-
-[plugins."gmail@openai-curated"]
-enabled = true
-
-[plugins."github@openai-curated"]
-enabled = true
-
-[plugins."google-drive@openai-curated"]
-enabled = true
-
-[plugins."cloudflare@openai-curated"]
-enabled = true

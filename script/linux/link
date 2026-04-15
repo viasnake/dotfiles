@@ -24,6 +24,7 @@ function warning() {
   local reset="\033[0m"
   local prefix="[WARNING] "
   local message=$1
+  echo -e "${yellow}${prefix}${message}${reset}"
 }
 
 function info() {
@@ -54,6 +55,30 @@ function symlink() {
   success "Symlink created: $2 -> $1"
 }
 
+function copy_once_with_symlink_migration() {
+  local src=$1
+  local dst=$2
+  local target_dir
+  target_dir=$(dirname "$dst")
+  mkdir -p "$target_dir"
+
+  if [ -L "$dst" ]; then
+    rm -f "$dst"
+    info "Migrating symlink to copied file: $dst"
+    cp "$src" "$dst"
+    success "Copied file (migrated): $dst <- $src"
+    return 0
+  fi
+
+  if [ -e "$dst" ]; then
+    info "Skipped existing file: $dst"
+    return 0
+  fi
+
+  cp "$src" "$dst"
+  success "Copied file: $dst <- $src"
+}
+
 # Link configuration files
 {
   info "Linking configuration files..."
@@ -66,7 +91,7 @@ function symlink() {
 
   ## ssh
   mkdir -p "$HOME/.ssh/config.d"
-  symlink "$PWD/config/ssh/config" "$HOME/.ssh/config"
+  copy_once_with_symlink_migration "$PWD/config/ssh/config" "$HOME/.ssh/config"
   symlink "$PWD/config/ssh/config.d/00-base.conf" "$HOME/.ssh/config.d/00-base.conf"
 
   ## homebrew
@@ -94,7 +119,7 @@ function symlink() {
 
   ## codex
   mkdir -p "$HOME/.codex"
-  symlink "$PWD/config/codex/config.toml" "$HOME/.codex/config.toml"
+  copy_once_with_symlink_migration "$PWD/config/codex/config.toml" "$HOME/.codex/config.toml"
   symlink "$PWD/config/codex/AGENTS.md" "$HOME/.codex/AGENTS.md"
 
   ## opencode

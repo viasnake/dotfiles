@@ -57,7 +57,7 @@ Notes:
 
 ## Optional: SSH for GitHub
 
-This repo links SSH config that uses `~/.ssh/id_ed25519_personal` for `github`/`github.com`.
+This repo copies SSH config to `~/.ssh/config` on first link only (existing file is kept) and uses `~/.ssh/id_ed25519_personal` for `github`/`github.com`.
 
 ```bash
 mkdir -p ~/.ssh
