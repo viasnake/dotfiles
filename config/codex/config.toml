@@ -8,6 +8,7 @@ file_opener = "vscode"
 plan_mode_reasoning_effort = "high"
 
 [features]
+goals = true
 personality = true
 shell_tool = true
 multi_agent = true
