@@ -3,26 +3,25 @@
 Personal dotfiles for macOS, Linux, and WSL2.
 Main entrypoint: `make init` (first-time setup) or `make apply` (already installed).
 
-## Requirements
+## Manual Prerequisites
 
-- `chezmoi`
-- `bw` (Bitwarden CLI)
-- `git`
-- `make`
-- `sudo`
+Install only what is needed to clone this repository and start `make init`.
+`make init` installs `chezmoi` when missing, and chezmoi scripts install the managed tools.
 
 Primary supported OS: macOS, Linux, WSL2.
 
-Bootstrap commands (minimum):
+Minimum commands when the base OS does not already provide them:
 
 ```bash
 # macOS
-brew install chezmoi bitwarden-cli git make
+xcode-select --install
 
 # Linux / WSL2 (Debian/Ubuntu)
 sudo apt-get update
-sudo apt-get install -y curl git make sudo
+sudo apt-get install -y curl git make
 ```
+
+Linux / WSL2 setup expects a user that can run `sudo`.
 
 This repository is a chezmoi source state. `.chezmoiroot` points chezmoi at `home/`, so files such as `home/dot_config/fish/config.fish` apply to `~/.config/fish/config.fish`.
 
@@ -60,6 +59,7 @@ If needed, set your Git identity in `~/.gitconfig`:
 ## Optional: Secrets
 
 OpenCode Context7 API key can be injected directly into `~/.config/opencode/opencode.jsonc` from Bitwarden.
+Install `bw` (Bitwarden CLI) only when using these Bitwarden-backed optional settings.
 
 1. Log in to Bitwarden and unlock:
 
