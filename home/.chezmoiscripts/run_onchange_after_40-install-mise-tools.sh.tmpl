@@ -1,0 +1,18 @@
+{{- if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") -}}
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+mise_config="$HOME/.config/mise/config.toml"
+# mise config hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
+
+if ! command -v mise >/dev/null 2>&1; then
+  exit 0
+fi
+
+if [[ ! -f "$mise_config" ]]; then
+  exit 0
+fi
+
+mise install
+{{ end -}}

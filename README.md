@@ -1,28 +1,38 @@
 # dotfiles
 
 Personal dotfiles for Linux, macOS, and WSL.
-Main entrypoint: `make setup`.
+Main entrypoint: `make apply`.
 
 ## Requirements
 
+- `chezmoi`
+- `bw` (Bitwarden CLI)
 - `git`
 - `make`
 - `sudo`
 
 Supported environments: Debian, Raspbian, Ubuntu, Zorin OS, macOS, WSL1, WSL2.
 
+This repository is a chezmoi source state. `.chezmoiroot` points chezmoi at `home/`, so files such as `home/dot_config/fish/config.fish` apply to `~/.config/fish/config.fish`.
+
 ## Quick Start
 
 ```bash
 git clone https://github.com/viasnake/dotfiles.git
 cd dotfiles
-make setup
+make apply
 ```
 
-`make setup` runs:
+## Make Targets
 
-- `make link`
-- `make install`
+- `make apply`: apply all managed files and scripts
+- `make apply-scripts`: apply only chezmoi scripts (`home/.chezmoiscripts/`)
+- `make dry-run`: show verbose apply plan without mutating target files
+- `make status`: show what would change
+- `make diff`: show detailed diff of pending changes
+- `make verify`: verify target state matches rendered source state
+- `make managed`: list managed target paths
+- `make remove-managed`: remove all currently managed files and symlinks from target
 
 If needed, set your Git identity in `~/.gitconfig`:
 
@@ -34,85 +44,95 @@ If needed, set your Git identity in `~/.gitconfig`:
 
 ## Optional: Secrets
 
-`make setup` (or `make install`) creates a local secrets template file for tools that read runtime env vars (for example, Context7):
+OpenCode Context7 API key can be injected directly into `~/.config/opencode/opencode.jsonc` from Bitwarden.
 
-- `~/.config/secrets/runtime.env.secret`
-- The file is created only when missing
-- The initial content is comments only
-
-Then edit the file and add actual values as needed:
+1. Log in to Bitwarden and unlock:
 
 ```bash
-cat >> ~/.config/secrets/runtime.env.secret <<'EOF'
-CONTEXT7_API_KEY=<your-context7-api-key>
-EOF
+bw login --apikey   # or: bw login <email> / bw login --sso
+bw unlock
 ```
 
-Notes:
+2. Set Bitwarden item metadata in `~/.config/chezmoi/chezmoi.toml`:
+   - `data.bitwarden.runtimeEnvItemId`
+   - `data.bitwarden.context7FieldName` (default: `CONTEXT7_API_KEY`)
+3. Run `make apply` (or `chezmoi apply`).
 
-- Format: `KEY=VALUE`
-- Lines starting with `#` are ignored
-- You can override the path with `SECRETS_ENV_FILE`
-- Never commit secret files
+Environment-variable overrides are also supported:
+- `BW_RUNTIME_ENV_ITEM_ID`
+- `BW_CONTEXT7_FIELD_NAME`
+
+If no Bitwarden item is configured, the generated config keeps `"{env:CONTEXT7_API_KEY}"` as a fallback.
 
 ## Optional: SSH for GitHub
 
-This repo copies SSH config to `~/.ssh/config` on first link only (existing file is kept) and uses `~/.ssh/id_ed25519_personal` for `github`/`github.com`.
+This repo manages SSH config with chezmoi and uses `~/.ssh/id_ed25519_personal` for `github`/`github.com`.
+The key pair can be materialized from Bitwarden attachments.
+
+1. Store private/public key as attachments in one Bitwarden item.
+2. Set metadata in `~/.config/chezmoi/chezmoi.toml`:
+   - `data.bitwarden.sshKeyItemId`
+   - `data.bitwarden.sshPrivateAttachment` (default: `id_ed25519_personal`)
+   - `data.bitwarden.sshPublicAttachment` (default: `id_ed25519_personal.pub`)
+3. Run `make apply`.
+
+Environment-variable overrides are also supported:
+- `BW_SSH_KEY_ITEM_ID`
+- `BW_SSH_PRIVATE_ATTACHMENT`
+- `BW_SSH_PUBLIC_ATTACHMENT`
+
+Then register `~/.ssh/id_ed25519_personal.pub` in your GitHub account and verify with `ssh -T github`.
+
+## Optional: Fonts
+
+Font provisioning is intentionally manual in this repository.
+Install `Firge` / `FirgeNerd` by downloading releases from:
+
+- https://github.com/yuru7/Firge/releases
+
+Example (Linux/macOS):
 
 ```bash
-mkdir -p ~/.ssh
-chmod 700 ~/.ssh
-ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_personal -C "you@example.com"
-chmod 600 ~/.ssh/id_ed25519_personal
-chmod 644 ~/.ssh/id_ed25519_personal.pub
-ssh -T github
+mkdir -p ~/.local/share/fonts
+unzip -o FirgeNerd_v0.3.0.zip -d ~/.local/share/fonts
+unzip -o Firge_v0.3.0.zip -d ~/.local/share/fonts
+fc-cache -fv
 ```
-
-Add `~/.ssh/id_ed25519_personal.pub` to your GitHub account before running `ssh -T github`.
 
 ## Verification
 
 ```bash
-make opencode_validate
-make test-smoke
+make status
+make diff
+make dry-run
 ```
 
-Optional dry-run:
+`script/opencode/validate` and `script/lib/load-secrets-env` are retired.
+Validation should be done with chezmoi-native checks and rendered-output inspection.
 
 ```bash
-make -n setup
+make verify
+chezmoi --source "$PWD" execute-template --file home/dot_config/opencode/opencode.jsonc.tmpl
 ```
 
-## OpenCode via ocx (personal)
+## OpenCode
 
-This repository keeps OpenCode config in `config/opencode/` and publishes it into `~/.config/opencode/`.
+This repository keeps OpenCode config in `home/dot_config/opencode/` and publishes it into `~/.config/opencode/` with chezmoi.
 
-- Available profiles: `personal`, `work`
-- Default profile: `personal`
-- Override profile per command: set `OCX_PROFILE=<name>`
-- Runtime launcher: `script/opencode/run-with-secrets`
-
-Install tools and link files:
+Apply with chezmoi:
 
 ```bash
-make install
-make link
+make apply
 ```
 
-Install the worktree plugin for your profile:
+Run OpenCode:
 
 ```bash
-OCX_PROFILE=personal ocx add kdco/worktree --from https://registry.kdco.dev
-
-# optional: work profile
-OCX_PROFILE=work ocx add kdco/worktree --from https://registry.kdco.dev
+opencode
 ```
 
-This repository includes a starter worktree config at `.opencode/worktree.jsonc`.
-Tune `sync` and `hooks` there as needed for your local workflow.
-
-## Uninstall
+## Remove Managed Files
 
 ```bash
-make uninstall
+make remove-managed
 ```

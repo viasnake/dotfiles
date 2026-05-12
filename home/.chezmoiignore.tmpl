@@ -1,0 +1,11 @@
+{{- if eq .chezmoi.os "windows" }}
+dot_bashrc
+dot_config/fish/**
+dot_config/ghostty/**
+dot_config/mise/**
+private_dot_ssh/**
+{{- end }}
+
+{{- if not (or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux")) }}
+.chezmoiscripts/**
+{{- end }}

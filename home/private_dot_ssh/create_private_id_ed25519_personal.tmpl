@@ -1,0 +1,6 @@
+{{- $bitwardenData := (get . "bitwarden" | default (dict)) -}}
+{{- $sshItemID := (env "BW_SSH_KEY_ITEM_ID" | default (get $bitwardenData "sshKeyItemId") | default "" | trim) -}}
+{{- $privateAttachment := (env "BW_SSH_PRIVATE_ATTACHMENT" | default (get $bitwardenData "sshPrivateAttachment") | default "id_ed25519_personal" | trim) -}}
+{{- if ne $sshItemID "" -}}
+{{- bitwardenAttachment $privateAttachment $sshItemID -}}
+{{- end -}}

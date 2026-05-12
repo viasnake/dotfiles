@@ -1,0 +1,18 @@
+[bitwarden]
+unlock = "auto"
+
+[data.bitwarden]
+# Bitwarden item id used by home/dot_config/opencode/opencode.jsonc.tmpl
+runtimeEnvItemId = ""
+
+# Field name that contains the Context7 API key in the Bitwarden item above.
+context7FieldName = "CONTEXT7_API_KEY"
+
+# Bitwarden item id used by SSH key templates:
+# - home/private_dot_ssh/create_private_id_ed25519_personal.tmpl
+# - home/private_dot_ssh/create_id_ed25519_personal.pub.tmpl
+sshKeyItemId = ""
+
+# Attachment names in the SSH item.
+sshPrivateAttachment = "id_ed25519_personal"
+sshPublicAttachment = "id_ed25519_personal.pub"

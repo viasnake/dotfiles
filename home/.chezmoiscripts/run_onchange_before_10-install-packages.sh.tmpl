@@ -1,0 +1,39 @@
+{{- if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") -}}
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+{{- if and (eq .chezmoi.os "linux") (hasKey .chezmoi.osRelease "id") (or (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "raspbian") (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.id "zorin")) }}
+if command -v apt-get >/dev/null 2>&1; then
+  sudo apt-get update
+  sudo apt-get install -y \
+    build-essential \
+    ca-certificates \
+    curl \
+    file \
+    git \
+    procps \
+    unzip
+fi
+{{ end }}
+
+if ! command -v brew >/dev/null 2>&1; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+{{- if eq .chezmoi.os "linux" }}
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+{{- else if eq .chezmoi.os "darwin" }}
+eval "$(/opt/homebrew/bin/brew shellenv)"
+{{- end }}
+
+brew bundle --file=/dev/stdin <<'BREWFILE'
+brew "chezmoi"
+brew "fish"
+brew "fisher"
+brew "gmailctl"
+brew "jsonnet"
+brew "mise"
+brew "zoxide"
+BREWFILE
+{{ end -}}

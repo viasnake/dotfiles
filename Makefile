@@ -1,43 +1,45 @@
-BOOTSTRAP = script/bootstrap
+CHEZMOI = chezmoi --source "$(CURDIR)"
 
-.PHONY: all setup clean install uninstall link unlink install_fonts uninstall_fonts \
-	opencode_validate \
-	test test-smoke test-unit
+.PHONY: help all apply apply-scripts dry-run status diff verify managed remove-managed
 
-all: setup
-setup: link install
-clean: uninstall unlink
+help:
+	@printf "Available targets:\n"
+	@printf "  apply          Apply all managed files and scripts\n"
+	@printf "  apply-scripts  Apply only chezmoi scripts\n"
+	@printf "  dry-run        Show verbose apply plan without mutating target files\n"
+	@printf "  status         Show what would change\n"
+	@printf "  diff           Show detailed diff of pending changes\n"
+	@printf "  verify         Verify target state matches rendered source state\n"
+	@printf "  managed        List managed target paths\n"
+	@printf "  remove-managed Remove all currently managed files and symlinks from target\n"
 
-install:
-	$(BOOTSTRAP) install
-uninstall:
-	$(BOOTSTRAP) uninstall
-link:
-	$(BOOTSTRAP) link
-unlink:
-	$(BOOTSTRAP) unlink
-install_fonts:
-	$(BOOTSTRAP) install_fonts
-uninstall_fonts:
-	$(BOOTSTRAP) uninstall_fonts
+all: apply
 
-opencode_validate:
-	script/opencode/validate
+apply:
+	$(CHEZMOI) apply
 
-test: test-smoke test-unit
+apply-scripts:
+	$(CHEZMOI) apply --include=scripts
 
-test-smoke:
-	$(MAKE) opencode_validate
-	$(MAKE) -n setup
+dry-run:
+	$(CHEZMOI) apply --dry-run --verbose
 
-test-unit:
-	@if command -v bats >/dev/null 2>&1; then \
-	  bats test; \
-	elif command -v mise >/dev/null 2>&1; then \
-	  MISE_WARN_MISSING_TOOLS=0 mise x bats -- bats test; \
-	elif [ -n "${CI:-}" ]; then \
-	  printf '[ERROR] bats is required in CI but was not found\n' >&2; \
-	  exit 1; \
-	else \
-	  printf '[INFO] bats/mise not found, skipping unit tests\n'; \
-	fi
+status:
+	$(CHEZMOI) status
+
+diff:
+	$(CHEZMOI) diff
+
+verify:
+	$(CHEZMOI) verify
+
+managed:
+	$(CHEZMOI) managed --include=files,symlinks --path-style=absolute
+
+remove-managed:
+	@set -eu; \
+	$(CHEZMOI) managed --include=files,symlinks --path-style=absolute | while IFS= read -r path; do \
+	  if [ -n "$$path" ] && [ "$$path" != "/" ]; then \
+	    rm -rf "$$path"; \
+	  fi; \
+	done
