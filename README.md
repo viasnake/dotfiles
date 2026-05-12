@@ -1,7 +1,7 @@
 # dotfiles
 
 Personal dotfiles for Linux, macOS, and WSL.
-Main entrypoint: `make apply`.
+Main entrypoint: `make init` (first-time setup) or `make apply` (already installed).
 
 ## Requirements
 
@@ -20,12 +20,16 @@ This repository is a chezmoi source state. `.chezmoiroot` points chezmoi at `hom
 ```bash
 git clone https://github.com/viasnake/dotfiles.git
 cd dotfiles
-make apply
+make init
 ```
+
+`make init` installs `chezmoi` via the official installer (`https://get.chezmoi.io`) only when missing, then applies this source state.
 
 ## Make Targets
 
 - `make apply`: apply all managed files and scripts
+- `make init`: install chezmoi if missing, then apply all managed files and scripts
+- `make ensure-chezmoi`: install chezmoi to `~/.local/bin` only when missing
 - `make apply-scripts`: apply only chezmoi scripts (`home/.chezmoiscripts/`)
 - `make dry-run`: show verbose apply plan without mutating target files
 - `make status`: show what would change
