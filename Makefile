@@ -3,7 +3,7 @@ CHEZMOI_CMD = $(shell command -v chezmoi 2>/dev/null || echo "$(CHEZMOI_BIN)")
 CHEZMOI = $(CHEZMOI_CMD) --source "$(CURDIR)"
 CHEZMOI_INSTALL_URL = https://get.chezmoi.io
 
-.PHONY: help all init ensure-chezmoi apply apply-scripts dry-run status diff verify managed remove-managed
+.PHONY: help all init ensure-chezmoi apply apply-scripts dry-run status diff verify managed test-ubuntu24-container test-ubuntu24-container-full remove-managed
 
 help:
 	@printf "Available targets:\n"
@@ -16,6 +16,8 @@ help:
 	@printf "  diff           Show detailed diff of pending changes\n"
 	@printf "  verify         Verify target state matches rendered source state\n"
 	@printf "  managed        List managed target paths\n"
+	@printf "  test-ubuntu24-container Run Ubuntu 24.04 container bootstrap smoke test\n"
+	@printf "  test-ubuntu24-container-full Run full Ubuntu 24.04 first-time setup in a container\n"
 	@printf "  remove-managed Remove all currently managed files and symlinks from target\n"
 
 all: apply
@@ -60,6 +62,14 @@ verify:
 
 managed:
 	$(CHEZMOI) managed --include=files,symlinks --path-style=absolute
+
+test-ubuntu24-container:
+	docker build -f test/ubuntu24/Dockerfile -t dotfiles-ubuntu24-test .
+	docker run --rm dotfiles-ubuntu24-test
+
+test-ubuntu24-container-full:
+	docker build -f test/ubuntu24/Dockerfile -t dotfiles-ubuntu24-test .
+	docker run --rm --env GITHUB_TOKEN --env DOTFILES_CONTAINER_TEST_MODE=full dotfiles-ubuntu24-test
 
 remove-managed:
 	@set -eu; \

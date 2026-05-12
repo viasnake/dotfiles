@@ -1,23 +1,31 @@
+# linuxbrew
+if test -x /home/linuxbrew/.linuxbrew/bin/brew
+  eval (/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+end
+
+# homebrew
+if test -x /opt/homebrew/bin/brew
+  eval (/opt/homebrew/bin/brew shellenv)
+else if test -x /usr/local/bin/brew
+  eval (/usr/local/bin/brew shellenv)
+end
+
 if status is-interactive
-  # linuxbrew
-  if test -d /home/linuxbrew/.linuxbrew
-    eval (/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+  if command -q mise
+    mise activate fish | source
   end
-
-  # homebrew
-  if test -d /opt/homebrew
-    eval (/opt/homebrew/bin/brew shellenv)
+  if command -q zoxide
+    zoxide init fish --cmd cd | source
   end
-
-  #
-  mise activate fish | source
-  zoxide init fish --cmd cd | source
-  fzf --fish | source
+  if command -q fzf
+    fzf --fish | source
+  end
 
   #
   set --universal pure_show_system_time true
 
 else
-  # mise
-  mise activate fish --shims | source
+  if command -q mise
+    mise activate fish --shims | source
+  end
 end

@@ -3,6 +3,21 @@
 
 set -euo pipefail
 
+load_homebrew_env() {
+  local brew_bin
+
+  for brew_bin in \
+    /home/linuxbrew/.linuxbrew/bin/brew \
+    /opt/homebrew/bin/brew \
+    /usr/local/bin/brew
+  do
+    if [[ -x "$brew_bin" ]]; then
+      eval "$("$brew_bin" shellenv)"
+      return
+    fi
+  done
+}
+
 {{- if and (eq .chezmoi.os "linux") (hasKey .chezmoi.osRelease "id") (or (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "raspbian") (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.id "zorin")) }}
 if command -v apt-get >/dev/null 2>&1; then
   sudo apt-get update
@@ -12,6 +27,7 @@ if command -v apt-get >/dev/null 2>&1; then
     curl \
     file \
     git \
+    libicu-dev \
     procps \
     unzip
 fi
@@ -21,11 +37,7 @@ if ! command -v brew >/dev/null 2>&1; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-{{- if eq .chezmoi.os "linux" }}
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-{{- else if eq .chezmoi.os "darwin" }}
-eval "$(/opt/homebrew/bin/brew shellenv)"
-{{- end }}
+load_homebrew_env
 
 brew bundle --file=/dev/stdin <<'BREWFILE'
 brew "chezmoi"

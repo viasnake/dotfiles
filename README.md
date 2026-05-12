@@ -46,6 +46,8 @@ make init
 - `make diff`: show detailed diff of pending changes
 - `make verify`: verify target state matches rendered source state
 - `make managed`: list managed target paths
+- `make test-ubuntu24-container`: run an Ubuntu 24.04 container smoke test for fish/mise bootstrap behavior
+- `make test-ubuntu24-container-full`: run full first-time setup in an Ubuntu 24.04 container and verify the real mise config; set `GITHUB_TOKEN` to avoid unauthenticated GitHub API rate limits
 - `make remove-managed`: remove all currently managed files and symlinks from target
 
 If needed, set your Git identity in `~/.gitconfig`:
@@ -120,6 +122,13 @@ fc-cache -fv
 make status
 make diff
 make dry-run
+make test-ubuntu24-container
+```
+
+For a full fresh-host check that installs every tool in `home/dot_config/mise/config.toml`, run:
+
+```bash
+GITHUB_TOKEN=<github-token> make test-ubuntu24-container-full
 ```
 
 `script/opencode/validate` and `script/lib/load-secrets-env` are retired.
