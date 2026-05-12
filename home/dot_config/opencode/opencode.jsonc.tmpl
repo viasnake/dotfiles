@@ -1,13 +1,3 @@
-{{- $bitwardenData := (get . "bitwarden" | default (dict)) -}}
-{{- $runtimeItemID := (env "BW_RUNTIME_ENV_ITEM_ID" | default (get $bitwardenData "runtimeEnvItemId") | default "" | trim) -}}
-{{- $context7FieldName := (env "BW_CONTEXT7_FIELD_NAME" | default (get $bitwardenData "context7FieldName") | default "CONTEXT7_API_KEY" | trim) -}}
-{{- $context7APIKey := "" -}}
-{{- if ne $runtimeItemID "" -}}
-{{- $fields := bitwardenFields "item" $runtimeItemID -}}
-{{- if hasKey $fields $context7FieldName -}}
-{{- $context7APIKey = (get (get $fields $context7FieldName) "value" | toString) -}}
-{{- end -}}
-{{- end -}}
 {
   "$schema": "https://opencode.ai/config.json",
   "instructions": [
@@ -22,13 +12,14 @@
         "-y",
         "@upstash/context7-mcp",
         "--api-key",
-{{- if ne $context7APIKey "" }}
-        {{ $context7APIKey | toJson }}
-{{- else }}
         "{env:CONTEXT7_API_KEY}"
-{{- end }}
       ],
       "enabled": true
+    }
+  },
+  "permission": {
+    "skill": {
+      "*": "allow"
     }
   },
   "experimental": {

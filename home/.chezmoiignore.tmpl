@@ -1,3 +1,9 @@
+{{- $bitwardenData := (get . "bitwarden" | default (dict)) -}}
+{{- $runtimeEnvItemID := (env "BW_RUNTIME_ENV_ITEM_ID" | default (get $bitwardenData "runtimeEnvItemId") | default "" | trim) -}}
+{{- $sshItemID := (env "BW_SSH_KEY_ITEM_ID" | default (get $bitwardenData "sshKeyItemId") | default "" | trim) -}}
+{{- $hasBitwardenSession := ne (env "BW_SESSION" | default "" | trim) "" -}}
+{{- $hasBitwardenCLI := ne (lookPath "bw") "" -}}
+{{- $canUseBitwarden := and $hasBitwardenSession $hasBitwardenCLI -}}
 {{- if eq .chezmoi.os "windows" }}
 dot_bashrc
 dot_config/fish/**
@@ -8,4 +14,22 @@ private_dot_ssh/**
 
 {{- if not (or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux")) }}
 .chezmoiscripts/**
+{{- end }}
+
+{{- if not (and $canUseBitwarden (ne $runtimeEnvItemID "")) }}
+dot_config/dotfiles/private_secrets.env
+dot_config/dotfiles/private_secrets.env.tmpl
+dot_config/dotfiles/private_secrets.fish
+dot_config/dotfiles/private_secrets.fish.tmpl
+.config/dotfiles/secrets.env
+.config/dotfiles/secrets.fish
+{{- end }}
+
+{{- if not (and $canUseBitwarden (ne $sshItemID "")) }}
+private_dot_ssh/create_private_id_ed25519_personal
+private_dot_ssh/create_private_id_ed25519_personal.tmpl
+private_dot_ssh/create_id_ed25519_personal.pub
+private_dot_ssh/create_id_ed25519_personal.pub.tmpl
+.ssh/id_ed25519_personal
+.ssh/id_ed25519_personal.pub
 {{- end }}

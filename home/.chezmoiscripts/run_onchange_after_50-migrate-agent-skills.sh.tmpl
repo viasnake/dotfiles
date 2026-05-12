@@ -1,0 +1,37 @@
+{{- if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") -}}
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+hash_file() {
+  local path="$1"
+
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$path" | awk '{ print $1 }'
+    return
+  fi
+
+  shasum -a 256 "$path" | awk '{ print $1 }'
+}
+
+remove_if_hash_matches() {
+  local path="$1"
+  local expected_hash="$2"
+
+  if [[ -f "$path" ]] && [[ "$(hash_file "$path")" == "$expected_hash" ]]; then
+    rm -f "$path"
+  fi
+}
+
+old_skills_dir="$HOME/.config/opencode/skills"
+
+remove_if_hash_matches "$old_skills_dir/README.md" "f5d9e7a671a693c9e9baa7d763a2a3fbf0baf682d6e57f62c9778f1a0dca10a7"
+remove_if_hash_matches "$old_skills_dir/frontend-design/SKILL.md" "254ed8351c6ba8c2c30327a665cbe669ae4145882a2960234b30020339e9a0c2"
+remove_if_hash_matches "$old_skills_dir/github/SKILL.md" "74ff3ac22c81c4231d48707ab6cb73b8d2fc749acf65e4054408a98446ac0370"
+remove_if_hash_matches "$old_skills_dir/playwright-cli/SKILL.md" "859556ce73a28e79d323444929f94fb88eb0d5d47e80d09c4dd7bf8cf377aedd"
+
+rmdir "$old_skills_dir/frontend-design" 2>/dev/null || true
+rmdir "$old_skills_dir/github" 2>/dev/null || true
+rmdir "$old_skills_dir/playwright-cli" 2>/dev/null || true
+rmdir "$old_skills_dir" 2>/dev/null || true
+{{ end -}}

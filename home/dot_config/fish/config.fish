@@ -10,6 +10,10 @@ else if test -x /usr/local/bin/brew
   eval (/usr/local/bin/brew shellenv)
 end
 
+if test -f ~/.config/dotfiles/secrets.fish
+  source ~/.config/dotfiles/secrets.fish
+end
+
 if status is-interactive
   if command -q mise
     mise activate fish | source

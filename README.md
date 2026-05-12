@@ -58,30 +58,49 @@ If needed, set your Git identity in `~/.gitconfig`:
   email = <your-email>
 ```
 
-## Optional: Secrets
+## Secrets with Bitwarden
 
-OpenCode Context7 API key can be injected directly into `~/.config/opencode/opencode.jsonc` from Bitwarden.
-Install `bw` (Bitwarden CLI) only when using these Bitwarden-backed optional settings.
+Bitwarden is the standard place for SSH keys and API keys in this repository.
+Using the repository without Bitwarden is still supported; in that case secret-backed files are skipped and commands that need those credentials must receive them another way.
 
-1. Log in to Bitwarden and unlock:
+`bw` (Bitwarden CLI) is managed by mise. Before applying Bitwarden-backed secrets, log in and export a session:
 
 ```bash
 bw login --apikey   # or: bw login <email> / bw login --sso
-bw unlock
+export BW_SESSION="$(bw unlock --raw)"
 ```
 
-2. Set Bitwarden item metadata in `~/.config/chezmoi/chezmoi.toml`:
-   - `data.bitwarden.runtimeEnvItemId`
-   - `data.bitwarden.context7FieldName` (default: `CONTEXT7_API_KEY`)
-3. Run `make apply` (or `chezmoi apply`).
+Set Bitwarden item metadata in `~/.config/chezmoi/chezmoi.toml`:
 
-Environment-variable overrides are also supported:
-- `BW_RUNTIME_ENV_ITEM_ID`
-- `BW_CONTEXT7_FIELD_NAME`
+```toml
+[data.bitwarden]
+runtimeEnvItemId = "<bitwarden-item-id-with-api-key-custom-fields>"
+sshKeyItemId = "<bitwarden-item-id-with-ssh-key-attachments>"
+```
 
-If no Bitwarden item is configured, the generated config keeps `"{env:CONTEXT7_API_KEY}"` as a fallback.
+The runtime env item is read from custom fields and rendered to private shell env files:
 
-## Optional: SSH for GitHub
+- `~/.config/dotfiles/secrets.env` for Bash-compatible shells
+- `~/.config/dotfiles/secrets.fish` for Fish
+
+Default custom field names:
+
+- `CONTEXT7_API_KEY`
+- `GITHUB_TOKEN`
+- `ANTHROPIC_API_KEY`
+- `OPENAI_API_KEY`
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `AWS_SESSION_TOKEN`
+
+Override the rendered field list with `data.bitwarden.runtimeEnvFields`.
+`BW_RUNTIME_ENV_ITEM_ID` can be used as an environment-variable override.
+
+OpenCode reads Context7 through `"{env:CONTEXT7_API_KEY}"`, so the same generated env files are the source of truth for local shells and OpenCode.
+
+## SSH for GitHub
 
 This repo manages SSH config with chezmoi and uses `~/.ssh/id_ed25519_personal` for `github`/`github.com`.
 The key pair can be materialized from Bitwarden attachments.
@@ -99,6 +118,8 @@ Environment-variable overrides are also supported:
 - `BW_SSH_PUBLIC_ATTACHMENT`
 
 Then register `~/.ssh/id_ed25519_personal.pub` in your GitHub account and verify with `ssh -T github`.
+
+If Bitwarden metadata, `bw`, or `BW_SESSION` is missing, chezmoi skips the secret env files and SSH key materialization rather than writing empty key files.
 
 ## Optional: Fonts
 
@@ -138,6 +159,24 @@ Validation should be done with chezmoi-native checks and rendered-output inspect
 make verify
 chezmoi --source "$PWD" execute-template --file home/dot_config/opencode/opencode.jsonc.tmpl
 ```
+
+## Agent Skills
+
+This repository keeps Codex/OpenCode skills in `home/dot_agents/skills/` and publishes them into `~/.agents/skills/` with chezmoi.
+
+Each skill lives at:
+
+```text
+home/dot_agents/skills/<name>/SKILL.md
+```
+
+Apply with:
+
+```bash
+make apply
+```
+
+Codex and OpenCode both discover `~/.agents/skills/<name>/SKILL.md`. This repository does not manage tool-specific skill copies under `~/.config/opencode/skills/`.
 
 ## OpenCode
 

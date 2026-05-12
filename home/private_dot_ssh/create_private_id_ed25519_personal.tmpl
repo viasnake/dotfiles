@@ -1,6 +1,8 @@
 {{- $bitwardenData := (get . "bitwarden" | default (dict)) -}}
 {{- $sshItemID := (env "BW_SSH_KEY_ITEM_ID" | default (get $bitwardenData "sshKeyItemId") | default "" | trim) -}}
 {{- $privateAttachment := (env "BW_SSH_PRIVATE_ATTACHMENT" | default (get $bitwardenData "sshPrivateAttachment") | default "id_ed25519_personal" | trim) -}}
-{{- if ne $sshItemID "" -}}
+{{- $hasBitwardenSession := ne (env "BW_SESSION" | default "" | trim) "" -}}
+{{- $hasBitwardenCLI := ne (lookPath "bw") "" -}}
+{{- if and (ne $sshItemID "") $hasBitwardenSession $hasBitwardenCLI -}}
 {{- bitwardenAttachment $privateAttachment $sshItemID -}}
 {{- end -}}
