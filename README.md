@@ -1,6 +1,6 @@
 # dotfiles
 
-Personal dotfiles for Linux, macOS, and WSL.
+Personal dotfiles for macOS, Linux, and WSL2.
 Main entrypoint: `make init` (first-time setup) or `make apply` (already installed).
 
 ## Requirements
@@ -11,7 +11,18 @@ Main entrypoint: `make init` (first-time setup) or `make apply` (already install
 - `make`
 - `sudo`
 
-Supported environments: Debian, Raspbian, Ubuntu, Zorin OS, macOS, WSL1, WSL2.
+Primary supported OS: macOS, Linux, WSL2.
+
+Bootstrap commands (minimum):
+
+```bash
+# macOS
+brew install chezmoi bitwarden-cli git make
+
+# Linux / WSL2 (Debian/Ubuntu)
+sudo apt-get update
+sudo apt-get install -y curl git make sudo
+```
 
 This repository is a chezmoi source state. `.chezmoiroot` points chezmoi at `home/`, so files such as `home/dot_config/fish/config.fish` apply to `~/.config/fish/config.fish`.
 
