@@ -162,21 +162,35 @@ chezmoi --source "$PWD" execute-template --file home/dot_config/opencode/opencod
 
 ## Agent Skills
 
-This repository keeps Codex/OpenCode skills in `home/dot_agents/skills/` and publishes them into `~/.agents/skills/` with chezmoi.
+Agent skills are managed by GitHub CLI `gh skill`.
 
-Each skill lives at:
+This repository keeps only the desired GitHub-backed skill list in:
 
 ```text
-home/dot_agents/skills/<name>/SKILL.md
+agent-skills.tsv
 ```
 
-Apply with:
+Install the listed skills for Codex user scope:
 
 ```bash
-make apply
+make skills-install
 ```
 
-Codex and OpenCode both discover `~/.agents/skills/<name>/SKILL.md`. This repository does not manage tool-specific skill copies under `~/.config/opencode/skills/`.
+The install target passes `--force` by default so bootstrap runs non-interactively. Override with `SKILL_INSTALL_FLAGS=` when you want `gh skill install` to protect existing local edits.
+
+Install the same list for another supported agent by overriding `SKILL_AGENT`:
+
+```bash
+make skills-install SKILL_AGENT=opencode
+```
+
+Update installed skills with:
+
+```bash
+make skills-update
+```
+
+`gh skill` injects source tracking metadata into installed skills, and `gh skill update` uses that metadata for future updates. This repository no longer publishes `SKILL.md` copies into `~/.agents/skills/` with chezmoi.
 
 ## OpenCode
 

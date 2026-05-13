@@ -22,6 +22,7 @@ If Cursor or Copilot rule files are added later, treat them as additional instru
 - `.chezmoiroot`: points chezmoi at `home/` as the source state.
 - `home/`: chezmoi-managed dotfiles, templates, and scripts.
 - `home/.chezmoiscripts/`: chezmoi-native setup hooks (`run_onchange_before_` / `run_onchange_after_`).
+- `agent-skills.tsv`: desired GitHub-backed agent skills installed and updated with `gh skill`.
 
 ## Working Principles
 - Make small, auditable, reversible changes.
@@ -51,6 +52,7 @@ If Cursor or Copilot rule files are added later, treat them as additional instru
 - Edited `home/.chezmoiscripts/**`: run `make dry-run` and `chezmoi --source "$PWD" apply --include=scripts --dry-run --verbose`.
 - Edited `home/dot_config/opencode/**`: run `chezmoi --source "$PWD" apply --dry-run --verbose`.
 - Edited `Makefile` targets: run `make help`, `make dry-run`, and `make managed`.
+- Edited `agent-skills.tsv` or Skill-related `Makefile` targets: run `make help`; run `make skills-update-dry-run` only when `gh skill` is available locally.
 - Edited Bitwarden-backed templates (`*.tmpl` under `home/`): run `chezmoi --source "$PWD" execute-template --file <template>` and `chezmoi --source "$PWD" apply --dry-run --verbose`.
 - Edited anything potentially affecting secrets/repo safety: inspect the diff and run the narrowest relevant checks.
 
@@ -85,7 +87,7 @@ Primary references: `home/.chezmoiscripts/*` and existing `home/**.tmpl` files.
 ### Configuration editing
 - Preserve existing schema and key stability in managed config files.
 - Avoid unrelated reformatting/noise diffs.
-- Keep skill directory names and frontmatter `name` aligned.
+- Keep `agent-skills.tsv` entries aligned with upstream GitHub skill paths.
 - Use Bitwarden-backed templates or environment placeholders for secret-bearing values.
 
 ## Verification and Reporting Expectations

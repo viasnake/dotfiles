@@ -2,13 +2,20 @@ CHEZMOI_BIN = $(HOME)/.local/bin/chezmoi
 CHEZMOI_CMD = $(shell command -v chezmoi 2>/dev/null || echo "$(CHEZMOI_BIN)")
 CHEZMOI = $(CHEZMOI_CMD) --source "$(CURDIR)"
 CHEZMOI_INSTALL_URL = https://get.chezmoi.io
+SKILL_AGENT ?= codex
+SKILL_SCOPE ?= user
+SKILL_INSTALL_FLAGS ?= --force
+SKILL_MANIFEST = agent-skills.tsv
 
-.PHONY: help all init ensure-chezmoi apply apply-scripts dry-run status diff verify managed test-ubuntu24-container test-ubuntu24-container-full remove-managed
+.PHONY: help all init ensure-chezmoi ensure-gh-skill apply apply-scripts dry-run status diff verify managed skills-install skills-update skills-update-dry-run test-ubuntu24-container test-ubuntu24-container-full remove-managed
 
 help:
 	@printf "Available targets:\n"
 	@printf "  init           Install chezmoi if missing and apply this source state\n"
 	@printf "  ensure-chezmoi Install chezmoi to ~/.local/bin when missing\n"
+	@printf "  skills-install Install agent skills from agent-skills.tsv with gh skill\n"
+	@printf "  skills-update  Update installed agent skills with gh skill\n"
+	@printf "  skills-update-dry-run Check agent skill updates without mutating files\n"
 	@printf "  apply          Apply all managed files and scripts\n"
 	@printf "  apply-scripts  Apply only chezmoi scripts\n"
 	@printf "  dry-run        Show verbose apply plan without mutating target files\n"
@@ -42,6 +49,12 @@ ensure-chezmoi:
 	  echo "If needed, add ~/.local/bin to PATH and re-open your shell."; \
 	fi
 
+ensure-gh-skill:
+	@if ! gh skill --help >/dev/null 2>&1; then \
+	  printf "gh skill is unavailable. Install GitHub CLI 2.91.0 or newer, then re-run this target.\n" >&2; \
+	  exit 1; \
+	fi
+
 apply:
 	$(CHEZMOI) apply
 
@@ -62,6 +75,18 @@ verify:
 
 managed:
 	$(CHEZMOI) managed --include=files,symlinks --path-style=absolute
+
+skills-install: ensure-gh-skill
+	@awk 'BEGIN { FS = "\t" } !/^#/ && NF >= 2 { print $$1, $$2 }' "$(SKILL_MANIFEST)" | while read -r repo skill; do \
+	  printf "Installing %s from %s for %s/%s\n" "$$skill" "$$repo" "$(SKILL_AGENT)" "$(SKILL_SCOPE)"; \
+	  gh skill install "$$repo" "$$skill" --agent "$(SKILL_AGENT)" --scope "$(SKILL_SCOPE)" --allow-hidden-dirs $(SKILL_INSTALL_FLAGS); \
+	done
+
+skills-update: ensure-gh-skill
+	gh skill update --all
+
+skills-update-dry-run: ensure-gh-skill
+	gh skill update --dry-run
 
 test-ubuntu24-container:
 	docker build -f test/ubuntu24/Dockerfile -t dotfiles-ubuntu24-test .
