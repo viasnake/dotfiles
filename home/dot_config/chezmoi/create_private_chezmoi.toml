@@ -1,7 +1,66 @@
 [bitwarden]
 unlock = "auto"
 
+[data.profile]
+# Active profile used by chezmoi templates. Override for one apply with:
+# DOTFILES_PROFILE=work make apply
+active = "personal"
+
+[data.profiles.personal]
+# Bitwarden item id whose custom fields are rendered into:
+# - ~/.config/dotfiles/secrets.env
+# - ~/.config/dotfiles/secrets.fish
+runtimeEnvItemId = ""
+
+# Custom field names to read from the runtime env item.
+runtimeEnvFields = [
+  "CONTEXT7_API_KEY",
+  "GITHUB_TOKEN",
+  "ANTHROPIC_API_KEY",
+  "OPENAI_API_KEY",
+  "CLOUDFLARE_API_TOKEN",
+  "CLOUDFLARE_ACCOUNT_ID",
+  "AWS_ACCESS_KEY_ID",
+  "AWS_SECRET_ACCESS_KEY",
+  "AWS_SESSION_TOKEN",
+]
+
+# Bitwarden item id used by SSH key templates:
+# - home/private_dot_ssh/create_private_id_ed25519_personal.tmpl
+# - home/private_dot_ssh/create_id_ed25519_personal.pub.tmpl
+sshKeyItemId = ""
+
+# Attachment names in the SSH item.
+sshPrivateAttachment = "id_ed25519_personal"
+sshPublicAttachment = "id_ed25519_personal.pub"
+
+[data.profiles.personal.git]
+name = ""
+email = ""
+
+[data.profiles.work]
+runtimeEnvItemId = ""
+runtimeEnvFields = [
+  "CONTEXT7_API_KEY",
+  "GITHUB_TOKEN",
+  "ANTHROPIC_API_KEY",
+  "OPENAI_API_KEY",
+  "CLOUDFLARE_API_TOKEN",
+  "CLOUDFLARE_ACCOUNT_ID",
+  "AWS_ACCESS_KEY_ID",
+  "AWS_SECRET_ACCESS_KEY",
+  "AWS_SESSION_TOKEN",
+]
+sshKeyItemId = ""
+sshPrivateAttachment = "id_ed25519_work"
+sshPublicAttachment = "id_ed25519_work.pub"
+
+[data.profiles.work.git]
+name = ""
+email = ""
+
 [data.bitwarden]
+# Legacy fallback used when data.profile.active is empty.
 # Bitwarden item id whose custom fields are rendered into:
 # - ~/.config/dotfiles/secrets.env
 # - ~/.config/dotfiles/secrets.fish

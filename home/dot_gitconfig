@@ -1,5 +1,6 @@
 [include]
 path = "~/.config/git"
+path = "~/.config/dotfiles/git-profile"
 
 [alias]
 vacuum = "!f () { git checkout $1; git branch --merged|egrep -v '\\*|develop|main|master'|xargs git branch -d; };f"

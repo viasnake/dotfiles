@@ -50,13 +50,49 @@ make init
 - `make test-ubuntu24-container-full`: run full first-time setup in an Ubuntu 24.04 container and verify the real mise config; set `GITHUB_TOKEN` to avoid unauthenticated GitHub API rate limits
 - `make remove-managed`: remove all currently managed files and symlinks from target
 
-If needed, set your Git identity in `~/.gitconfig`:
+Profile support can manage your Git identity. If you do not use profiles, set it in `~/.config/git` or another local Git include:
 
 ```ini
 [user]
   name = <your-name>
   email = <your-email>
 ```
+
+## Profiles
+
+Profiles separate work/personal credentials while keeping a single chezmoi source state.
+The active profile is selected at apply time from `~/.config/chezmoi/chezmoi.toml`:
+
+```toml
+[data.profile]
+active = "personal"
+
+[data.profiles.personal]
+runtimeEnvItemId = "<personal-bitwarden-item-id-with-api-key-custom-fields>"
+sshKeyItemId = "<personal-bitwarden-item-id-with-ssh-key-attachments>"
+sshPrivateAttachment = "id_ed25519_personal"
+sshPublicAttachment = "id_ed25519_personal.pub"
+
+[data.profiles.personal.git]
+name = "<your-personal-name>"
+email = "<your-personal-email>"
+
+[data.profiles.work]
+runtimeEnvItemId = "<work-bitwarden-item-id-with-api-key-custom-fields>"
+sshKeyItemId = "<work-bitwarden-item-id-with-ssh-key-attachments>"
+sshPrivateAttachment = "id_ed25519_work"
+sshPublicAttachment = "id_ed25519_work.pub"
+
+[data.profiles.work.git]
+name = "<your-work-name>"
+email = "<your-work-email>"
+```
+
+Run `make apply` after changing `data.profile.active`.
+For one-off renders, override the selected profile with `DOTFILES_PROFILE=work make apply`.
+
+The generated Git identity is written to `~/.config/dotfiles/git-profile` and included from `~/.gitconfig`.
+The existing `~/.config/git` include remains available for local machine-specific Git settings.
 
 ## Secrets with Bitwarden
 
@@ -70,10 +106,13 @@ bw login --apikey   # or: bw login <email> / bw login --sso
 export BW_SESSION="$(bw unlock --raw)"
 ```
 
-Set Bitwarden item metadata in `~/.config/chezmoi/chezmoi.toml`:
+Set Bitwarden item metadata under the active profile in `~/.config/chezmoi/chezmoi.toml`:
 
 ```toml
-[data.bitwarden]
+[data.profile]
+active = "personal"
+
+[data.profiles.personal]
 runtimeEnvItemId = "<bitwarden-item-id-with-api-key-custom-fields>"
 sshKeyItemId = "<bitwarden-item-id-with-ssh-key-attachments>"
 ```
@@ -95,8 +134,9 @@ Default custom field names:
 - `AWS_SECRET_ACCESS_KEY`
 - `AWS_SESSION_TOKEN`
 
-Override the rendered field list with `data.bitwarden.runtimeEnvFields`.
+Override the rendered field list with `data.profiles.<name>.runtimeEnvFields`.
 `BW_RUNTIME_ENV_ITEM_ID` can be used as an environment-variable override.
+The legacy `data.bitwarden.runtimeEnvItemId` and `data.bitwarden.runtimeEnvFields` keys are still supported when no active profile is configured.
 
 OpenCode reads Context7 through `"{env:CONTEXT7_API_KEY}"`, so the same generated env files are the source of truth for local shells and OpenCode.
 
@@ -107,9 +147,9 @@ The key pair can be materialized from Bitwarden attachments.
 
 1. Store private/public key as attachments in one Bitwarden item.
 2. Set metadata in `~/.config/chezmoi/chezmoi.toml`:
-   - `data.bitwarden.sshKeyItemId`
-   - `data.bitwarden.sshPrivateAttachment` (default: `id_ed25519_personal`)
-   - `data.bitwarden.sshPublicAttachment` (default: `id_ed25519_personal.pub`)
+   - `data.profiles.<name>.sshKeyItemId`
+   - `data.profiles.<name>.sshPrivateAttachment` (default: `id_ed25519_personal`)
+   - `data.profiles.<name>.sshPublicAttachment` (default: `id_ed25519_personal.pub`)
 3. Run `make apply`.
 
 Environment-variable overrides are also supported:
@@ -120,6 +160,7 @@ Environment-variable overrides are also supported:
 Then register `~/.ssh/id_ed25519_personal.pub` in your GitHub account and verify with `ssh -T github`.
 
 If Bitwarden metadata, `bw`, or `BW_SESSION` is missing, chezmoi skips the secret env files and SSH key materialization rather than writing empty key files.
+The legacy `data.bitwarden.sshKeyItemId`, `data.bitwarden.sshPrivateAttachment`, and `data.bitwarden.sshPublicAttachment` keys are still supported when no active profile is configured.
 
 ## Optional: Fonts
 

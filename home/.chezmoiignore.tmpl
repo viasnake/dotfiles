@@ -1,6 +1,16 @@
 {{- $bitwardenData := (get . "bitwarden" | default (dict)) -}}
-{{- $runtimeEnvItemID := (env "BW_RUNTIME_ENV_ITEM_ID" | default (get $bitwardenData "runtimeEnvItemId") | default "" | trim) -}}
-{{- $sshItemID := (env "BW_SSH_KEY_ITEM_ID" | default (get $bitwardenData "sshKeyItemId") | default "" | trim) -}}
+{{- $profileData := (get . "profile" | default (dict)) -}}
+{{- $profilesData := (get . "profiles" | default (dict)) -}}
+{{- $activeProfile := (env "DOTFILES_PROFILE" | default (get $profileData "active") | default "" | trim) -}}
+{{- $activeProfileData := dict -}}
+{{- if ne $activeProfile "" -}}
+{{- if not (hasKey $profilesData $activeProfile) -}}
+{{- fail (printf "DOTFILES_PROFILE/profile.active %q is not defined in data.profiles" $activeProfile) -}}
+{{- end -}}
+{{- $activeProfileData = (get $profilesData $activeProfile | default (dict)) -}}
+{{- end -}}
+{{- $runtimeEnvItemID := (env "BW_RUNTIME_ENV_ITEM_ID" | default (get $activeProfileData "runtimeEnvItemId") | default (get $bitwardenData "runtimeEnvItemId") | default "" | trim) -}}
+{{- $sshItemID := (env "BW_SSH_KEY_ITEM_ID" | default (get $activeProfileData "sshKeyItemId") | default (get $bitwardenData "sshKeyItemId") | default "" | trim) -}}
 {{- $hasBitwardenSession := ne (env "BW_SESSION" | default "" | trim) "" -}}
 {{- $hasBitwardenCLI := ne (lookPath "bw") "" -}}
 {{- $canUseBitwarden := and $hasBitwardenSession $hasBitwardenCLI -}}

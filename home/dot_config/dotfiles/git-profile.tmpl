@@ -1,0 +1,31 @@
+{{- $profileData := (get . "profile" | default (dict)) -}}
+{{- $profilesData := (get . "profiles" | default (dict)) -}}
+{{- $activeProfile := (env "DOTFILES_PROFILE" | default (get $profileData "active") | default "" | trim) -}}
+{{- $activeProfileData := dict -}}
+{{- if ne $activeProfile "" -}}
+{{- if not (hasKey $profilesData $activeProfile) -}}
+{{- fail (printf "DOTFILES_PROFILE/profile.active %q is not defined in data.profiles" $activeProfile) -}}
+{{- end -}}
+{{- $activeProfileData = (get $profilesData $activeProfile | default (dict)) -}}
+{{- end -}}
+{{- $gitData := (get $activeProfileData "git" | default (dict)) -}}
+{{- $gitName := (get $gitData "name" | default "" | trim) -}}
+{{- $gitEmail := (get $gitData "email" | default "" | trim) -}}
+{{- if or (contains "\n" $gitName) (contains "\n" $gitEmail) -}}
+{{- fail "profile Git name/email must not contain newlines" -}}
+{{- end -}}
+# Managed by chezmoi. Source values come from the active dotfiles profile.
+{{- if ne $activeProfile "" }}
+# Active profile: {{ $activeProfile }}
+{{- end }}
+{{- if or (ne $gitName "") (ne $gitEmail "") }}
+[user]
+{{- if ne $gitName "" }}
+  name = {{ $gitName }}
+{{- end }}
+{{- if ne $gitEmail "" }}
+  email = {{ $gitEmail }}
+{{- end }}
+{{- else }}
+# No active profile Git identity is configured.
+{{- end }}
