@@ -1,4 +1,5 @@
-FROM ubuntu:24.04
+ARG UBUNTU_VERSION=24.04
+FROM ubuntu:${UBUNTU_VERSION}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -21,4 +22,4 @@ WORKDIR /home/dotfiles/dotfiles
 
 COPY --chown=dotfiles:dotfiles . .
 
-CMD ["bash", "test/ubuntu24/run.sh"]
+CMD ["bash", "test/ubuntu/run.sh"]

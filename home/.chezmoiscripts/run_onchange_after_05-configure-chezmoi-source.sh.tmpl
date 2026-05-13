@@ -6,6 +6,24 @@ set -euo pipefail
 config_path="${CHEZMOI_CONFIG_PATH:-$HOME/.config/chezmoi/chezmoi.toml}"
 source_dir={{ .chezmoi.config.sourceDir | quote }}
 source_line='sourceDir = {{ .chezmoi.config.sourceDir | toJson }}'
+chezmoi_cmd=""
+
+if command -v chezmoi >/dev/null 2>&1; then
+  chezmoi_cmd="$(command -v chezmoi)"
+elif [[ -x "$HOME/.local/bin/chezmoi" ]]; then
+  chezmoi_cmd="$HOME/.local/bin/chezmoi"
+elif [[ -x /home/linuxbrew/.linuxbrew/bin/chezmoi ]]; then
+  chezmoi_cmd="/home/linuxbrew/.linuxbrew/bin/chezmoi"
+elif [[ -x /opt/homebrew/bin/chezmoi ]]; then
+  chezmoi_cmd="/opt/homebrew/bin/chezmoi"
+elif [[ -x /usr/local/bin/chezmoi ]]; then
+  chezmoi_cmd="/usr/local/bin/chezmoi"
+fi
+
+if [[ -z "$chezmoi_cmd" ]]; then
+  printf 'dotfiles: chezmoi command is unavailable; cannot verify sourceDir.\n' >&2
+  exit 1
+fi
 
 has_top_level_source_dir() {
   awk '
@@ -41,7 +59,7 @@ if ! has_top_level_source_dir; then
 fi
 
 current_source_dir="$(
-  chezmoi --config "$config_path" dump-config \
+  "$chezmoi_cmd" --config "$config_path" dump-config \
     | awk -F '"' '/"sourceDir":/ { print $4; exit }'
 )"
 

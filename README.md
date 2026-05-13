@@ -71,6 +71,14 @@ make verify
 make managed
 ```
 
+Make targets print command boundaries through `script/log-run` so long
+`chezmoi`, `gh`, and container logs are easier to scan. Disable color when
+needed:
+
+```bash
+DOTFILES_LOG_COLOR=never make dry-run
+```
+
 Additional maintenance targets:
 
 ```bash
@@ -78,8 +86,11 @@ make apply-scripts
 make skills-install
 make skills-update
 make skills-update-dry-run
+make test-ubuntu-container
 make test-ubuntu24-container
 make test-ubuntu24-container-full
+make test-macos-docker-osx-preflight
+make test-macos-docker-osx-smoke
 make remove-managed
 ```
 
@@ -136,9 +147,41 @@ make dry-run
 chezmoi --source "$PWD" apply --dry-run --verbose
 ```
 
-For the Ubuntu 24.04 container checks:
+For Ubuntu container checks:
 
 ```bash
-make test-ubuntu24-container
-GITHUB_TOKEN=<github-token> make test-ubuntu24-container-full
+make test-ubuntu-container
+GITHUB_TOKEN=<github-token> make test-ubuntu-container-full
 ```
+
+By default, `make test-ubuntu-container` validates Ubuntu 20.04 and 26.04.
+Set `UBUNTU_TEST_VERSIONS` to override the matrix:
+
+```bash
+make test-ubuntu-container UBUNTU_TEST_VERSIONS="20.04 24.04 26.04"
+```
+
+Compatibility targets remain available for single-version checks:
+
+```bash
+make test-ubuntu20-container
+make test-ubuntu24-container
+make test-ubuntu26-container
+```
+
+macOS-in-Docker validation uses Docker-OSX and requires an x86_64 host with
+KVM exposed at `/dev/kvm` and enough Docker storage for the image/runtime disk.
+Check those host prerequisites with:
+
+```bash
+make test-macos-docker-osx-preflight
+```
+
+To verify that Docker-OSX can actually start QEMU with KVM on the current host:
+
+```bash
+make test-macos-docker-osx-smoke
+```
+
+This is a container/KVM smoke test. A full macOS guest dotfiles apply still
+requires a booted and provisioned macOS image that accepts SSH.
