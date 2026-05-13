@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+
+set -uo pipefail
+
+usage() {
+  printf 'Usage: %s <label> -- <command> [args...]\n' "${0##*/}" >&2
+}
+
+if [[ $# -lt 3 ]]; then
+  usage
+  exit 64
+fi
+
+label="$1"
+shift
+
+if [[ "${1:-}" != "--" ]]; then
+  usage
+  exit 64
+fi
+shift
+
+if [[ $# -eq 0 ]]; then
+  usage
+  exit 64
+fi
+
+case "${DOTFILES_LOG_COLOR:-auto}" in
+  always)
+    color=1
+    ;;
+  never)
+    color=0
+    ;;
+  auto | "")
+    if [[ -t 2 && -z "${NO_COLOR:-}" && "${TERM:-}" != "dumb" ]]; then
+      color=1
+    else
+      color=0
+    fi
+    ;;
+  *)
+    printf 'dotfiles: invalid DOTFILES_LOG_COLOR=%s; expected auto, always, or never.\n' \
+      "$DOTFILES_LOG_COLOR" >&2
+    exit 64
+    ;;
+esac
+
+if [[ "$color" -eq 1 ]]; then
+  bold=$'\033[1m'
+  dim=$'\033[2m'
+  green=$'\033[32m'
+  red=$'\033[31m'
+  reset=$'\033[0m'
+else
+  bold=""
+  dim=""
+  green=""
+  red=""
+  reset=""
+fi
+
+print_command() {
+  local arg
+
+  printf '%s  $' "$dim" >&2
+  for arg in "$@"; do
+    printf ' ' >&2
+    quote_arg "$arg"
+  done
+  printf '%s\n' "$reset" >&2
+}
+
+quote_arg() {
+  local arg="$1"
+
+  if [[ -z "$arg" ]]; then
+    printf "''" >&2
+  elif [[ "$arg" =~ ^[A-Za-z0-9_./:@%+=,-]+$ ]]; then
+    printf '%s' "$arg" >&2
+  else
+    printf "'" >&2
+    printf '%s' "$arg" | sed "s/'/'\\\\''/g" >&2
+    printf "'" >&2
+  fi
+}
+
+started_at="$(date +%s)"
+
+printf '\n%s==> %s%s\n' "$bold" "$label" "$reset" >&2
+print_command "$@"
+
+"$@"
+status=$?
+
+finished_at="$(date +%s)"
+elapsed="$((finished_at - started_at))s"
+
+if [[ "$status" -eq 0 ]]; then
+  printf '%sOK%s %s (%s)\n' "$green" "$reset" "$label" "$elapsed" >&2
+else
+  printf '%sFAILED%s %s: exit %s (%s)\n' "$red" "$reset" "$label" "$status" "$elapsed" >&2
+fi
+
+exit "$status"

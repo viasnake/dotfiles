@@ -1,4 +1,4 @@
-name: test
+name: validate
 
 on:
   pull_request:
@@ -7,20 +7,19 @@ on:
       - master
 
 jobs:
-  test:
+  validate:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
       - name: Checkout repository
-        run: |
-          git clone "https://github.com/${GITHUB_REPOSITORY}.git" .
-          git checkout "${GITHUB_SHA}"
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Install bats
+      - name: Install chezmoi
         run: |
           sudo apt-get update
-          sudo apt-get install -y bats
+          sudo apt-get install -y chezmoi
 
-      - name: Run tests
-        run: make test
+      - name: Run validation
+        run: |
+          make dry-run

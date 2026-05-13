@@ -1,0 +1,40 @@
+{{- if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") -}}
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+load_homebrew_env() {
+  local brew_bin
+
+  for brew_bin in \
+    /home/linuxbrew/.linuxbrew/bin/brew \
+    /opt/homebrew/bin/brew \
+    /usr/local/bin/brew
+  do
+    if [[ -x "$brew_bin" ]]; then
+      eval "$("$brew_bin" shellenv)"
+      return
+    fi
+  done
+}
+
+plugins_file="$HOME/.config/fish/fish_plugins"
+# fish_plugins hash: {{ include "dot_config/fish/fish_plugins" | sha256sum }}
+
+load_homebrew_env
+
+if ! command -v fish >/dev/null 2>&1; then
+  exit 0
+fi
+
+if [[ ! -f "$plugins_file" ]]; then
+  exit 0
+fi
+
+plugins="$(tr '\n' ' ' < "$plugins_file")"
+if [[ -z "${plugins// }" ]]; then
+  exit 0
+fi
+
+fish -c "fisher install $plugins"
+{{ end -}}

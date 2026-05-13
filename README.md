@@ -1,118 +1,187 @@
 # dotfiles
 
-Personal dotfiles for Linux, macOS, and WSL.
-Main entrypoint: `make setup`.
+Personal dotfiles for macOS, Linux, and WSL2.
 
-## Requirements
-
-- `git`
-- `make`
-- `sudo`
-
-Supported environments: Debian, Raspbian, Ubuntu, Zorin OS, macOS, WSL1, WSL2.
+This repository is a chezmoi source state. `.chezmoiroot` points chezmoi at
+`home/`, so files under `home/` are rendered into `$HOME`.
 
 ## Quick Start
+
+Install the minimum tools needed to clone this repository and run `make`.
+
+```bash
+# macOS
+xcode-select --install
+
+# Debian / Ubuntu / WSL2
+sudo apt-get update
+sudo apt-get install -y curl git make
+```
+
+Then apply the dotfiles:
 
 ```bash
 git clone https://github.com/viasnake/dotfiles.git
 cd dotfiles
-make setup
+make init
 ```
 
-`make setup` runs:
+## Local Settings
 
-- `make link`
-- `make install`
+User-specific chezmoi data belongs in:
 
-If needed, set your Git identity in `~/.gitconfig`:
-
-```ini
-[user]
-  name = <your-name>
-  email = <your-email>
+```text
+~/.config/chezmoi/chezmoi.toml
 ```
 
-## Optional: Secrets
+The managed template for that file is:
 
-`make setup` (or `make install`) creates a local secrets template file for tools that read runtime env vars (for example, Context7):
+```text
+home/dot_config/chezmoi/create_private_chezmoi.toml.tmpl
+```
 
-- `~/.config/secrets/runtime.env.secret`
-- The file is created only when missing
-- The initial content is comments only
-
-Then edit the file and add actual values as needed:
+Use it for profile names, Git identity, Bitwarden item IDs, and SSH attachment
+names. To apply a different profile once:
 
 ```bash
-cat >> ~/.config/secrets/runtime.env.secret <<'EOF'
-CONTEXT7_API_KEY=<your-context7-api-key>
-EOF
+DOTFILES_PROFILE=work make apply
 ```
 
-Notes:
-
-- Format: `KEY=VALUE`
-- Lines starting with `#` are ignored
-- You can override the path with `SECRETS_ENV_FILE`
-- Never commit secret files
-
-## Optional: SSH for GitHub
-
-This repo copies SSH config to `~/.ssh/config` on first link only (existing file is kept) and uses `~/.ssh/id_ed25519_personal` for `github`/`github.com`.
+Bitwarden-backed secrets and SSH keys require an unlocked Bitwarden session:
 
 ```bash
-mkdir -p ~/.ssh
-chmod 700 ~/.ssh
-ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_personal -C "you@example.com"
-chmod 600 ~/.ssh/id_ed25519_personal
-chmod 644 ~/.ssh/id_ed25519_personal.pub
-ssh -T github
+bw login --apikey
+export BW_SESSION="$(bw unlock --raw)"
+make apply
 ```
 
-Add `~/.ssh/id_ed25519_personal.pub` to your GitHub account before running `ssh -T github`.
+## Commands
+
+Run `make help` for the current target list.
+
+Common targets:
+
+```bash
+make init
+make apply
+make dry-run
+make status
+make diff
+make verify
+make managed
+```
+
+Make targets print command boundaries through `script/log-run` so long
+`chezmoi`, `gh`, and container logs are easier to scan. Disable color when
+needed:
+
+```bash
+DOTFILES_LOG_COLOR=never make dry-run
+```
+
+Additional maintenance targets:
+
+```bash
+make apply-scripts
+make skills-install
+make skills-update
+make skills-update-dry-run
+make test-ubuntu-container
+make test-ubuntu24-container
+make test-ubuntu24-container-full
+make test-macos-docker-osx-preflight
+make test-macos-docker-osx-smoke
+make remove-managed
+```
+
+## Agent Skills
+
+Desired GitHub-backed skills are listed in:
+
+```text
+agent-skills.tsv
+```
+
+Install or update them with:
+
+```bash
+make skills-install
+make skills-update
+```
+
+The default agent is `codex`. Override it when needed:
+
+```bash
+make skills-install SKILL_AGENT=opencode
+```
+
+## OpenCode
+
+OpenCode config lives in:
+
+```text
+home/dot_config/opencode/
+```
+
+Apply it with chezmoi and run OpenCode normally:
+
+```bash
+make apply
+opencode
+```
+
+## Fonts
+
+Font installation is manual. The Ghostty config expects Firge Nerd fonts:
+
+```text
+https://github.com/yuru7/Firge/releases
+```
 
 ## Verification
 
-```bash
-make opencode_validate
-make test-smoke
-```
-
-Optional dry-run:
+Use dry-runs before applying broad changes:
 
 ```bash
-make -n setup
+make dry-run
+chezmoi --source "$PWD" apply --dry-run --verbose
 ```
 
-## OpenCode via ocx (personal)
-
-This repository keeps OpenCode config in `config/opencode/` and publishes it into `~/.config/opencode/`.
-
-- Available profiles: `personal`, `work`
-- Default profile: `personal`
-- Override profile per command: set `OCX_PROFILE=<name>`
-- Runtime launcher: `script/opencode/run-with-secrets`
-
-Install tools and link files:
+For Ubuntu container checks:
 
 ```bash
-make install
-make link
+make test-ubuntu-container
+GITHUB_TOKEN=<github-token> make test-ubuntu-container-full
 ```
 
-Install the worktree plugin for your profile:
+By default, `make test-ubuntu-container` validates Ubuntu 20.04 and 26.04.
+Set `UBUNTU_TEST_VERSIONS` to override the matrix:
 
 ```bash
-OCX_PROFILE=personal ocx add kdco/worktree --from https://registry.kdco.dev
-
-# optional: work profile
-OCX_PROFILE=work ocx add kdco/worktree --from https://registry.kdco.dev
+make test-ubuntu-container UBUNTU_TEST_VERSIONS="20.04 24.04 26.04"
 ```
 
-This repository includes a starter worktree config at `.opencode/worktree.jsonc`.
-Tune `sync` and `hooks` there as needed for your local workflow.
-
-## Uninstall
+Compatibility targets remain available for single-version checks:
 
 ```bash
-make uninstall
+make test-ubuntu20-container
+make test-ubuntu24-container
+make test-ubuntu26-container
 ```
+
+macOS-in-Docker validation uses Docker-OSX and requires an x86_64 host with
+KVM exposed at `/dev/kvm` and enough Docker storage for the image/runtime disk.
+Check those host prerequisites with:
+
+```bash
+make test-macos-docker-osx-preflight
+```
+
+To verify that Docker-OSX can actually start QEMU with KVM on the current host:
+
+```bash
+make test-macos-docker-osx-smoke
+```
+
+This is a container/KVM smoke test. A full macOS guest dotfiles apply still
+requires a booted and provisioned macOS image that accepts SSH.

@@ -1,0 +1,42 @@
+{{- if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") -}}
+{{- $bitwardenData := (get . "bitwarden" | default (dict)) -}}
+{{- $profileData := (get . "profile" | default (dict)) -}}
+{{- $profilesData := (get . "profiles" | default (dict)) -}}
+{{- $activeProfile := (env "DOTFILES_PROFILE" | default (get $profileData "active") | default "" | trim) -}}
+{{- $activeProfileData := dict -}}
+{{- if ne $activeProfile "" -}}
+{{- if not (hasKey $profilesData $activeProfile) -}}
+{{- fail (printf "DOTFILES_PROFILE/profile.active %q is not defined in data.profiles" $activeProfile) -}}
+{{- end -}}
+{{- $activeProfileData = (get $profilesData $activeProfile | default (dict)) -}}
+{{- end -}}
+{{- $runtimeEnvItemID := (env "BW_RUNTIME_ENV_ITEM_ID" | default (get $activeProfileData "runtimeEnvItemId") | default (get $bitwardenData "runtimeEnvItemId") | default "" | trim) -}}
+{{- $sshItemID := (env "BW_SSH_KEY_ITEM_ID" | default (get $activeProfileData "sshKeyItemId") | default (get $bitwardenData "sshKeyItemId") | default "" | trim) -}}
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Bitwarden config hash: {{ list $activeProfile $runtimeEnvItemID $sshItemID (get $activeProfileData "runtimeEnvFields" | default (get $bitwardenData "runtimeEnvFields") | default (list)) | toJson | sha256sum }}
+
+active_profile='{{ $activeProfile }}'
+runtime_env_item_id='{{ $runtimeEnvItemID }}'
+ssh_item_id='{{ $sshItemID }}'
+
+if [[ -n "$active_profile" ]]; then
+  printf 'dotfiles: active profile is %s.\n' "$active_profile" >&2
+fi
+
+if [[ -z "$runtime_env_item_id" && -z "$ssh_item_id" ]]; then
+  printf 'dotfiles: Bitwarden item metadata is not configured; secrets and SSH keys will be skipped.\n' >&2
+  exit 0
+fi
+
+if ! command -v bw >/dev/null 2>&1; then
+  printf 'dotfiles: Bitwarden CLI (bw) is missing; secrets and SSH keys will be skipped.\n' >&2
+  exit 0
+fi
+
+if [[ -z "${BW_SESSION:-}" ]]; then
+  printf 'dotfiles: BW_SESSION is not set; run `export BW_SESSION=$(bw unlock --raw)` to materialize Bitwarden-backed secrets.\n' >&2
+fi
+{{ end -}}

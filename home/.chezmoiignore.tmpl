@@ -1,0 +1,45 @@
+{{- $bitwardenData := (get . "bitwarden" | default (dict)) -}}
+{{- $profileData := (get . "profile" | default (dict)) -}}
+{{- $profilesData := (get . "profiles" | default (dict)) -}}
+{{- $activeProfile := (env "DOTFILES_PROFILE" | default (get $profileData "active") | default "" | trim) -}}
+{{- $activeProfileData := dict -}}
+{{- if ne $activeProfile "" -}}
+{{- if not (hasKey $profilesData $activeProfile) -}}
+{{- fail (printf "DOTFILES_PROFILE/profile.active %q is not defined in data.profiles" $activeProfile) -}}
+{{- end -}}
+{{- $activeProfileData = (get $profilesData $activeProfile | default (dict)) -}}
+{{- end -}}
+{{- $runtimeEnvItemID := (env "BW_RUNTIME_ENV_ITEM_ID" | default (get $activeProfileData "runtimeEnvItemId") | default (get $bitwardenData "runtimeEnvItemId") | default "" | trim) -}}
+{{- $sshItemID := (env "BW_SSH_KEY_ITEM_ID" | default (get $activeProfileData "sshKeyItemId") | default (get $bitwardenData "sshKeyItemId") | default "" | trim) -}}
+{{- $hasBitwardenSession := ne (env "BW_SESSION" | default "" | trim) "" -}}
+{{- $hasBitwardenCLI := ne (lookPath "bw") "" -}}
+{{- $canUseBitwarden := and $hasBitwardenSession $hasBitwardenCLI -}}
+{{- if eq .chezmoi.os "windows" }}
+dot_bashrc
+dot_config/fish/**
+dot_config/ghostty/**
+dot_config/mise/**
+private_dot_ssh/**
+{{- end }}
+
+{{- if not (or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux")) }}
+.chezmoiscripts/**
+{{- end }}
+
+{{- if not (and $canUseBitwarden (ne $runtimeEnvItemID "")) }}
+dot_config/dotfiles/private_secrets.env
+dot_config/dotfiles/private_secrets.env.tmpl
+dot_config/dotfiles/private_secrets.fish
+dot_config/dotfiles/private_secrets.fish.tmpl
+.config/dotfiles/secrets.env
+.config/dotfiles/secrets.fish
+{{- end }}
+
+{{- if not (and $canUseBitwarden (ne $sshItemID "")) }}
+private_dot_ssh/create_private_id_ed25519_personal
+private_dot_ssh/create_private_id_ed25519_personal.tmpl
+private_dot_ssh/create_id_ed25519_personal.pub
+private_dot_ssh/create_id_ed25519_personal.pub.tmpl
+.ssh/id_ed25519_personal
+.ssh/id_ed25519_personal.pub
+{{- end }}

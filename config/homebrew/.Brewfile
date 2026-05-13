@@ -1,6 +1,0 @@
-brew "fish"
-brew "fisher"
-brew "gmailctl"
-brew "jsonnet"
-brew "mise"
-brew "zoxide"

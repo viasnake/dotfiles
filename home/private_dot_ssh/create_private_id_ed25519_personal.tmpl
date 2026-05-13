@@ -1,0 +1,18 @@
+{{- $bitwardenData := (get . "bitwarden" | default (dict)) -}}
+{{- $profileData := (get . "profile" | default (dict)) -}}
+{{- $profilesData := (get . "profiles" | default (dict)) -}}
+{{- $activeProfile := (env "DOTFILES_PROFILE" | default (get $profileData "active") | default "" | trim) -}}
+{{- $activeProfileData := dict -}}
+{{- if ne $activeProfile "" -}}
+{{- if not (hasKey $profilesData $activeProfile) -}}
+{{- fail (printf "DOTFILES_PROFILE/profile.active %q is not defined in data.profiles" $activeProfile) -}}
+{{- end -}}
+{{- $activeProfileData = (get $profilesData $activeProfile | default (dict)) -}}
+{{- end -}}
+{{- $sshItemID := (env "BW_SSH_KEY_ITEM_ID" | default (get $activeProfileData "sshKeyItemId") | default (get $bitwardenData "sshKeyItemId") | default "" | trim) -}}
+{{- $privateAttachment := (env "BW_SSH_PRIVATE_ATTACHMENT" | default (get $activeProfileData "sshPrivateAttachment") | default (get $bitwardenData "sshPrivateAttachment") | default "id_ed25519_personal" | trim) -}}
+{{- $hasBitwardenSession := ne (env "BW_SESSION" | default "" | trim) "" -}}
+{{- $hasBitwardenCLI := ne (lookPath "bw") "" -}}
+{{- if and (ne $sshItemID "") $hasBitwardenSession $hasBitwardenCLI -}}
+{{- bitwardenAttachment $privateAttachment $sshItemID -}}
+{{- end -}}
