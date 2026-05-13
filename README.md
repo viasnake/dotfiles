@@ -109,7 +109,14 @@ make skills-install
 make skills-update
 ```
 
-The default agent is `codex`. Override it when needed:
+By default, installation targets both `codex` and `opencode`. Override the
+target list when needed:
+
+```bash
+make skills-install SKILL_AGENTS="codex opencode"
+```
+
+For a single target agent, `SKILL_AGENT` remains supported:
 
 ```bash
 make skills-install SKILL_AGENT=opencode

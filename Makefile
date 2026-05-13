@@ -3,7 +3,8 @@ CHEZMOI_CMD = $(shell command -v chezmoi 2>/dev/null || echo "$(CHEZMOI_BIN)")
 CHEZMOI = $(CHEZMOI_CMD) --source "$(CURDIR)"
 CHEZMOI_INSTALL_URL = https://get.chezmoi.io
 LOG_RUN ?= $(CURDIR)/script/log-run
-SKILL_AGENT ?= codex
+SKILL_AGENTS ?= codex opencode
+SKILL_AGENT ?=
 SKILL_SCOPE ?= user
 SKILL_INSTALL_FLAGS ?= --force
 SKILL_MANIFEST = agent-skills.tsv
@@ -17,7 +18,7 @@ help:
 	@printf "Available targets:\n"
 	@printf "  init           Install chezmoi if missing and apply this source state\n"
 	@printf "  ensure-chezmoi Install chezmoi to ~/.local/bin when missing\n"
-	@printf "  skills-install Install agent skills from agent-skills.tsv with gh skill\n"
+	@printf "  skills-install Install agent skills from agent-skills.tsv for SKILL_AGENTS\n"
 	@printf "  skills-update  Update installed agent skills with gh skill\n"
 	@printf "  skills-update-dry-run Check agent skill updates without mutating files\n"
 	@printf "  apply          Apply all managed files and scripts\n"
@@ -92,9 +93,12 @@ managed:
 	@$(LOG_RUN) "chezmoi managed files" -- $(CHEZMOI) managed --include=files,symlinks --path-style=absolute
 
 skills-install: ensure-gh-skill
-	@awk 'BEGIN { FS = "\t" } !/^#/ && NF >= 2 { print $$1, $$2 }' "$(SKILL_MANIFEST)" | while read -r repo skill; do \
-	  printf "Installing %s from %s for %s/%s\n" "$$skill" "$$repo" "$(SKILL_AGENT)" "$(SKILL_SCOPE)"; \
-	  "$(LOG_RUN)" "gh skill install $$skill" -- gh skill install "$$repo" "$$skill" --agent "$(SKILL_AGENT)" --scope "$(SKILL_SCOPE)" --allow-hidden-dirs $(SKILL_INSTALL_FLAGS); \
+	@agents="$(if $(SKILL_AGENT),$(SKILL_AGENT),$(SKILL_AGENTS))"; \
+	awk 'BEGIN { FS = "\t" } !/^#/ && NF >= 2 { print $$1, $$2 }' "$(SKILL_MANIFEST)" | while read -r repo skill; do \
+	  for agent in $$agents; do \
+	    printf "Installing %s from %s for %s/%s\n" "$$skill" "$$repo" "$$agent" "$(SKILL_SCOPE)"; \
+	    "$(LOG_RUN)" "gh skill install $$skill ($$agent)" -- gh skill install "$$repo" "$$skill" --agent "$$agent" --scope "$(SKILL_SCOPE)" --allow-hidden-dirs $(SKILL_INSTALL_FLAGS); \
+	  done; \
 	done
 
 skills-update: ensure-gh-skill
