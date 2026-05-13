@@ -126,13 +126,6 @@ Default custom field names:
 
 - `CONTEXT7_API_KEY`
 - `GITHUB_TOKEN`
-- `ANTHROPIC_API_KEY`
-- `OPENAI_API_KEY`
-- `CLOUDFLARE_API_TOKEN`
-- `CLOUDFLARE_ACCOUNT_ID`
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `AWS_SESSION_TOKEN`
 
 Override the rendered field list with `data.profiles.<name>.runtimeEnvFields`.
 `BW_RUNTIME_ENV_ITEM_ID` can be used as an environment-variable override.
