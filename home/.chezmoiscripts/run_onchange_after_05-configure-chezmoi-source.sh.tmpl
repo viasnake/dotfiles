@@ -1,0 +1,71 @@
+{{- if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") -}}
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+config_path="${CHEZMOI_CONFIG_PATH:-$HOME/.config/chezmoi/chezmoi.toml}"
+source_dir={{ .chezmoi.config.sourceDir | quote }}
+source_line='sourceDir = {{ .chezmoi.config.sourceDir | toJson }}'
+
+has_top_level_source_dir() {
+  awk '
+    /^[[:space:]]*\[/ { in_table = 1 }
+    !in_table && /^[[:space:]]*sourceDir[[:space:]]*=/ { found = 1 }
+    END { exit found ? 0 : 1 }
+  ' "$config_path"
+}
+
+prepend_source_dir() {
+  local tmp_file
+
+  tmp_file="$(mktemp)"
+  {
+    printf '%s\n\n' "$source_line"
+    cat "$config_path"
+  } >"$tmp_file"
+  cat "$tmp_file" >"$config_path"
+  rm -f "$tmp_file"
+}
+
+mkdir -p "$(dirname "$config_path")"
+
+if [[ ! -f "$config_path" ]]; then
+  umask 077
+  printf '%s\n' "$source_line" >"$config_path"
+  exit 0
+fi
+
+if ! has_top_level_source_dir; then
+  prepend_source_dir
+  exit 0
+fi
+
+current_source_dir="$(
+  chezmoi --config "$config_path" dump-config \
+    | awk -F '"' '/"sourceDir":/ { print $4; exit }'
+)"
+
+if [[ "$current_source_dir" == "$source_dir" ]]; then
+  exit 0
+fi
+
+if [[ -d "$current_source_dir" ]]; then
+  printf 'dotfiles: leaving existing chezmoi sourceDir unchanged: %s\n' "$current_source_dir" >&2
+  printf 'dotfiles: expected sourceDir for this repo: %s\n' "$source_dir" >&2
+  exit 0
+fi
+
+tmp_file="$(mktemp)"
+awk -v source_line="$source_line" '
+  /^[[:space:]]*\[/ { in_table = 1 }
+  BEGIN { replaced = 0 }
+  !in_table && /^[[:space:]]*sourceDir[[:space:]]*=/ && !replaced {
+    print source_line
+    replaced = 1
+    next
+  }
+  { print }
+' "$config_path" >"$tmp_file"
+cat "$tmp_file" >"$config_path"
+rm -f "$tmp_file"
+{{ end -}}
