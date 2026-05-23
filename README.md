@@ -26,6 +26,18 @@ cd dotfiles
 make init
 ```
 
+### `make apply` and root execution
+
+- Running `make apply` as `root` skips (or should avoid) Homebrew-related steps.
+- For `root`, the primary responsibility is base OS package installation (for example,
+  `apt` on Debian/Ubuntu).
+- Homebrew installation and updates are expected to run as a regular user.
+- Recommended flow for LXC/Docker:
+  1. As `root`, install base OS packages (for example, `apt-get update && apt-get install`).
+  2. Switch to a regular user and run Homebrew setup.
+  3. As that regular user, run `make apply` (or `chezmoi apply`).
+- Failure triage keyword: `Don't run this as root!` (helps quickly identify root-execution issues).
+
 ## Local Settings
 
 User-specific chezmoi data belongs in:
