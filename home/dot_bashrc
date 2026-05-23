@@ -119,14 +119,17 @@ if ! shopt -oq posix; then
     fi
 fi
 
-# linuxbrew
-if test -d /home/linuxbrew/.linuxbrew
+# homebrew / linuxbrew
+if command -v brew >/dev/null 2>&1
+then
+  eval "$(brew shellenv)"
+elif test -x /home/linuxbrew/.linuxbrew/bin/brew
 then
   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-fi
-
-# homebrew
-if test -d /opt/homebrew
+elif test -x "$HOME/.linuxbrew/bin/brew"
+then
+  eval "$("$HOME/.linuxbrew/bin/brew" shellenv)"
+elif test -x /opt/homebrew/bin/brew
 then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 elif test -x /usr/local/bin/brew

@@ -1,10 +1,11 @@
-# linuxbrew
-if test -x /home/linuxbrew/.linuxbrew/bin/brew
+# homebrew / linuxbrew
+if command -q brew
+  eval (brew shellenv)
+else if test -x /home/linuxbrew/.linuxbrew/bin/brew
   eval (/home/linuxbrew/.linuxbrew/bin/brew shellenv)
-end
-
-# homebrew
-if test -x /opt/homebrew/bin/brew
+else if test -x $HOME/.linuxbrew/bin/brew
+  eval ($HOME/.linuxbrew/bin/brew shellenv)
+else if test -x /opt/homebrew/bin/brew
   eval (/opt/homebrew/bin/brew shellenv)
 else if test -x /usr/local/bin/brew
   eval (/usr/local/bin/brew shellenv)

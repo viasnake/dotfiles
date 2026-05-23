@@ -6,8 +6,14 @@ set -euo pipefail
 load_homebrew_env() {
   local brew_bin
 
+  if command -v brew >/dev/null 2>&1; then
+    eval "$(brew shellenv)"
+    return
+  fi
+
   for brew_bin in \
     /home/linuxbrew/.linuxbrew/bin/brew \
+    "$HOME/.linuxbrew/bin/brew" \
     /opt/homebrew/bin/brew \
     /usr/local/bin/brew
   do
