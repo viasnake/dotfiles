@@ -28,9 +28,9 @@ make init
 
 ### `make apply` and root execution
 
-- Running `make apply` as `root` skips (or should avoid) Homebrew-related steps.
-- For `root`, the primary responsibility is base OS package installation (for example,
-  `apt` on Debian/Ubuntu).
+- Running `make apply` as `root` skips Homebrew install/update and prioritizes OS packages.
+- For `root`, the primary responsibility is OS package installation (for example,
+  `apt` on Debian/Ubuntu), including common CLI dependencies normally provided by Brew.
 - Homebrew installation and updates are expected to run as a regular user.
 - Recommended flow for LXC/Docker:
   1. As `root`, install base OS packages (for example, `apt-get update && apt-get install`).
