@@ -3,6 +3,10 @@
 
 set -euo pipefail
 
+is_root() {
+  [[ ${EUID:-$(id -u)} -eq 0 ]]
+}
+
 load_homebrew_env() {
   local brew_bin
 
@@ -33,13 +37,16 @@ if command -v apt-get >/dev/null 2>&1; then
 fi
 {{ end }}
 
-if ! command -v brew >/dev/null 2>&1; then
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
+if is_root; then
+  printf '%s\n' '[install-packages] root実行のためHomebrew処理をスキップします'
+else
+  if ! command -v brew >/dev/null 2>&1; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
 
-load_homebrew_env
+  load_homebrew_env
 
-brew bundle --file=/dev/stdin <<'BREWFILE'
+  brew bundle --file=/dev/stdin <<'BREWFILE'
 brew "chezmoi"
 brew "fish"
 brew "fisher"
@@ -48,4 +55,5 @@ brew "jsonnet"
 brew "mise"
 brew "zoxide"
 BREWFILE
+fi
 {{ end -}}
