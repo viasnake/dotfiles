@@ -17,8 +17,10 @@ jobs:
 
       - name: Install chezmoi
         run: |
-          sudo apt-get update
-          sudo apt-get install -y chezmoi
+          mkdir -p "$HOME/.local/bin"
+          sh -c "$(curl -fsLS https://get.chezmoi.io)" -- -b "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/chezmoi" --version
 
       - name: Run validation
         run: |
