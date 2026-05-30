@@ -86,6 +86,7 @@ make apply-scripts
 make skills-install
 make skills-update
 make skills-update-dry-run
+make test-shell-path
 make test-ubuntu-container
 make test-ubuntu24-container
 make test-ubuntu24-container-full

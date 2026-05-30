@@ -10,6 +10,10 @@ else if test -x /usr/local/bin/brew
   eval (/usr/local/bin/brew shellenv)
 end
 
+if test -d "$HOME/.local/bin"; and not contains -- "$HOME/.local/bin" $PATH
+  set -gx PATH "$HOME/.local/bin" $PATH
+end
+
 if test -f ~/.config/dotfiles/secrets.fish
   source ~/.config/dotfiles/secrets.fish
 end

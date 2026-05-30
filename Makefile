@@ -12,7 +12,7 @@ UBUNTU_TEST_VERSIONS ?= 20.04 26.04
 UBUNTU_TEST_IMAGE_PREFIX ?= dotfiles-ubuntu-test
 MAKEFLAGS += --no-print-directory
 
-.PHONY: help all init ensure-chezmoi ensure-gh-skill apply apply-scripts dry-run status diff verify managed skills-install skills-update skills-update-dry-run test-ubuntu-container test-ubuntu-container-full test-ubuntu20-container test-ubuntu20-container-full test-ubuntu24-container test-ubuntu24-container-full test-ubuntu26-container test-ubuntu26-container-full test-macos-docker-osx-preflight test-macos-docker-osx-smoke remove-managed
+.PHONY: help all init ensure-chezmoi ensure-gh-skill apply apply-scripts dry-run status diff verify managed skills-install skills-update skills-update-dry-run test-shell-path test-ubuntu-container test-ubuntu-container-full test-ubuntu20-container test-ubuntu20-container-full test-ubuntu24-container test-ubuntu24-container-full test-ubuntu26-container test-ubuntu26-container-full test-macos-docker-osx-preflight test-macos-docker-osx-smoke remove-managed
 
 help:
 	@printf "Available targets:\n"
@@ -28,6 +28,7 @@ help:
 	@printf "  diff           Show detailed diff of pending changes\n"
 	@printf "  verify         Verify target state matches rendered source state\n"
 	@printf "  managed        List managed target paths\n"
+	@printf "  test-shell-path Verify ~/.local/bin is available in managed shells\n"
 	@printf "  test-ubuntu-container Run Ubuntu container smoke tests for UBUNTU_TEST_VERSIONS\n"
 	@printf "  test-ubuntu-container-full Run full Ubuntu first-time setup for UBUNTU_TEST_VERSIONS\n"
 	@printf "  test-ubuntu20-container Run Ubuntu 20.04 container bootstrap smoke test\n"
@@ -106,6 +107,9 @@ skills-update: ensure-gh-skill
 
 skills-update-dry-run: ensure-gh-skill
 	@$(LOG_RUN) "gh skill update dry run" -- gh skill update --dry-run
+
+test-shell-path:
+	@$(LOG_RUN) "shell PATH smoke test" -- test/shell-path.sh
 
 test-ubuntu-container:
 	@set -eu; \
