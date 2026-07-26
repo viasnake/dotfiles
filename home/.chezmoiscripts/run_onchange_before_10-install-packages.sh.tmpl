@@ -3,20 +3,11 @@
 
 set -euo pipefail
 
-load_homebrew_env() {
-  local brew_bin
+{{ include ".chezmoitemplates/dotfiles-nix-env.sh" -}}
 
-  for brew_bin in \
-    /home/linuxbrew/.linuxbrew/bin/brew \
-    /opt/homebrew/bin/brew \
-    /usr/local/bin/brew
-  do
-    if [[ -x "$brew_bin" ]]; then
-      eval "$("$brew_bin" shellenv)"
-      return
-    fi
-  done
-}
+source_dir={{ .chezmoi.config.sourceDir | quote }}
+dotfiles_profile="$HOME/.local/state/nix/profiles/dotfiles-tools"
+dotfiles_flake="path:$source_dir"
 
 {{- if and (eq .chezmoi.os "linux") (hasKey .chezmoi.osRelease "id") (or (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "raspbian") (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.id "zorin")) }}
 if command -v apt-get >/dev/null 2>&1; then
@@ -27,25 +18,55 @@ if command -v apt-get >/dev/null 2>&1; then
     curl \
     file \
     git \
+    libarchive-tools \
     libicu-dev \
     procps \
-    unzip
+    unzip \
+    xz-utils
 fi
 {{ end }}
 
-if ! command -v brew >/dev/null 2>&1; then
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
+in_container() {
+  [[ -f /.dockerenv || -f /run/.containerenv || -f /run/systemd/container ]]
+}
 
-load_homebrew_env
+install_nix() {
+  local install_script
+  local install_mode
 
-brew bundle --file=/dev/stdin <<'BREWFILE'
-brew "chezmoi"
-brew "fish"
-brew "fisher"
-brew "gmailctl"
-brew "jsonnet"
-brew "mise"
-brew "zoxide"
-BREWFILE
+  if nix_command >/dev/null 2>&1; then
+    return
+  fi
+
+  if ! command -v curl >/dev/null 2>&1; then
+    printf 'dotfiles: curl is required to install Nix.\n' >&2
+    exit 1
+  fi
+
+  install_mode="--daemon"
+  if in_container; then
+    install_mode="--no-daemon"
+  fi
+
+  install_script="$(mktemp)"
+  curl --proto '=https' --tlsv1.2 -fsSL https://nixos.org/nix/install -o "$install_script"
+  sh "$install_script" "$install_mode" --yes --no-channel-add --no-modify-profile
+  rm -f "$install_script"
+}
+
+install_nix
+load_nix_env
+
+nix_bin="$(nix_command)" || {
+  printf 'dotfiles: nix command is unavailable after installation.\n' >&2
+  exit 1
+}
+
+mkdir -p "$(dirname "$dotfiles_profile")"
+"$nix_bin" --extra-experimental-features "nix-command flakes" build \
+  --no-write-lock-file \
+  --no-link \
+  --profile "$dotfiles_profile" \
+  "$dotfiles_flake#dotfiles-tools"
+load_nix_env
 {{ end -}}

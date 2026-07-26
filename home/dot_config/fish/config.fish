@@ -1,13 +1,14 @@
-# linuxbrew
-if test -x /home/linuxbrew/.linuxbrew/bin/brew
-  eval (/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+# nix
+if test -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
+  set -e __ETC_PROFILE_NIX_SOURCED
+  source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
+else if test -f "$HOME/.nix-profile/etc/profile.d/nix.fish"
+  set -e __ETC_PROFILE_NIX_SOURCED
+  source "$HOME/.nix-profile/etc/profile.d/nix.fish"
 end
 
-# homebrew
-if test -x /opt/homebrew/bin/brew
-  eval (/opt/homebrew/bin/brew shellenv)
-else if test -x /usr/local/bin/brew
-  eval (/usr/local/bin/brew shellenv)
+if test -d "$HOME/.local/state/nix/profiles/dotfiles-tools/bin"; and not contains -- "$HOME/.local/state/nix/profiles/dotfiles-tools/bin" $PATH
+  set -gx PATH "$HOME/.local/state/nix/profiles/dotfiles-tools/bin" $PATH
 end
 
 if test -d "$HOME/.local/bin"; and not contains -- "$HOME/.local/bin" $PATH

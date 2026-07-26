@@ -8,8 +8,10 @@ RUN apt-get update \
     ca-certificates \
     curl \
     git \
+    libarchive-tools \
     make \
     sudo \
+    xz-utils \
   && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m -s /bin/bash dotfiles \

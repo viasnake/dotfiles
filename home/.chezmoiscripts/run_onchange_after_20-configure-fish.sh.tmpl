@@ -3,20 +3,7 @@
 
 set -euo pipefail
 
-load_homebrew_env() {
-  local brew_bin
-
-  for brew_bin in \
-    /home/linuxbrew/.linuxbrew/bin/brew \
-    /opt/homebrew/bin/brew \
-    /usr/local/bin/brew
-  do
-    if [[ -x "$brew_bin" ]]; then
-      eval "$("$brew_bin" shellenv)"
-      return
-    fi
-  done
-}
+{{ include ".chezmoitemplates/dotfiles-nix-env.sh" -}}
 
 current_login_shell() {
   local user_name="$1"
@@ -42,7 +29,7 @@ change_login_shell() {
   fi
 }
 
-load_homebrew_env
+load_nix_env
 
 if ! command -v fish >/dev/null 2>&1; then
   exit 0

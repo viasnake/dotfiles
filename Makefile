@@ -10,9 +10,15 @@ SKILL_INSTALL_FLAGS ?= --force
 SKILL_MANIFEST = agent-skills.tsv
 UBUNTU_TEST_VERSIONS ?= 20.04 26.04
 UBUNTU_TEST_IMAGE_PREFIX ?= dotfiles-ubuntu-test
+NIX ?= $(shell if command -v nix >/dev/null 2>&1; then command -v nix; elif [ -x /nix/var/nix/profiles/default/bin/nix ]; then printf '%s\n' /nix/var/nix/profiles/default/bin/nix; else printf '%s\n' nix; fi)
+NIX_FLAGS ?= --extra-experimental-features "nix-command flakes"
+NIX_FLAKE ?= path:$(CURDIR)
+NIX_LOCK_FLAGS ?= --no-write-lock-file
+NIX_BUILD_FLAGS ?= --no-link
+DOCKER ?= docker
 MAKEFLAGS += --no-print-directory
 
-.PHONY: help all init ensure-chezmoi ensure-gh-skill apply apply-scripts dry-run status diff verify managed skills-install skills-update skills-update-dry-run test-shell-path test-ubuntu-container test-ubuntu-container-full test-ubuntu20-container test-ubuntu20-container-full test-ubuntu24-container test-ubuntu24-container-full test-ubuntu26-container test-ubuntu26-container-full test-macos-docker-osx-preflight test-macos-docker-osx-smoke remove-managed
+.PHONY: help all init ensure-chezmoi ensure-gh-skill apply apply-scripts dry-run status diff verify managed skills-install skills-update skills-update-dry-run nix-show nix-check nix-build-tools test-shell-path test-ubuntu-container test-ubuntu-container-full test-ubuntu20-container test-ubuntu20-container-full test-ubuntu24-container test-ubuntu24-container-full test-ubuntu26-container test-ubuntu26-container-full test-macos-docker-osx-preflight test-macos-docker-osx-smoke remove-managed
 
 help:
 	@printf "Available targets:\n"
@@ -21,6 +27,9 @@ help:
 	@printf "  skills-install Install agent skills from agent-skills.tsv for SKILL_AGENTS\n"
 	@printf "  skills-update  Update installed agent skills with gh skill\n"
 	@printf "  skills-update-dry-run Check agent skill updates without mutating files\n"
+	@printf "  nix-show       Show Nix flake outputs\n"
+	@printf "  nix-check      Validate Nix flake outputs\n"
+	@printf "  nix-build-tools Build Nix dotfiles tool profile\n"
 	@printf "  apply          Apply all managed files and scripts\n"
 	@printf "  apply-scripts  Apply only chezmoi scripts\n"
 	@printf "  dry-run        Show verbose apply plan without mutating target files\n"
@@ -108,6 +117,27 @@ skills-update: ensure-gh-skill
 skills-update-dry-run: ensure-gh-skill
 	@$(LOG_RUN) "gh skill update dry run" -- gh skill update --dry-run
 
+nix-show:
+	@if ! command -v "$(NIX)" >/dev/null 2>&1; then \
+	  printf "nix is unavailable. Install Nix, then re-run this target.\n" >&2; \
+	  exit 1; \
+	fi
+	@$(LOG_RUN) "nix flake show" -- $(NIX) $(NIX_FLAGS) flake show $(NIX_LOCK_FLAGS) "$(NIX_FLAKE)"
+
+nix-check:
+	@if ! command -v "$(NIX)" >/dev/null 2>&1; then \
+	  printf "nix is unavailable. Install Nix, then re-run this target.\n" >&2; \
+	  exit 1; \
+	fi
+	@$(LOG_RUN) "nix flake check" -- $(NIX) $(NIX_FLAGS) flake check $(NIX_LOCK_FLAGS) "$(NIX_FLAKE)"
+
+nix-build-tools:
+	@if ! command -v "$(NIX)" >/dev/null 2>&1; then \
+	  printf "nix is unavailable. Install Nix, then re-run this target.\n" >&2; \
+	  exit 1; \
+	fi
+	@$(LOG_RUN) "nix build dotfiles tools" -- $(NIX) $(NIX_FLAGS) build $(NIX_LOCK_FLAGS) $(NIX_BUILD_FLAGS) "$(NIX_FLAKE)#dotfiles-tools"
+
 test-shell-path:
 	@$(LOG_RUN) "shell PATH smoke test" -- test/shell-path.sh
 
@@ -116,9 +146,9 @@ test-ubuntu-container:
 	for version in $(UBUNTU_TEST_VERSIONS); do \
 	  image="$(UBUNTU_TEST_IMAGE_PREFIX):$$version"; \
 	  printf 'Building Ubuntu %s test image: %s\n' "$$version" "$$image"; \
-	  "$(LOG_RUN)" "docker build Ubuntu $$version" -- docker build --build-arg "UBUNTU_VERSION=$$version" -f test/ubuntu/Dockerfile -t "$$image" .; \
+	  "$(LOG_RUN)" "docker build Ubuntu $$version" -- $(DOCKER) build --build-arg "UBUNTU_VERSION=$$version" -f test/ubuntu/Dockerfile -t "$$image" .; \
 	  printf 'Running Ubuntu %s smoke test\n' "$$version"; \
-	  "$(LOG_RUN)" "docker run Ubuntu $$version smoke" -- docker run --rm "$$image"; \
+	  "$(LOG_RUN)" "docker run Ubuntu $$version smoke" -- $(DOCKER) run --rm "$$image"; \
 	done
 
 test-ubuntu-container-full:
@@ -126,9 +156,9 @@ test-ubuntu-container-full:
 	for version in $(UBUNTU_TEST_VERSIONS); do \
 	  image="$(UBUNTU_TEST_IMAGE_PREFIX):$$version"; \
 	  printf 'Building Ubuntu %s test image: %s\n' "$$version" "$$image"; \
-	  "$(LOG_RUN)" "docker build Ubuntu $$version" -- docker build --build-arg "UBUNTU_VERSION=$$version" -f test/ubuntu/Dockerfile -t "$$image" .; \
+	  "$(LOG_RUN)" "docker build Ubuntu $$version" -- $(DOCKER) build --build-arg "UBUNTU_VERSION=$$version" -f test/ubuntu/Dockerfile -t "$$image" .; \
 	  printf 'Running Ubuntu %s full setup test\n' "$$version"; \
-	  "$(LOG_RUN)" "docker run Ubuntu $$version full setup" -- docker run --rm --env GITHUB_TOKEN --env DOTFILES_CONTAINER_TEST_MODE=full "$$image"; \
+	  "$(LOG_RUN)" "docker run Ubuntu $$version full setup" -- $(DOCKER) run --rm --env GITHUB_TOKEN --env DOTFILES_CONTAINER_TEST_MODE=full "$$image"; \
 	done
 
 test-ubuntu20-container:

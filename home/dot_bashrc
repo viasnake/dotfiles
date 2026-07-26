@@ -127,19 +127,21 @@ if ! shopt -oq posix; then
     fi
 fi
 
-# linuxbrew
-if test -d /home/linuxbrew/.linuxbrew
-then
-  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# nix
+if [ -f /etc/profile.d/nix.sh ]; then
+  unset __ETC_PROFILE_NIX_SOURCED
+  . /etc/profile.d/nix.sh
+elif [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+  unset __ETC_PROFILE_NIX_SOURCED
+  . "$HOME/.nix-profile/etc/profile.d/nix.sh"
 fi
 
-# homebrew
-if test -d /opt/homebrew
-then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-elif test -x /usr/local/bin/brew
-then
-  eval "$(/usr/local/bin/brew shellenv)"
+if [ -d "$HOME/.local/state/nix/profiles/dotfiles-tools/bin" ]; then
+  case ":$PATH:" in
+    *":$HOME/.local/state/nix/profiles/dotfiles-tools/bin:"*) ;;
+    *) PATH="$HOME/.local/state/nix/profiles/dotfiles-tools/bin:$PATH" ;;
+  esac
+  export PATH
 fi
 
 # mise path

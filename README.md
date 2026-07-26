@@ -86,6 +86,9 @@ make apply-scripts
 make skills-install
 make skills-update
 make skills-update-dry-run
+make nix-show
+make nix-check
+make nix-build-tools
 make test-shell-path
 make test-ubuntu-container
 make test-ubuntu24-container
@@ -94,6 +97,37 @@ make test-macos-docker-osx-preflight
 make test-macos-docker-osx-smoke
 make remove-managed
 ```
+
+## Tool Ownership
+
+Nix owns the bootstrap/system tool layer through:
+
+```text
+flake.nix
+flake.lock
+nix/README.md
+```
+
+The package setup script installs Nix when it is missing, then builds the
+`dotfiles-tools` profile at:
+
+```text
+~/.local/state/nix/profiles/dotfiles-tools
+```
+
+This profile provides shell-level tools such as `fish`, `fzf`, `ghq`,
+`gmailctl`, `jsonnet`, and `mise`. No separate package manager is part of the
+managed setup.
+
+Versioned CLIs and runtime tools remain in:
+
+```text
+home/dot_config/mise/config.toml
+```
+
+Prefer Nix for bootstrap tools that must exist before mise runs. Prefer mise
+for language runtimes and fast-moving development CLIs that benefit from
+per-tool version pins.
 
 ## Agent Skills
 

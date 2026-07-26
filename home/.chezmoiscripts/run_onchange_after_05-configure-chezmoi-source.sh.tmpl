@@ -12,10 +12,6 @@ if command -v chezmoi >/dev/null 2>&1; then
   chezmoi_cmd="$(command -v chezmoi)"
 elif [[ -x "$HOME/.local/bin/chezmoi" ]]; then
   chezmoi_cmd="$HOME/.local/bin/chezmoi"
-elif [[ -x /home/linuxbrew/.linuxbrew/bin/chezmoi ]]; then
-  chezmoi_cmd="/home/linuxbrew/.linuxbrew/bin/chezmoi"
-elif [[ -x /opt/homebrew/bin/chezmoi ]]; then
-  chezmoi_cmd="/opt/homebrew/bin/chezmoi"
 elif [[ -x /usr/local/bin/chezmoi ]]; then
   chezmoi_cmd="/usr/local/bin/chezmoi"
 fi

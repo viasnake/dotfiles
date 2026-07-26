@@ -3,25 +3,12 @@
 
 set -euo pipefail
 
-load_homebrew_env() {
-  local brew_bin
-
-  for brew_bin in \
-    /home/linuxbrew/.linuxbrew/bin/brew \
-    /opt/homebrew/bin/brew \
-    /usr/local/bin/brew
-  do
-    if [[ -x "$brew_bin" ]]; then
-      eval "$("$brew_bin" shellenv)"
-      return
-    fi
-  done
-}
+{{ include ".chezmoitemplates/dotfiles-nix-env.sh" -}}
 
 mise_config="$HOME/.config/mise/config.toml"
 # mise config hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
 
-load_homebrew_env
+load_nix_env
 
 if ! command -v mise >/dev/null 2>&1; then
   exit 0

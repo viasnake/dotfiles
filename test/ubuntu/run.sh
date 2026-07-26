@@ -17,7 +17,15 @@ else
   "$HOME/.local/bin/chezmoi" --source "$PWD" apply --include=scripts
 fi
 
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+if [[ -f /etc/profile.d/nix.sh ]]; then
+  # shellcheck disable=SC1091
+  . /etc/profile.d/nix.sh
+elif [[ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]]; then
+  # shellcheck disable=SC1091
+  . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+fi
+
+export PATH="$HOME/.local/state/nix/profiles/dotfiles-tools/bin:$PATH"
 
 fish_path="$(command -v fish)"
 login_shell="$(getent passwd "$(id -un)" | awk -F: '{ print $7 }')"
