@@ -18,12 +18,13 @@ NIX_BUILD_FLAGS ?= --no-link
 DOCKER ?= docker
 MAKEFLAGS += --no-print-directory
 
-.PHONY: help all init ensure-chezmoi ensure-gh-skill apply apply-scripts dry-run status diff verify managed skills-install skills-update skills-update-dry-run nix-show nix-check nix-build-tools test-shell-path test-ubuntu-container test-ubuntu-container-full test-ubuntu20-container test-ubuntu20-container-full test-ubuntu24-container test-ubuntu24-container-full test-ubuntu26-container test-ubuntu26-container-full test-macos-docker-osx-preflight test-macos-docker-osx-smoke remove-managed
+.PHONY: help all init ensure-chezmoi ensure-gh-skill apply apply-scripts dry-run status diff verify managed skills-check skills-install skills-update skills-update-dry-run nix-show nix-check nix-build-tools test-shell-path test-ubuntu-container test-ubuntu-container-full test-ubuntu20-container test-ubuntu20-container-full test-ubuntu24-container test-ubuntu24-container-full test-ubuntu26-container test-ubuntu26-container-full test-macos-docker-osx-preflight test-macos-docker-osx-smoke remove-managed
 
 help:
 	@printf "Available targets:\n"
 	@printf "  init           Install chezmoi if missing and apply this source state\n"
 	@printf "  ensure-chezmoi Install chezmoi to ~/.local/bin when missing\n"
+	@printf "  skills-check  Validate agent-skills.tsv format and duplicates\n"
 	@printf "  skills-install Install agent skills from agent-skills.tsv for SKILL_AGENTS\n"
 	@printf "  skills-update  Update installed agent skills with gh skill\n"
 	@printf "  skills-update-dry-run Check agent skill updates without mutating files\n"
@@ -101,6 +102,13 @@ verify:
 
 managed:
 	@$(LOG_RUN) "chezmoi managed files" -- $(CHEZMOI) managed --include=files,symlinks --path-style=absolute
+
+skills-check:
+	@awk 'BEGIN { FS = "\t"; ok = 1 } \
+	  /^#/ || /^[[:space:]]*$$/ { next } \
+	  NF != 2 || $$1 == "" || $$2 == "" { printf "Invalid %s line %d: expected <repo> TAB <skill>\n", FILENAME, FNR > "/dev/stderr"; ok = 0; next } \
+	  { key = $$1 "\t" $$2; if (seen[key]++) { printf "Duplicate %s line %d: %s\n", FILENAME, FNR, key > "/dev/stderr"; ok = 0 } } \
+	  END { exit ok ? 0 : 1 }' "$(SKILL_MANIFEST)"
 
 skills-install: ensure-gh-skill
 	@agents="$(if $(SKILL_AGENT),$(SKILL_AGENT),$(SKILL_AGENTS))"; \

@@ -83,6 +83,7 @@ Additional maintenance targets:
 
 ```bash
 make apply-scripts
+make skills-check
 make skills-install
 make skills-update
 make skills-update-dry-run
@@ -140,6 +141,7 @@ agent-skills.tsv
 Install or update them with:
 
 ```bash
+make skills-check
 make skills-install
 make skills-update
 ```
