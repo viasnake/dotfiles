@@ -11,6 +11,7 @@ The current Nix tool profile covers:
 - `gmailctl`
 - `jsonnet`
 - `mise`
+- `sqlite3`, used to apply the Codex diagnostic-log safeguard
 
 It intentionally does not replace `home/dot_config/mise/config.toml`. The first
 layer only covers tools needed before or outside mise. Versioned runtimes and

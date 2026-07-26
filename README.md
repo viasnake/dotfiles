@@ -130,6 +130,25 @@ Prefer Nix for bootstrap tools that must exist before mise runs. Prefer mise
 for language runtimes and fast-moving development CLIs that benefit from
 per-tool version pins.
 
+## Codex SQLite Diagnostic Logging
+
+On Linux and macOS, each `chezmoi apply` checks the active Codex SQLite
+directory and creates a `block_log_inserts` trigger in `logs_2.sqlite`. The
+trigger discards new diagnostic records while leaving conversation, goal, and
+application-state databases unchanged.
+
+This is an unofficial safeguard for excessive diagnostic-log writes. It
+reduces the local data available to `/feedback` and OpenAI Support. To collect
+diagnostics again, stop Codex processes and remove the trigger:
+
+```bash
+sqlite3 "${CODEX_SQLITE_HOME:-${CODEX_HOME:-$HOME/.codex}}/logs_2.sqlite" \
+  "DROP TRIGGER IF EXISTS block_log_inserts;"
+```
+
+Adjust the path when `sqlite_home` is set in `config.toml`. A later
+`chezmoi apply` recreates the trigger.
+
 ## Agent Skills
 
 Desired GitHub-backed skills are listed in:

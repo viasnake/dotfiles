@@ -52,6 +52,7 @@
           gmailctl
           jsonnet
           mise
+          sqlite
         ];
 
       fishPlugins = [
