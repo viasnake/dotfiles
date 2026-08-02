@@ -1,102 +1,141 @@
-# AGENTS.md
+# Repository Guidance
 
-## Scope
-This file is the repository-local operating guide for coding agents in this dotfiles repo.
-It applies from `/home/sysadmin/dotfiles` downward.
+## 1. Scope and precedence
 
-The repository is a chezmoi source state plus managed configuration files.
-There is no traditional compile/build artifact.
-Verification is done by targeted `make` targets and chezmoi dry-runs.
+This file applies to work in this repository and its child directories. It records current
+repository facts, local commands, and repository-specific constraints.
 
-## Rule Sources Checked
-- `.cursor/rules/`: not present (searched recursively)
-- `.cursorrules`: not present (searched recursively)
-- `.github/copilot-instructions.md`: not present (searched recursively)
-- existing agent guidance: `home/dot_codex/AGENTS.md`, `home/dot_config/opencode/AGENTS.md`
-- shared style guidance: `home/dot_config/opencode/instructions/coding-style.md`
+General agent guidance may come from a parent or user-level `AGENTS.md`. A closer
+`AGENTS.md`, `CONTRIBUTING.md`, or other repository document takes precedence when it
+defines a more specific rule. Do not use this file to override a closer rule.
 
-If Cursor or Copilot rule files are added later, treat them as additional instructions with repository scope.
+## 2. Current repository facts
 
-## Repository Shape
-- `Makefile`: canonical entry point for chezmoi apply/inspect workflows.
-- `.chezmoiroot`: points chezmoi at `home/` as the source state.
-- `home/`: chezmoi-managed dotfiles, templates, and scripts.
-- `home/.chezmoiscripts/`: chezmoi-native setup hooks (`run_onchange_before_` / `run_onchange_after_`).
-- `agent-skills.tsv`: desired GitHub-backed agent skills installed and updated with `gh skill`.
+- This repository contains source files for user configuration and setup scripts.
+- `chezmoi` is the tool used here to render those source files into a target home directory.
+- `.chezmoiroot` points `chezmoi` at `home/` as the source directory.
+- `home/` contains managed files, templates, and scripts.
+- `home/.chezmoiscripts/` contains setup scripts run by `chezmoi`.
+- `agent-skills.tsv` is a tab-separated manifest of the skills managed by this repository.
+- `Makefile` is the common entry point for setup, inspection, and validation commands.
 
-## Working Principles
-- Make small, auditable, reversible changes.
-- Inspect before editing; do not guess structure.
-- Keep Linux and macOS behavior aligned unless differences are real and documented.
-- Avoid machine-specific assumptions unless the repository already requires them.
-- Never commit secrets, generated credentials, or host-local runtime state.
+## 3. Common operations
 
-## Build and Validation Commands
+### 3.1 Setup and apply
 
-### Setup commands
-- `make apply` - full chezmoi apply.
-- `make apply-scripts` - run only chezmoi scripts (`chezmoi apply --include=scripts`).
-- `make remove-managed` - remove current chezmoi-managed file/symlink targets from the target home.
+- `make help` lists the available targets.
+- `make init` installs `chezmoi` when needed and applies the source files.
+- `make apply` applies all managed files and scripts.
+- `make apply-scripts` applies only managed scripts.
+- `make remove-managed` removes the currently managed files and symbolic links from the
+  target home directory. Confirm the target before running this command.
 
-### Inspection commands
-- `make status` - show managed target differences.
-- `make diff` - show full managed diff.
-- `make managed` - list managed target paths.
+### 3.2 Inspect the rendered state
 
-### Validation checks
-- `make dry-run` - dry-run apply flow.
-- `make verify` - verify managed target state.
-- `chezmoi --source "$PWD" apply --dry-run --verbose` - template/render validation without mutation.
+- `make status` shows pending changes.
+- `make diff` shows the rendered difference.
+- `make managed` lists managed target paths.
 
-## Change-Based Verification Matrix
-- Edited `home/.chezmoiscripts/**`: run `make dry-run` and `chezmoi --source "$PWD" apply --include=scripts --dry-run --verbose`.
-- Edited `home/dot_config/opencode/**`: run `chezmoi --source "$PWD" apply --dry-run --verbose`.
-- Edited `Makefile` targets: run `make help`, `make dry-run`, and `make managed`.
-- Edited `agent-skills.tsv` or Skill-related `Makefile` targets: run `make help`; run `make skills-update-dry-run` only when `gh skill` is available locally.
-- Edited Bitwarden-backed templates (`*.tmpl` under `home/`): run `chezmoi --source "$PWD" execute-template --file <template>` and `chezmoi --source "$PWD" apply --dry-run --verbose`.
-- Edited anything potentially affecting secrets/repo safety: inspect the diff and run the narrowest relevant checks.
+### 3.3 Validate without changing the target
 
-## Code Style Guidelines
-Follow existing repository patterns first.
-Primary references: `home/.chezmoiscripts/*` and existing `home/**.tmpl` files.
+- `make dry-run` shows the verbose apply plan without mutating target files.
+- `make verify` checks whether the target state matches the rendered source state.
+- `chezmoi --source "$PWD" apply --dry-run --verbose` validates rendering without applying it.
 
-### Language and typing approach
-- Bash is used in chezmoi scripts where shell behavior is required.
-- Template logic should stay in chezmoi templates (`*.tmpl`) when possible.
-- For JSON/JSONC/TOML, treat schemas as contracts and preserve key stability.
+## 4. Verification by change
 
-### Formatting
-- Bash: 2-space indentation, no tabs.
-- JSON/JSONC: stable 2-space indentation.
-- TOML: preserve existing grouping and key order unless reorganization improves clarity.
+- For changes under `home/.chezmoiscripts/`, run `make dry-run` and
+  `chezmoi --source "$PWD" apply --include=scripts --dry-run --verbose`.
+- For managed configuration or template changes, run
+  `chezmoi --source "$PWD" apply --dry-run --verbose`.
+- For `Makefile` changes, run `make help`, `make dry-run`, and `make managed`.
+- For `agent-skills.tsv` changes, run `make help` and the available skill-update dry run.
+- For shell or setup behavior, run the narrowest relevant shell or container check listed by
+  `make help`.
+- For changes that may affect secrets or repository safety, inspect the diff and run the
+  narrowest relevant checks. Never put secrets, generated credentials, or host-local runtime
+  state into the repository.
+
+## 5. Code and configuration conventions
+
+Follow existing repository patterns before introducing a new one.
+
+### 5.1 Shell and templates
+
+- Use Bash when shell behavior is required in a setup script.
+- Prefer `#!/usr/bin/env bash` and `set -euo pipefail` for new or substantially changed
+  scripts.
+- Use `[[ ... ]]` for Bash conditionals and quote expansions unless unquoted behavior is
+  intentional.
+- Keep rendering logic in templates when the source format supports it.
+- Use two spaces for Bash indentation and no tabs.
 - End every file with a trailing newline.
 
-### Bash conventions
-- Prefer `#!/usr/bin/env bash`.
-- Prefer `set -euo pipefail` for new or substantially modified scripts.
-- Use `[[ ... ]]` for Bash conditionals.
-- Quote expansions unless unquoted behavior is intentionally required.
-- Prefer `printf` over `echo` when exact output/escaping matters.
+### 5.2 Structured configuration
 
-### Comments and documentation
-- Write comments in English.
-- Explain why/constraints/trade-offs, not obvious mechanics.
-- Keep comments synchronized with behavior; delete stale comments quickly.
-- When behavior or workflow changes, update nearby docs (`README.md`, this file, or related docs).
+- Treat JSON, JSONC, and TOML schemas as contracts.
+- Preserve key stability and existing grouping unless a reorganization improves clarity.
+- Avoid unrelated formatting changes.
+- Use the repository's secret-backed template mechanism or environment placeholders for
+  secret-bearing values.
 
-### Configuration editing
-- Preserve existing schema and key stability in managed config files.
-- Avoid unrelated reformatting/noise diffs.
-- Keep `agent-skills.tsv` entries aligned with upstream GitHub skill paths.
-- Use Bitwarden-backed templates or environment placeholders for secret-bearing values.
+## 6. Documentation
 
-## Verification and Reporting Expectations
-- Report exactly which commands were executed.
-- If a command was skipped to avoid machine mutation, state that explicitly.
-- Do not claim full validation when only static inspection was performed.
-- Prefer targeted checks before broad setup operations.
+- This file is developer-facing guidance. Keep it separate from user-facing instructions in
+  `README.md` and other user documentation.
+- User-facing documentation should begin with the reader's goal and a conceptual overview;
+  explain internal terms only when the reader needs them.
+- Developer-facing documentation may use concrete implementation terms, but define uncommon or
+  repository-specific terms at first use.
+- Document current facts and current behavior only. Do not commit ADRs or other historical
+  narratives whose purpose is to reconstruct past reasoning.
+- Use the commit log for change history, and use comments only for current non-obvious
+  constraints or rationale at the relevant code location.
+- Remove temporary notes, superseded documents, and duplicate sources of truth when they no
+  longer serve a current reader.
 
-## Default Behavior for Agents
-When uncertain, prefer chezmoi-native mechanisms over ad-hoc shell wrappers.
-Choose the narrowest meaningful validation command for the changed area.
-Call out assumptions and any unverified platform-specific behavior.
+## 7. Version control
+
+### 7.1 Branches
+
+- Before creating, renaming, or switching a branch, inspect `CONTRIBUTING.md`, `README.md`,
+  project documentation, and any closer repository guidance for an explicit branch policy.
+- If an explicit policy exists, follow it. Do not replace it with this default.
+- If no explicit policy exists, use GitHub Flow: develop one coherent change on a short-lived
+  branch, open a pull request against the default branch, complete required review and checks,
+  merge it, and delete the branch after completion.
+- If no local naming rule exists, use lowercase `<type>/<short-description>`. Here, `type` is a
+  short category such as `feature`, `fix`, `docs`, `refactor`, or `chore`; the description is
+  concise and hyphen-separated.
+- Avoid vague names, personal names, dates, and issue numbers without a description. Include an
+  issue number only when the repository's local convention requires it.
+- Keep unrelated work on separate branches.
+
+### 7.2 Commits
+
+- Inspect recent commit messages before choosing a commit format.
+- When no local convention is clear, use Conventional Commits.
+- If recent commits consistently use another clear convention, follow that convention instead.
+- Keep commits intentional, reviewable, and split by concern.
+- Use the commit log for change history instead of creating a separate history document.
+
+### 7.3 Issues and pull requests
+
+- Before opening an Issue or pull request, inspect `.github/ISSUE_TEMPLATE/` and the pull request
+  template files or directories under `.github/`.
+- Use the applicable repository template when one exists.
+- If no template exists and adding files is in scope, add a small common template before opening
+  the Issue or pull request. Otherwise, use the following minimum structure:
+  - `Problem`: what is wrong or missing.
+  - `Changes`: what was changed and why.
+  - `Impact`: expected effects, risks, compatibility concerns, or operational consequences.
+- Test details are optional; include them only when they materially clarify risk, impact, or
+  confidence.
+
+## 8. Reporting and completion
+
+- Report exactly which commands were executed and which were skipped.
+- State explicitly when a check was not run to avoid mutating the target environment.
+- Do not claim full validation when only static inspection or a dry run was performed.
+- A change is complete when the relevant state was inspected, the requested files were updated,
+  the narrowest meaningful checks passed, and remaining uncertainty is stated.
