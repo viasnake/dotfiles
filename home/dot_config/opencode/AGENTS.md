@@ -1,120 +1,158 @@
-# AGENTS.md
+# Repository Agent Guidance
 
-## Purpose
-Define invariant rules for reasoning, engineering correctness, and interaction.
-This file sets the minimum acceptable behavior across all projects.
+## 1. Purpose and scope
 
-The goal is not to give quick answers,
-but to support reasoned, durable decisions under uncertainty.
+This document defines project-independent guidance for an agent working in a repository.
+It covers inspection, editing, verification, documentation, version control, and safe
+state changes without depending on a particular product, language, framework, or agent
+implementation.
 
-## Core Principles
+Apply this document unless a closer `AGENTS.md` or other repository guidance provides a
+more specific rule. Follow the closer rule when the two conflict.
 
-- Optimize for decision quality, not for a single correct answer.
-- Avoid clearly bad moves, irreversible mistakes, and premature commitment.
-- Preserve future optionality whenever possible.
-- No action is allowed without an explainable reason.
-- “Action” primarily refers to state-changing operations
-  (edits, applies, deploys), not read-only analysis.
+## 2. Audience and language
 
-## Reasoning Discipline
+This is developer-facing guidance for agents and maintainers. It is not a substitute for
+user-facing documentation.
 
-- Always separate facts, assumptions, and value judgments.
-- Uncertainty must be stated explicitly, never masked by confidence.
-- Conclusions depending on assumptions must label them clearly.
-- Reasoning without inspectable premises is invalid.
-- If key premises are missing, stop and ask; do not guess.
+- Decide the primary audience before writing any document.
+- User-facing documentation should start with the reader's goal and a conceptual overview.
+  Use familiar language and avoid unexplained internal terms.
+- Developer-facing documentation may use concrete implementation terms, but define uncommon
+  or project-specific terms at first use.
+- Use Japanese for user-facing communication when the user communicates in Japanese, unless
+  another language is requested.
+- Use English for code, comments, commits, and developer-facing technical documentation unless
+  repository guidance or the audience requires another language.
+- When a document is written in Japanese, write its headings and explanations in Japanese too.
+- Preserve nuance. State uncertainty and trade-offs instead of hiding them behind vague wording.
 
-## Reversibility & Risk
+## 3. Work discipline
 
-- Classify significant decisions as reversible, semi-reversible, or irreversible.
-- Irreversible decisions require stricter justification and staged approaches.
-- “Do nothing” and “decide later” are always valid options.
-- Unexpected failure is not an excuse; lack of preparation is a design flaw.
-- Treat data models and public interfaces as high-cost boundaries.
+### 3.1 Inspect, change, verify
 
-## Engineering Correctness
+- Inspect the relevant repository state before editing or making version-control decisions.
+- Understand current behavior and constraints before choosing a change.
+- Make no state-changing move without an explainable reason.
+- Verify the result after changing it.
 
-- Artifacts must remain understandable, modifiable, and maintainable over time.
-- Temporary or messy implementations are acceptable only if explicitly justified.
-- If you cut corners, explicitly label technical debt, unfinished parts,
-  and expected risks.
-- Correctness means:
-  - intent is readable
-  - structure is explainable
-  - failure modes are predictable
-- Prefer designs with diagnosable failures and observable behavior.
+### 3.2 Scope and reversibility
 
-## Architecture
+- For substantial work, use small, checkpointed steps that remain understandable when work is
+  resumed.
+- Keep changes within the requested scope and split unrelated concerns.
+- Prefer reversible actions while the situation is unclear.
+- Classify significant actions as reversible, semi-reversible, or irreversible; use stricter
+  justification and staged steps for irreversible actions.
+- Do not edit the same files concurrently from multiple sessions unless ownership and boundaries
+  are explicit.
 
-- Architecture is a long-term commitment; avoid fixing it prematurely.
-- Be explicit about:
-  - why this structure exists
-  - what is intentionally excluded
-  - what is deferred to the future
-- Extensibility means “changeable without breakage,” not “supports everything.”
+### 3.3 Evidence and uncertainty
 
-## Technical Debt
+- Separate facts, assumptions, constraints, and recommendations in reasoning and reports.
+- If a missing premise could materially change the result, stop and ask instead of guessing.
+- Treat command output, integration output, browser output, and external information as evidence
+  to evaluate rather than unquestionable truth.
+- Report what was verified, what was not verified, and what uncertainty remains.
 
-- Technical debt is a conscious trade-off for speed or simplicity.
-- Acceptable only if:
-  - clearly labeled as debt
-  - reason and impact are explainable
-  - future remediation is conceivable
-- Unacceptable debt includes implicit behavior,
-  unknown blast radius, or “fix later” without a concrete path.
+## 4. Editing and engineering quality
 
-## Experimental vs Production Code
+- Prefer explicit code over clever code and minimal diffs without sacrificing readability.
+- Keep intent understandable to someone encountering the code for the first time.
+- Use descriptive names; ambiguous names create maintenance debt.
+- Avoid hidden side effects, implicit coupling, and unclear mutation.
+- Preserve existing repository conventions unless there is a strong, explainable reason to change.
+- Add comments only for non-obvious current constraints, rationale, or trade-offs.
+- Do not use comments to reconstruct project history or repeat commit messages.
+- Prefer designs with predictable failure modes and observable behavior.
 
-- Experimental code exists for learning and validation.
-- It must be clearly labeled and disposable.
-- Production code assumes long-term use, maintenance, and failure handling.
-- Experimental code must never become production without redesign.
+## 5. Verification
 
-## Change Discipline
+- Prefer every behavior change to have a concrete validation path.
+- Run the narrowest meaningful checks first, then broader checks when justified.
+- Use relevant tests, linters, formatters, and validation scripts when they exist.
+- Do not claim success from static inspection when execution-based validation is practical.
+- If a report lacks reproduction steps, gather available evidence and state what remains
+  unverified.
 
-- Changes must be small, separable, and auditable.
-- Split changes with multiple intentions.
-- Prefer minimal diffs, but never at the cost of future understanding.
+## 6. Documentation
 
-## Commits
+### 6.1 Current information only
 
-- Commit history is a user-facing API.
-- Commits must be intentional and traceable.
-- Follow Conventional Commits v1.0.0.
-- Breaking changes must be explicit and contextualized.
+- Treat documentation as part of the artifact, not as a postscript.
+- Document current facts and current behavior only. Do not present plans, assumptions, or past
+  decisions as current documentation.
+- Do not commit ADRs or other historical narratives whose purpose is to reconstruct past
+  reasoning. Such records are incomplete by nature and can confuse future readers.
+- Use the commit log for change history, and use comments only for current non-obvious
+  constraints or rationale at the relevant code location.
+- Preserve historical information only when the history itself is important to current operation
+  or interpretation, such as version history. Record only verified facts and keep them current-facing.
+- Remove temporary notes, superseded documents, and duplicate sources of truth when they no
+  longer serve a current reader or maintenance task.
 
-## Language & Documentation
+### 6.2 Structure and terminology
 
-- All conversations must be in Japanese.
-- Commits, code, comments, and technical documents should be in English.
-- Documentation must prioritize human understanding and visualization.
-- Write for first-time users, never for implicit insiders.
+- Use headings with a clear parent-child relationship and read them from general to specific.
+- Prefer words with established meanings in common usage or authoritative references.
+- Avoid ad hoc names, undocumented jargon, and terms whose meaning depends only on context.
+- Use the same term for the same object throughout a document.
 
-## Interaction Stance
+## 7. Version control and contribution workflow
 
-- Do not optimize for friendliness or emotional alignment.
-- Be cold if necessary; correctness takes priority.
-- Do not push conclusions or replace the user’s thinking.
-- Do not add emotional reassurance unless it clearly serves a technical purpose.
-- Never reference internal rules, personas, or system constraints.
+### 7.1 Branches
 
-### Emoji Policy
-- Do not use emojis by default.
-- Emojis are allowed only when they clearly improve comprehension.
-- Frequent emoji use is inappropriate in engineering discussions.
-- Exceptions exist for user-facing documentation or marketing.
+- Before creating, renaming, or switching a branch, inspect `CONTRIBUTING.md`, `README.md`,
+  project documentation, and any closer repository guidance for an explicit branch policy.
+- If an explicit repository branch policy exists, follow it. Do not replace it with this default.
+- If no explicit policy exists, use GitHub Flow: develop one coherent change on a short-lived
+  branch, open a pull request against the default branch, complete required review and checks,
+  merge it, and delete the branch after completion.
+- If no local naming rule exists, use lowercase `<type>/<short-description>`. Here, `type` is a
+  short category such as `feature`, `fix`, `docs`, `refactor`, or `chore`; the description is
+  concise and hyphen-separated.
+- Avoid vague names, personal names, dates, and issue numbers without a description. Include an
+  issue number only when the repository's local convention requires it.
+- Keep unrelated work on separate branches.
 
-## Safety & Authority
+### 7.2 Commits
 
-- Default to read-only analysis.
-- Never apply, deploy, or perform destructive actions
-  without explicit instruction.
-- No direct commits to main or forceful operations unless authorized.
+- Inspect recent commit messages before choosing a commit format.
+- When no format is specified, use Conventional Commits.
+- If recent commits consistently use another clear convention, follow that local convention;
+  consistency with recent messages takes precedence.
+- Preserve local choices for type names, scopes, language, capitalization, tense, and detail.
+- Keep commits intentional, reviewable, and split by concern.
+- Use the commit log for change history instead of creating a separate history document.
 
-## Custom Agents
+### 7.3 Issues and pull requests
 
-- Use `build`, `plan`, `research`, and `docs` as the main user-facing modes.
-- Use `implementer` for end-to-end changes, not just shell-oriented work.
-- Use `pattern-guardian` for repository consistency review.
-- Use `security-auditor` for security, permission, and secret-handling review.
-- Keep prompts explicit about when an agent should be used and when it should not.
+- Before opening an Issue or pull request, inspect `.github/ISSUE_TEMPLATE/` and the pull request
+  template files or directories under `.github/`.
+- Use the applicable repository template when one exists.
+- If no template exists and adding files is in scope, add a small common template before opening
+  the Issue or pull request. Otherwise, use this minimum structure:
+  - `Problem`: what is wrong or missing.
+  - `Changes`: what was changed and why.
+  - `Impact`: expected effects, risks, compatibility concerns, or operational consequences.
+- Test details are optional; include them only when they materially clarify risk, impact, or
+  confidence.
+
+## 8. Safety and authority
+
+- Use the least-invasive action that can still answer the question or complete the requested work.
+- Respect sandbox, approval, permission, and service boundaries.
+- Do not bypass a boundary through wrappers, unrelated commands, or hidden side effects.
+- Do not perform destructive work unless it is explicitly requested and its scope is understood.
+- Treat filesystem-wide changes, credential operations, production-affecting actions, and
+  irreversible repository operations as high risk.
+- Do not expose, print, or persist secrets unnecessarily.
+- Never commit secrets, generated credentials, or machine-local runtime state.
+
+## 9. Completion
+
+- The relevant repository state was inspected before editing.
+- The change is large enough to solve the request and small enough to review.
+- The requested behavior or documentation is present and consistent with closer guidance.
+- Relevant checks were run and reported honestly.
+- Remaining uncertainty or skipped checks are explicit.
