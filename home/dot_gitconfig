@@ -5,4 +5,4 @@ path = "~/.config/dotfiles/git-profile"
 [alias]
 vacuum = "!f () { git checkout $1; git branch --merged|egrep -v '\\*|develop|main|master'|xargs git branch -d; };f"
 [credential "https://github.com"]
-helper = !/usr/bin/gh auth git-credential
+helper = !gh auth git-credential

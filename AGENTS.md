@@ -19,6 +19,15 @@ defines a more specific rule. Do not use this file to override a closer rule.
 - `agent-skills.tsv` is a tab-separated manifest of the skills managed by this repository.
 - `Makefile` is the common entry point for setup, inspection, and validation commands.
 
+## Package Ownership
+
+- Do not manage the same tool through multiple package managers.
+- Use the OS package manager only for system and bootstrap dependencies.
+- Use mise for versioned user tools and language runtimes.
+- Use Fisher only for Fish plugins.
+- Use vendor-specific installers only when the vendor distribution is required.
+- Do not introduce Nix or Home Manager without an explicit architectural decision.
+
 ## 3. Common operations
 
 ### 3.1 Setup and apply
@@ -38,16 +47,16 @@ defines a more specific rule. Do not use this file to override a closer rule.
 
 ### 3.3 Validate without changing the target
 
-- `make dry-run` shows the verbose apply plan without mutating target files.
+- `make dry-run` shows the verbose apply plan without mutating target files, even when a target file has drifted.
 - `make verify` checks whether the target state matches the rendered source state.
-- `chezmoi --source "$PWD" apply --dry-run --verbose` validates rendering without applying it.
+- `chezmoi --source "$PWD" apply --dry-run --verbose --force --no-pager` validates rendering without applying it.
 
 ## 4. Verification by change
 
 - For changes under `home/.chezmoiscripts/`, run `make dry-run` and
-  `chezmoi --source "$PWD" apply --include=scripts --dry-run --verbose`.
+  `chezmoi --source "$PWD" apply --include=scripts --dry-run --verbose --force --no-pager`.
 - For managed configuration or template changes, run
-  `chezmoi --source "$PWD" apply --dry-run --verbose`.
+  `chezmoi --source "$PWD" apply --dry-run --verbose --force --no-pager`.
 - For `Makefile` changes, run `make help`, `make dry-run`, and `make managed`.
 - For `agent-skills.tsv` changes, run `make help` and the available skill-update dry run.
 - For shell or setup behavior, run the narrowest relevant shell or container check listed by

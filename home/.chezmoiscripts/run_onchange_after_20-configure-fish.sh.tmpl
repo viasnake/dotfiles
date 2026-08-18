@@ -3,7 +3,34 @@
 
 set -euo pipefail
 
-{{ include ".chezmoitemplates/dotfiles-nix-env.sh" -}}
+load_homebrew_env() {
+  local brew_bin
+
+  for brew_bin in \
+    /opt/homebrew/bin/brew \
+    /usr/local/bin/brew
+  do
+    if [[ -x "$brew_bin" ]]; then
+      eval "$("$brew_bin" shellenv)"
+      return
+    fi
+  done
+
+  return 1
+}
+
+add_fish_to_shells() {
+  local fish_path="$1"
+
+  if [[ "$(id -u)" -eq 0 ]]; then
+    printf '%s\n' "$fish_path" >>/etc/shells
+  elif command -v sudo >/dev/null 2>&1; then
+    printf '%s\n' "$fish_path" | sudo tee -a /etc/shells >/dev/null
+  else
+    printf 'dotfiles: sudo is required to add fish to /etc/shells.\n' >&2
+    exit 1
+  fi
+}
 
 current_login_shell() {
   local user_name="$1"
@@ -18,31 +45,30 @@ current_login_shell() {
   fi
 }
 
-change_login_shell() {
-  local fish_path="$1"
-  local user_name="$2"
-
-  if [[ "$(id -u)" -eq 0 ]]; then
-    chsh -s "$fish_path" "$user_name"
-  else
-    sudo chsh -s "$fish_path" "$user_name"
-  fi
-}
-
-load_nix_env
+load_homebrew_env || true
 
 if ! command -v fish >/dev/null 2>&1; then
-  exit 0
+  printf 'dotfiles: fish is unavailable after system package installation.\n' >&2
+  exit 1
 fi
 
 fish_path="$(command -v fish)"
 user_name="${USER:-$(id -un)}"
 
 if ! grep -qxF "$fish_path" /etc/shells; then
-  echo "$fish_path" | sudo tee -a /etc/shells >/dev/null
+  add_fish_to_shells "$fish_path"
 fi
 
 if [[ "$(current_login_shell "$user_name")" != "$fish_path" ]]; then
-  change_login_shell "$fish_path" "$user_name"
+  if [[ "$(id -u)" -eq 0 ]]; then
+    chsh -s "$fish_path" "$user_name"
+  elif [[ "$user_name" == "$(id -un)" ]]; then
+    chsh -s "$fish_path"
+  elif command -v sudo >/dev/null 2>&1; then
+    sudo chsh -s "$fish_path" "$user_name"
+  else
+    printf 'dotfiles: sudo is required to change the login shell for %s.\n' "$user_name" >&2
+    exit 1
+  fi
 fi
 {{ end -}}

@@ -1,0 +1,34 @@
+{{- if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") -}}
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+mise_path="$HOME/.local/bin/mise"
+
+if [[ -x "$mise_path" ]]; then
+  exit 0
+fi
+
+if command -v mise >/dev/null 2>&1; then
+  exit 0
+fi
+
+if ! command -v curl >/dev/null 2>&1; then
+  printf 'dotfiles: curl is required to install mise.\n' >&2
+  exit 1
+fi
+
+mkdir -p "$(dirname "$mise_path")"
+
+# Official mise installer; the installer selects the current release and writes
+# the standard user binary path without changing shell startup files.
+curl -fsSL https://mise.run | env \
+  MISE_INSTALL_PATH="$mise_path" \
+  MISE_INSTALL_SKIP_IF_EXISTS=1 \
+  sh
+
+if [[ ! -x "$mise_path" ]]; then
+  printf 'dotfiles: mise installation failed: %s was not created.\n' "$mise_path" >&2
+  exit 1
+fi
+{{ end -}}

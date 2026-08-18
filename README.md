@@ -26,6 +26,21 @@ cd dotfiles
 make init
 ```
 
+## Tool Ownership
+
+- chezmoi owns configuration deployment and orchestration.
+- The OS package manager owns system and bootstrap dependencies.
+- mise owns versioned user tools and language runtimes.
+- Fisher owns Fish plugins listed in `home/dot_config/fish/fish_plugins`.
+- Vendor-specific installers are used only when a tool requires its own distribution. Codex CLI uses OpenAI's standalone installer.
+
+On macOS, Homebrew is used only for system packages that are not provided by
+macOS, such as Fish and SQLite. It is not a general-purpose user CLI manager.
+
+The mise bootstrap writes `mise` to `~/.local/bin/mise` when no existing mise
+executable is available. The standard shell integrations in the managed Bash
+and Fish configuration expose that path and mise-managed tools.
+
 ## Local Settings
 
 User-specific chezmoi data belongs in:
@@ -87,9 +102,6 @@ make skills-check
 make skills-install
 make skills-update
 make skills-update-dry-run
-make nix-show
-make nix-check
-make nix-build-tools
 make test-shell-path
 make test-ubuntu-container
 make test-ubuntu24-container
@@ -98,37 +110,6 @@ make test-macos-docker-osx-preflight
 make test-macos-docker-osx-smoke
 make remove-managed
 ```
-
-## Tool Ownership
-
-Nix owns the bootstrap/system tool layer through:
-
-```text
-flake.nix
-flake.lock
-nix/README.md
-```
-
-The package setup script installs Nix when it is missing, then builds the
-`dotfiles-tools` profile at:
-
-```text
-~/.local/state/nix/profiles/dotfiles-tools
-```
-
-This profile provides shell-level tools such as `fish`, `fzf`, `ghq`,
-`gmailctl`, `jsonnet`, and `mise`. No separate package manager is part of the
-managed setup.
-
-Versioned CLIs and runtime tools remain in:
-
-```text
-home/dot_config/mise/config.toml
-```
-
-Prefer Nix for bootstrap tools that must exist before mise runs. Prefer mise
-for language runtimes and fast-moving development CLIs that benefit from
-per-tool version pins.
 
 ## Codex SQLite Diagnostic Logging
 
@@ -207,7 +188,7 @@ Use dry-runs before applying broad changes:
 
 ```bash
 make dry-run
-chezmoi --source "$PWD" apply --dry-run --verbose
+chezmoi --source "$PWD" apply --dry-run --verbose --force --no-pager
 ```
 
 For Ubuntu container checks:

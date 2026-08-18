@@ -3,15 +3,30 @@
 
 set -euo pipefail
 
-{{ include ".chezmoitemplates/dotfiles-nix-env.sh" -}}
+load_homebrew_env() {
+  local brew_bin
+
+  for brew_bin in \
+    /opt/homebrew/bin/brew \
+    /usr/local/bin/brew
+  do
+    if [[ -x "$brew_bin" ]]; then
+      eval "$("$brew_bin" shellenv)"
+      return
+    fi
+  done
+
+  return 1
+}
 
 plugins_file="$HOME/.config/fish/fish_plugins"
 # fish_plugins hash: {{ include "dot_config/fish/fish_plugins" | sha256sum }}
 
-load_nix_env
+load_homebrew_env || true
 
 if ! command -v fish >/dev/null 2>&1; then
-  exit 0
+  printf 'dotfiles: fish is unavailable; cannot install Fisher plugins.\n' >&2
+  exit 1
 fi
 
 ensure_fisher() {
