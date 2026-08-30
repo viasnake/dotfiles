@@ -1,4 +1,0 @@
-interface:
-  display_name: "Semantic Generation"
-  short_description: "Fix referents before drafting documents or names."
-  default_prompt: "Use $semantic-generation to prepare a referent table before drafting this design document."

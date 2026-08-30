@@ -15,13 +15,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Install dependencies
+      - name: Install syntax checkers
         run: |
           sudo apt-get update
-          sudo apt-get install -y fish
-          make ensure-chezmoi
+          sudo apt-get install -y fish shellcheck
 
-      - name: Run validation
+      - name: Validate shell and mise configuration
         run: |
-          make test-shell-path
-          make dry-run
+          bash -n install.sh config/bash/.bashrc
+          shellcheck install.sh config/bash/.bashrc
+          fish -n config/fish/config.fish config/fish/functions/fish_greeting.fish
+          python3 -c 'import pathlib, tomllib; tomllib.loads(pathlib.Path("config/mise/config.toml").read_text())'
+
+      - name: Smoke test installation
+        run: |
+          smoke_home="$(mktemp -d)"
+          mkdir -p "$smoke_home/.local/bin"
+          ln -s /bin/true "$smoke_home/.local/bin/mise"
+          ln -s /bin/true "$smoke_home/.local/bin/fish"
+          HOME="$smoke_home" PATH="$smoke_home/.local/bin:/usr/bin:/bin" ./install.sh
+          test "$(readlink "$smoke_home/.bashrc")" = "$GITHUB_WORKSPACE/config/bash/.bashrc"
+          test "$(readlink "$smoke_home/.config/mise/config.toml")" = "$GITHUB_WORKSPACE/config/mise/config.toml"
+          test "$(readlink "$smoke_home/.config/ghostty/config")" = "$GITHUB_WORKSPACE/config/ghostty/config"
+          test "$(stat -c '%a' "$smoke_home/.ssh")" = "700"
