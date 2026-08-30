@@ -15,12 +15,15 @@ link_file() {
 
   mkdir -p "$(dirname "$target_path")"
 
-  if [[ -d "$target_path" && ! -L "$target_path" ]]; then
-    printf 'dotfiles: cannot replace directory with file link: %s\n' "$target_path" >&2
+  if [[ -L "$target_path" ]]; then
+    ln -sfn "$source_path" "$target_path"
+  elif [[ -e "$target_path" ]]; then
+    printf 'dotfiles: refusing to replace existing non-symlink: %s\n' "$target_path" >&2
     exit 1
+  else
+    ln -s "$source_path" "$target_path"
   fi
 
-  ln -sfn "$source_path" "$target_path"
   info "linked $target_path"
 }
 
@@ -33,6 +36,59 @@ load_homebrew_path() {
       return
     fi
   done
+}
+
+ensure_fish() {
+  if command -v fish >/dev/null 2>&1; then
+    return
+  fi
+
+  case "$(uname -s)" in
+    Darwin)
+      if ! command -v brew >/dev/null 2>&1; then
+        if ! command -v curl >/dev/null 2>&1; then
+          printf 'dotfiles: curl is required to install Homebrew for Fish.\n' >&2
+          exit 1
+        fi
+
+        info "installing Homebrew for Fish"
+        curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh \
+          | NONINTERACTIVE=1 /bin/bash
+        load_homebrew_path
+      fi
+
+      info "installing Fish with Homebrew"
+      brew install fish
+      load_homebrew_path
+      ;;
+    Linux)
+      if ! command -v apt-get >/dev/null 2>&1; then
+        printf 'dotfiles: automatic Fish installation requires apt-get on Linux.\n' >&2
+        exit 1
+      fi
+
+      info "installing Fish with apt-get"
+      if [[ "$(id -u)" -eq 0 ]]; then
+        DEBIAN_FRONTEND=noninteractive apt-get update
+        DEBIAN_FRONTEND=noninteractive apt-get install -y fish
+      elif command -v sudo >/dev/null 2>&1; then
+        sudo env DEBIAN_FRONTEND=noninteractive apt-get update
+        sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y fish
+      else
+        printf 'dotfiles: sudo is required to install Fish with apt-get.\n' >&2
+        exit 1
+      fi
+      ;;
+    *)
+      printf 'dotfiles: automatic Fish installation is unsupported on %s.\n' "$(uname -s)" >&2
+      exit 1
+      ;;
+  esac
+
+  if ! command -v fish >/dev/null 2>&1; then
+    printf 'dotfiles: Fish installation completed without a usable fish command.\n' >&2
+    exit 1
+  fi
 }
 
 ensure_mise() {
@@ -60,11 +116,6 @@ ensure_mise() {
 }
 
 update_fisher_plugins() {
-  if ! command -v fish >/dev/null 2>&1; then
-    info "Fish is not installed; linked its configuration without installing plugins"
-    return
-  fi
-
   if ! fish -c 'functions -q fisher'; then
     if ! command -v curl >/dev/null 2>&1; then
       printf 'dotfiles: curl is required to install Fisher.\n' >&2
@@ -80,19 +131,20 @@ update_fisher_plugins() {
 }
 
 load_homebrew_path
-mkdir -p "$HOME/.local/bin" "$HOME/.config" "$HOME/.ssh/config.d"
-chmod 700 "$HOME/.ssh" "$HOME/.ssh/config.d"
 
 link_file "$ROOT/config/bash/.bashrc" "$HOME/.bashrc"
-link_file "$ROOT/config/fish/config.fish" "$HOME/.config/fish/config.fish"
-link_file "$ROOT/config/fish/fish_plugins" "$HOME/.config/fish/fish_plugins"
-link_file "$ROOT/config/fish/functions/fish_greeting.fish" "$HOME/.config/fish/functions/fish_greeting.fish"
 link_file "$ROOT/config/git/.gitconfig" "$HOME/.gitconfig"
 link_file "$ROOT/config/ssh/config" "$HOME/.ssh/config"
 link_file "$ROOT/config/ssh/config.d/00-base.conf" "$HOME/.ssh/config.d/00-base.conf"
+chmod 700 "$HOME/.ssh" "$HOME/.ssh/config.d"
+link_file "$ROOT/config/fish/config.fish" "$HOME/.config/fish/config.fish"
+link_file "$ROOT/config/fish/fish_plugins" "$HOME/.config/fish/fish_plugins"
+link_file "$ROOT/config/fish/functions/fish_greeting.fish" "$HOME/.config/fish/functions/fish_greeting.fish"
 link_file "$ROOT/config/ghostty/config" "$HOME/.config/ghostty/config"
 link_file "$ROOT/config/mise/config.toml" "$HOME/.config/mise/config.toml"
 
+mkdir -p "$HOME/.local/bin"
+ensure_fish
 export PATH="$HOME/.local/bin:$PATH"
 ensure_mise
 info "installing mise tools"

@@ -34,7 +34,18 @@ jobs:
           ln -s /bin/true "$smoke_home/.local/bin/mise"
           ln -s /bin/true "$smoke_home/.local/bin/fish"
           HOME="$smoke_home" PATH="$smoke_home/.local/bin:/usr/bin:/bin" ./install.sh
+          HOME="$smoke_home" PATH="$smoke_home/.local/bin:/usr/bin:/bin" ./install.sh
           test "$(readlink "$smoke_home/.bashrc")" = "$GITHUB_WORKSPACE/config/bash/.bashrc"
           test "$(readlink "$smoke_home/.config/mise/config.toml")" = "$GITHUB_WORKSPACE/config/mise/config.toml"
           test "$(readlink "$smoke_home/.config/ghostty/config")" = "$GITHUB_WORKSPACE/config/ghostty/config"
           test "$(stat -c '%a' "$smoke_home/.ssh")" = "700"
+
+          conflict_home="$(mktemp -d)"
+          touch "$conflict_home/.bashrc"
+          if HOME="$conflict_home" PATH="/usr/bin:/bin" ./install.sh >"$conflict_home/install.log" 2>&1; then
+            echo "install.sh replaced an existing non-symlink" >&2
+            exit 1
+          fi
+          test -f "$conflict_home/.bashrc"
+          test ! -L "$conflict_home/.bashrc"
+          grep -F "refusing to replace existing non-symlink" "$conflict_home/install.log"

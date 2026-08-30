@@ -10,9 +10,14 @@ cd dotfiles
 ./install.sh
 ```
 
-`install.sh` links the configuration, installs mise when needed, installs the
-configured mise tools, and updates Fisher plugins when Fish is available. Git
-and curl are required; install Fish separately if it is not already present.
+`install.sh` links the configuration, installs Fish when needed, installs mise
+and its configured tools, and updates Fisher plugins. Fish is installed with
+Homebrew on macOS and `apt-get` on Debian, Ubuntu, and WSL. Git and curl are
+required.
+
+Existing symlinks are updated. If a managed target is a regular file or
+directory, installation stops without replacing it; review and move that file
+yourself before running `install.sh` again.
 
 ## Managed configuration
 
