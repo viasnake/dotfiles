@@ -1,0 +1,8 @@
+[include]
+  path = ~/.gitconfig.local
+
+[alias]
+  vacuum = "!f () { git checkout $1; git branch --merged | grep -Ev '\\*|develop|main|master' | xargs git branch -d; }; f"
+
+[credential "https://github.com"]
+  helper = !gh auth git-credential
