@@ -1,31 +1,37 @@
-# Fish configuration for terminal sessions.
-
-if test -x /opt/homebrew/bin/brew
-  eval (/opt/homebrew/bin/brew shellenv)
-else if test -x /usr/local/bin/brew
-  eval (/usr/local/bin/brew shellenv)
+# Fish is the human interface. Child processes should see Bash / zsh as SHELL.
+switch "$SHELL"
+  case '*/bash' '*/zsh' '*/sh'
+    # Keep the inherited system shell.
+  case '*'
+    if test (uname -s) = Darwin
+      set -gx SHELL /bin/zsh
+    else
+      set -gx SHELL /bin/bash
+    end
 end
 
-if test -d "$HOME/.local/bin"; and not contains -- "$HOME/.local/bin" $PATH
-  set -gx PATH "$HOME/.local/bin" $PATH
+for bin in /home/linuxbrew/.linuxbrew/bin /usr/local/bin /opt/homebrew/bin "$HOME/.local/bin"
+  fish_add_path --global --path "$bin"
 end
+set -l mise_data "$HOME/.local/share/mise"
+if set -q MISE_DATA_DIR
+  set mise_data "$MISE_DATA_DIR"
+end
+fish_add_path --global --path "$mise_data/shims"
 
 if test -f "$HOME/.config/env.local.fish"
   source "$HOME/.config/env.local.fish"
 end
 
-if command -q mise
-  mise activate fish | source
-end
-
 if status is-interactive
+  if command -q mise
+    mise activate fish | source
+  end
   if command -q zoxide
     zoxide init fish --cmd cd | source
   end
-
   if command -q fzf
     fzf --fish | source
   end
-
-  set --universal pure_show_system_time true
+  set -g pure_show_system_time true
 end

@@ -1,3 +1,7 @@
 theme = Chester
 font-family = Firge35Nerd Console
 font-feature = -dlig
+
+# Load the POSIX environment, then start the human-facing shell.
+command = /bin/bash -lc 'exec fish'
+shell-integration = fish

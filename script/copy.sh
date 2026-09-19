@@ -81,7 +81,12 @@ copy_file() {
   printf 'dotfiles: copied %s\n' "$target"
 }
 
+copy_file "$ROOT/config/shell/env.sh" "$HOME/.config/shell/env.sh"
+copy_file "$ROOT/config/bash/.bash_profile" "$HOME/.bash_profile"
 copy_file "$ROOT/config/bash/.bashrc" "$HOME/.bashrc"
+copy_file "$ROOT/config/zsh/.zshenv" "$HOME/.zshenv"
+copy_file "$ROOT/config/zsh/.zprofile" "$HOME/.zprofile"
+copy_file "$ROOT/config/zsh/.zshrc" "$HOME/.zshrc"
 copy_file "$ROOT/config/git/.gitconfig" "$HOME/.gitconfig"
 copy_file "$ROOT/config/ssh/config" "$HOME/.ssh/config"
 copy_file "$ROOT/config/ssh/config.d/00-base.conf" "$HOME/.ssh/config.d/00-base.conf"
