@@ -1,0 +1,12 @@
+capture_input = false
+recording_required = true
+flush_interval_ms = 1000
+
+# Explicit shell overrides $SHELL / the account login shell.
+# [shell]
+# command = "/bin/bash"
+# args = ["-l"]
+
+[storage]
+retention_days = 0
+# path = "/absolute/private/path/termlog"

@@ -93,7 +93,7 @@ copy_file "$ROOT/config/ssh/config.d/00-base.conf" "$HOME/.ssh/config.d/00-base.
 copy_file "$ROOT/config/fish/config.fish" "$HOME/.config/fish/config.fish"
 copy_file "$ROOT/config/fish/fish_plugins" "$HOME/.config/fish/fish_plugins"
 copy_file "$ROOT/config/fish/functions/fish_greeting.fish" "$HOME/.config/fish/functions/fish_greeting.fish"
-copy_file "$ROOT/config/ghostty/config" "$HOME/.config/ghostty/config"
+copy_file "$ROOT/config/termlog/config.toml" "$HOME/.config/termlog/config.toml"
 copy_file "$ROOT/config/mise/config.toml" "$HOME/.config/mise/config.toml"
 
 if [[ "$pending" -gt 0 ]]; then
