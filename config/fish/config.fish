@@ -23,6 +23,8 @@ if test -f "$HOME/.config/env.local.fish"
   source "$HOME/.config/env.local.fish"
 end
 
+set -g pure_show_system_time true
+
 if status is-interactive
   if command -q mise
     mise activate fish | source
@@ -33,5 +35,4 @@ if status is-interactive
   if command -q fzf
     fzf --fish | source
   end
-  set -g pure_show_system_time true
 end
