@@ -1,0 +1,4 @@
+interface:
+  display_name: "Japanese Writing Humanizer"
+  short_description: "LLM臭さと冗長さを抜き、読み手に自然な日本語へ整える"
+  default_prompt: "Use $ja-writing-humanizer to この下書きの意味と事実を保ったまま、LLM臭さと冗長さを抜いて、自然な日本語に整えてください。"
