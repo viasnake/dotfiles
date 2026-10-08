@@ -16,7 +16,7 @@ Install Alacritty and the `Firge35Nerd Console` font separately if you use them.
 
 ```sh
 ./install.sh install    # Default when no action is given
-./install.sh reinstall  # Reinstall mise-managed tools, Codex, and termlog
+./install.sh reinstall  # Reinstall mise-managed tools, Codex, Pi, and termlog
 ./install.sh update     # Update tools within the configured version constraints
 ./install.sh uninstall  # Remove managed configuration files; remove is an alias
 ```
@@ -24,7 +24,7 @@ Install Alacritty and the `Firge35Nerd Console` font separately if you use them.
 Install, reinstall, and update all apply the repository configuration with review
 and backup. Unresolved differences stop the operation without rolling back earlier
 changes. Update preserves exact version pins; change `config/mise/config.toml` to
-advance them. Reinstall and update refresh Codex, Fisher plugins, and termlog and
+advance them. Reinstall and update refresh Codex, Pi, Fisher plugins, and termlog and
 update mise itself when selected as a regular binary at `~/.local/bin/mise`. Fish
 and a mise installed elsewhere or symlinked remain managed by their original
 package manager.
@@ -47,9 +47,18 @@ for manual restoration.
 
 ## AI agents
 
-Setup installs Codex and OpenCode and copies their settings, instructions, agent
-definitions, and the bundled `ja-writing-humanizer` skill for both agents.
+Setup installs Codex, Pi, and OpenCode. Codex remains the general-purpose agent; Pi is the coding agent. OpenCode is retained during migration. Pi uses a minimal global `AGENTS.md`; authentication and session data are not managed by dotfiles. The bundled `ja-writing-humanizer` skill continues to be installed for Codex and OpenCode.
 Set `CONTEXT7_API_KEY` in your local environment for OpenCode's Context7 integration.
+
+On the development VM, start Pi from the repository root in tmux:
+
+```sh
+tmux new -s coding
+cd ~/src/my-project
+pi
+```
+
+Use `/login` in Pi to authenticate, `/model` to select a model, and `pi -c` to resume the last session. Pi does not require MCP, extensions, or a web frontend for this setup. Uninstalling dotfiles does not uninstall the Pi executable.
 
 Changes made by agents to installed settings must be reviewed and copied back
 here to keep them.
