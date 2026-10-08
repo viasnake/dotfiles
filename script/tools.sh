@@ -59,6 +59,23 @@ tools_install_codex() {
   fi
 }
 
+tools_install_pi() {
+  local action="${1:-install}"
+  if [[ "$action" == install ]] && command -v pi >/dev/null 2>&1; then
+    return
+  fi
+  # npm is provided by mise-managed Node.js.
+  if ! command -v npm >/dev/null 2>&1; then
+    log_error 'npm is required to install Pi.'
+    return 1
+  fi
+  npm install --global @mariozechner/pi-coding-agent
+  if ! command -v pi >/dev/null 2>&1; then
+    log_error 'Pi installation failed: pi is not on PATH.'
+    return 1
+  fi
+}
+
 tools_install_fisher() {
   if ! fish -c 'functions -q fisher'; then
     curl -fsSL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish \
@@ -85,6 +102,7 @@ tools_install() {
   packages_ensure_command fish fish
   tools_install_mise "$action"
   tools_install_codex "$action"
+  tools_install_pi "$action"
   tools_install_fisher
   tools_install_termlog
   tools_verify_termlog "$HOME/.local/bin/termlog"
