@@ -31,11 +31,13 @@ config_terminal_files() {
 config_agent_files() {
   local operation="${1:-files_copy}"
   local codex_home="${CODEX_HOME:-$HOME/.codex}"
+  local pi_home="${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}"
   local opencode_home="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
   local skill_file
 
   "$operation" "$DOTFILES_ROOT/config/codex/AGENTS.md" "$codex_home/AGENTS.md"
   "$operation" "$DOTFILES_ROOT/config/codex/config.toml" "$codex_home/config.toml"
+  "$operation" "$DOTFILES_ROOT/config/pi/AGENTS.md" "$pi_home/AGENTS.md"
   "$operation" "$DOTFILES_ROOT/config/opencode/AGENTS.md" "$opencode_home/AGENTS.md"
   "$operation" "$DOTFILES_ROOT/config/opencode/agents/architect.md" "$opencode_home/agents/architect.md"
   "$operation" "$DOTFILES_ROOT/config/opencode/agents/build.md" "$opencode_home/agents/build.md"
