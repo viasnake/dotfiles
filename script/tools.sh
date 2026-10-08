@@ -61,17 +61,20 @@ tools_install_codex() {
 
 tools_install_pi() {
   local action="${1:-install}"
-  if [[ "$action" == install ]] && command -v pi >/dev/null 2>&1; then
-    return
-  fi
-  # npm is provided by mise-managed Node.js.
-  if ! command -v npm >/dev/null 2>&1; then
-    log_error 'npm is required to install Pi.'
+  # Run npm through mise so fresh installations do not depend on shell activation.
+  if ! mise exec -- npm --version >/dev/null 2>&1; then
+    log_error 'mise-managed npm is required to install Pi.'
     return 1
   fi
-  npm install --global @mariozechner/pi-coding-agent
-  if ! command -v pi >/dev/null 2>&1; then
-    log_error 'Pi installation failed: pi is not on PATH.'
+
+  # Verify the package itself rather than trusting any command named pi on PATH.
+  if [[ "$action" == install ]] && mise exec -- npm list --global --depth=0 @mariozechner/pi-coding-agent >/dev/null 2>&1; then
+    return
+  fi
+
+  mise exec -- npm install --global @mariozechner/pi-coding-agent
+  if ! mise exec -- npm list --global --depth=0 @mariozechner/pi-coding-agent >/dev/null 2>&1; then
+    log_error 'Pi package verification failed.'
     return 1
   fi
 }
